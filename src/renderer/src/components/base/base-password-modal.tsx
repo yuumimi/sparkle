@@ -6,7 +6,7 @@ import {
   ModalFooter,
   Button,
   Input
-} from '@nextui-org/react'
+} from '@heroui/react'
 import React, { useState } from 'react'
 
 interface Props {
@@ -21,7 +21,7 @@ const BasePasswordModal: React.FC<Props> = (props) => {
   return (
     <Modal backdrop="blur" classNames={{ backdrop: 'top-[48px]' }} hideCloseButton isOpen={true}>
       <ModalContent>
-        <ModalHeader className="flex app-drag">请输入root密码</ModalHeader>
+        <ModalHeader className="flex app-drag">请输入 root 密码</ModalHeader>
         <ModalBody>
           <Input fullWidth type="password" value={password} onValueChange={setPassword} />
         </ModalBody>

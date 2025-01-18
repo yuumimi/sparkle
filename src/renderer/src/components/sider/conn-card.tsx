@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardFooter, Tooltip } from '@nextui-org/react'
+import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import { FaCircleArrowDown, FaCircleArrowUp } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { calcTraffic } from '@renderer/utils/calc'
@@ -48,8 +48,8 @@ const ConnCard: React.FC<Props> = (props) => {
   useEffect(() => {
     setChartColor(
       match
-        ? `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--nextui-primary-foreground')})`
-        : `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--nextui-foreground')})`
+        ? `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--heroui-primary-foreground')})`
+        : `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--heroui-foreground')})`
     )
   }, [theme, systemTheme, match])
 
@@ -57,8 +57,8 @@ const ConnCard: React.FC<Props> = (props) => {
     setTimeout(() => {
       setChartColor(
         match
-          ? `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--nextui-primary-foreground')})`
-          : `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--nextui-foreground')})`
+          ? `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--heroui-primary-foreground')})`
+          : `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--heroui-foreground')})`
       )
     }, 200)
   }, [customTheme])
