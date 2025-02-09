@@ -49,7 +49,7 @@ chokidar.watch(path.join(mihomoCoreDir(), 'meta-update'), {}).on('unlinkDir', as
 })
 
 export const mihomoIpcPath =
-  process.platform === 'win32' ? '\\\\.\\pipe\\MihomoParty\\mihomo' : '/tmp/mihomo-party.sock'
+  process.platform === 'win32' ? '\\\\.\\pipe\\Party\\mihomo' : '/tmp/party.sock'
 const ctlParam = process.platform === 'win32' ? '-ext-ctl-pipe' : '-ext-ctl-unix'
 
 let setPublicDNSTimer: NodeJS.Timeout | null = null
@@ -64,8 +64,6 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     diffWorkDir = false,
     mihomoCpuPriority = 'PRIORITY_NORMAL',
     disableLoopbackDetector = false,
-    disableEmbedCA = false,
-    disableSystemCA = false,
     skipSafePathCheck = false
   } = await getAppConfig()
   const { 'log-level': logLevel } = await getControledMihomoConfig()
@@ -97,9 +95,8 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
   const stdout = createWriteStream(logPath(), { flags: 'a' })
   const stderr = createWriteStream(logPath(), { flags: 'a' })
   const env = {
+    ...process.env,
     DISABLE_LOOPBACK_DETECTOR: String(disableLoopbackDetector),
-    DISABLE_EMBED_CA: String(disableEmbedCA),
-    DISABLE_SYSTEM_CA: String(disableSystemCA),
     SKIP_SAFE_PATH_CHECK: String(skipSafePathCheck)
   }
   child = spawn(

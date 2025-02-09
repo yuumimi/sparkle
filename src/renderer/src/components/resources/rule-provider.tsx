@@ -28,7 +28,7 @@ const RuleProvider: React.FC = () => {
     if (showDetails.title) {
       const fetchProviderPath = async (name: string): Promise<void> => {
         try {
-          const providers= await getRuntimeConfig()
+          const providers = await getRuntimeConfig()
           const provider = providers['rule-providers'][name]
           if (provider) {
             setShowDetails((prev) => ({
@@ -49,13 +49,8 @@ const RuleProvider: React.FC = () => {
   const providers = useMemo(() => {
     if (!data) return []
     return Object.values(data.providers).sort((a, b) => {
-      if (a.vehicleType === 'File' && b.vehicleType !== 'File') {
-        return -1
-      }
-      if (a.vehicleType !== 'File' && b.vehicleType === 'File') {
-        return 1
-      }
-      return 0
+      const order = { File: 1, Inline: 2, HTTP: 3 }
+      return (order[a.vehicleType] || 4) - (order[b.vehicleType] || 4)
     })
   }, [data])
   const [updating, setUpdating] = useState(Array(providers.length).fill(false))
@@ -119,7 +114,7 @@ const RuleProvider: React.FC = () => {
           >
             <div className="flex h-[32px] leading-[32px] text-foreground-500">
               <div>{dayjs(provider.updatedAt).fromNow()}</div>
-              {provider.format !== 'MrsRule' && (
+              {provider.format !== 'MrsRule' && provider.vehicleType !== 'Inline' &&  (
                 <Button
                   isIconOnly
                   title={provider.vehicleType == 'File' ? '编辑' : '查看'}

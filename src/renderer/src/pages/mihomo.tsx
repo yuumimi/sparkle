@@ -30,9 +30,8 @@ const Mihomo: React.FC = () => {
     maxLogDays = 7,
     sysProxy,
     disableLoopbackDetector,
-    disableEmbedCA,
-    disableSystemCA,
-    skipSafePathCheck } = appConfig || {}
+    skipSafePathCheck
+  } = appConfig || {}
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
   const {
     ipv6,
@@ -660,24 +659,6 @@ const Mihomo: React.FC = () => {
               isSelected={skipSafePathCheck}
               onValueChange={(v) => {
                 handleConfigChangeWithRestart('skipSafePathCheck', v)
-              }}
-            />
-          </SettingItem>
-          <SettingItem title="不使用内置 CA 证书" divider>
-            <Switch
-              size="sm"
-              isSelected={disableEmbedCA}
-              onValueChange={(v) => {
-                handleConfigChangeWithRestart('disableEmbedCA', v)
-              }}
-            />
-          </SettingItem>
-          <SettingItem title="不使用系统 CA 证书" divider>
-            <Switch
-              size="sm"
-              isSelected={disableSystemCA}
-              onValueChange={(v) => {
-                handleConfigChangeWithRestart('disableSystemCA', v)
               }}
             />
           </SettingItem>

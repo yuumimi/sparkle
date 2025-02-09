@@ -256,11 +256,14 @@ interface ISysProxyConfig {
   pacScript?: string
 }
 
+interface IHost {
+  domain: string
+  value: string | string[]
+}
+
 interface IAppConfig {
   core: 'mihomo' | 'mihomo-alpha'
   disableLoopbackDetector: boolean
-  disableEmbedCA: boolean
-  disableSystemCA: boolean
   skipSafePathCheck: boolean
   proxyDisplayMode: 'simple' | 'full'
   proxyDisplayOrder: 'default' | 'delay' | 'name'
@@ -308,7 +311,6 @@ interface IAppConfig {
   appTheme: AppTheme
   customTheme?: string
   autoCheckUpdate: boolean
-  updateChannel: string
   silentStart: boolean
   autoCloseConnection: boolean
   sysProxy: ISysProxyConfig
@@ -328,6 +330,7 @@ interface IAppConfig {
   webdavPassword?: string
   useNameserverPolicy: boolean
   nameserverPolicy: { [key: string]: string | string[] }
+  hosts: IHost[]
   showWindowShortcut?: string
   showFloatingWindowShortcut?: string
   triggerSysProxyShortcut?: string
