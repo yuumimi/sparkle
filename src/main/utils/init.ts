@@ -156,7 +156,8 @@ async function migration(): Promise<void> {
     useSubStore = true,
     showFloatingWindow = false,
     disableTray = false,
-    encryptedPassword
+    encryptedPassword,
+    hosts = [],
   } = await getAppConfig()
   const {
     'external-controller-pipe': externalControllerPipe,
@@ -191,6 +192,10 @@ async function migration(): Promise<void> {
   // add default lan disallowed ips
   if (!lanDisallowedIps) {
     await patchControledMihomoConfig({ 'lan-disallowed-ips': [] })
+  }
+  // add default hosts
+  if (!hosts.length) {
+    await patchAppConfig({ hosts: [] })
   }
   // remove custom app theme
   if (!['system', 'light', 'dark'].includes(appTheme)) {
