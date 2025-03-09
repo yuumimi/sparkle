@@ -104,13 +104,17 @@ jobs:
           path: bin/
           merge-multiple: true
 
-      - name: Delete Pre-release
+      - name: Delete current release assets
+        uses: 8Mi-Tech/delete-release-assets-action@main
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tag: pre-release
+          deleteOnlyFromDrafts: false
+
+      - name: Create Changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if ! gh release delete pre-release --yes; then
-            echo "Failed to delete release, but continuing..."
-          fi
           git log -1 --pretty=format:"%s%n%b" > changelog.md
 
       - name: Publish Prerelease
