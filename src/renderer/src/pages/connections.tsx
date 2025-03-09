@@ -101,8 +101,13 @@ const Connections: React.FC = () => {
         const preConn = activeConnections.find((c) => c.id === conn.id)
         const downloadSpeed = preConn ? conn.download - preConn.download : 0
         const uploadSpeed = preConn ? conn.upload - preConn.upload : 0
+        const metadata = {
+          ...conn.metadata,
+          ...((!conn.metadata.sourceIP) && { process: 'mohomo' })
+        }
         return {
           ...conn,
+          metadata,
           isActive: true,
           downloadSpeed: downloadSpeed,
           uploadSpeed: uploadSpeed
