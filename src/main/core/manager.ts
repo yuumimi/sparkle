@@ -148,6 +148,12 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
         reject('虚拟网卡启动失败，请尝试手动授予内核权限')
       }
 
+      if ((process.platform !== 'win32' && str.includes('External controller unix listen error')) ||
+        (process.platform === 'win32' && str.includes('External controller pipe listen error'))
+      ) {
+        reject('控制器监听错误')
+      }
+
       if (
         (process.platform !== 'win32' && str.includes('RESTful API unix listening at')) ||
         (process.platform === 'win32' && str.includes('RESTful API pipe listening at'))
