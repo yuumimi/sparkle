@@ -21,7 +21,7 @@ const InterfaceSelect: React.FC<{
       size="sm"
       className="w-[300px]"
       selectedKeys={new Set([value])}
-      disallowEmptySelection={false}
+      disallowEmptySelection={true}
       onSelectionChange={(v) => onChange(v.currentKey as string)}
     >
       <SelectItem key="">禁用</SelectItem>
