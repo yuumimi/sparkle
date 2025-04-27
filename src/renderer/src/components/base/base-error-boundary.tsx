@@ -1,5 +1,5 @@
 import { Button } from '@heroui/react'
-import { ReactNode } from 'react'
+import { JSX, ReactNode } from 'react'
 import { ErrorBoundary, FallbackProps } from 'react-error-boundary'
 
 const ErrorFallback = ({ error }: FallbackProps): JSX.Element => {
@@ -13,18 +13,9 @@ const ErrorFallback = ({ error }: FallbackProps): JSX.Element => {
         size="sm"
         color="primary"
         variant="flat"
-        onPress={() => open('https://github.com/mihomo-party-org/mihomo-party/issues/new/choose')}
+        onPress={() => open('https://github.com/xishang0128/sparkle/issues/new/choose')}
       >
         GitHub
-      </Button>
-      <Button
-        size="sm"
-        color="primary"
-        variant="flat"
-        className="ml-2"
-        onPress={() => open('https://t.me/mihomo_party_group')}
-      >
-        Telegram
       </Button>
 
       <Button

@@ -9,7 +9,7 @@ import { useAppConfig } from '@renderer/hooks/use-app-config'
 
 const WebdavConfig: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
-  const { webdavUrl, webdavUsername, webdavPassword, webdavDir = 'mihomo-party' } = appConfig || {}
+  const { webdavUrl, webdavUsername, webdavPassword, webdavDir = 'sparkle' } = appConfig || {}
   const [backuping, setBackuping] = useState(false)
   const [restoring, setRestoring] = useState(false)
   const [filenames, setFilenames] = useState<string[]>([])
@@ -38,7 +38,7 @@ const WebdavConfig: React.FC = () => {
       setFilenames(filenames)
       setRestoreOpen(true)
     } catch (e) {
-      alert(`获取备份列表失败: ${e}`)
+      alert(`获取备份列表失败：${e}`)
     } finally {
       setRestoring(false)
     }

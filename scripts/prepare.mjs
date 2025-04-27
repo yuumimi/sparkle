@@ -273,7 +273,7 @@ const resolveSysproxy = () =>
   })
 const resolveRunner = () =>
   resolveResource({
-    file: 'mihomo-party-run.exe',
+    file: 'sparkle-run.exe',
     downloadURL: `https://github.com/mihomo-party-org/mihomo-party-run/releases/download/${arch}/mihomo-party-run.exe`
   })
 
@@ -311,7 +311,7 @@ const resolveSubstore = () =>
   })
 const resolveHelper = () =>
   resolveResource({
-    file: 'party.mihomo.helper',
+    file: 'sparkle.helper',
     downloadURL: `https://github.com/mihomo-party-org/mihomo-party-helper/releases/download/${arch}/party.mihomo.helper`
   })
 const resolveSubstoreFrontend = async () => {

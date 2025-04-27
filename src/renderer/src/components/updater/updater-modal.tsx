@@ -44,7 +44,7 @@ const UpdaterModal: React.FC<Props> = (props) => {
             size="sm"
             className="flex app-nodrag"
             onPress={() => {
-              open(`https://github.com/xishang0128/mihomo-party/releases/tag/${version}`)
+              open(`https://github.com/xishang0128/sparkle/releases/tag/${version}`)
             }}
           >
             前往下载

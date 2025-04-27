@@ -1,5 +1,5 @@
-appId: party.mihomo.app
-productName: Mihomo Party
+appId: sparkle.app
+productName: Sparkle
 directories:
   buildResources: build
 files:
@@ -19,7 +19,7 @@ extraResources:
   - from: './extra/'
     to: ''
 protocols:
-  name: 'Mihomo Party URI Scheme'
+  name: 'Sparkle URI Scheme'
   schemes:
     - 'clash'
     - 'mihomo'
@@ -54,12 +54,12 @@ pkg:
     file: build/background.png
 linux:
   desktop:
-    Name: Mihomo Party
+    Name: Sparkle
     MimeType: 'x-scheme-handler/clash;x-scheme-handler/mihomo'
   target:
     - deb
     - rpm
-  maintainer: mihomo-party-org
+  maintainer: xishang0128
   category: Utility
   artifactName: ${name}-linux-${version}-${arch}.${ext}
 deb:

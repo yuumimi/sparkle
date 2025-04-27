@@ -13,7 +13,7 @@ import { promisify } from 'util'
 export async function checkUpdate(): Promise<IAppVersion | undefined> {
   const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
   const res = await axios.get(
-    'https://github.com/xishang0128/mihomo-party/releases/latest/download/latest.yml',
+    'https://github.com/xishang0128/sparkle/releases/latest/download/latest.yml',
     {
       headers: { 'Content-Type': 'application/octet-stream' },
       proxy: {
@@ -35,12 +35,12 @@ export async function checkUpdate(): Promise<IAppVersion | undefined> {
 
 export async function downloadAndInstallUpdate(version: string): Promise<void> {
   const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
-  const baseUrl = `https://github.com/xishang0128/mihomo-party/releases/download/${version}/`
+  const baseUrl = `https://github.com/xishang0128/sparkle/releases/download/${version}/`
   const fileMap = {
-    'win32-x64': `mihomo-party-windows-${version}-x64-setup.exe`,
-    'win32-arm64': `mihomo-party-windows-${version}-arm64-setup.exe`,
-    'darwin-x64': `mihomo-party-macos-${version}-x64.pkg`,
-    'darwin-arm64': `mihomo-party-macos-${version}-arm64.pkg`
+    'win32-x64': `sparkle-windows-${version}-x64-setup.exe`,
+    'win32-arm64': `sparkle-windows-${version}-arm64-setup.exe`,
+    'darwin-x64': `sparkle-macos-${version}-x64.pkg`,
+    'darwin-arm64': `sparkle-macos-${version}-arm64.pkg`
   }
   let file = fileMap[`${process.platform}-${process.arch}`]
   if (isPortable()) {

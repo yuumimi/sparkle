@@ -86,8 +86,8 @@ jobs:
         with:
           name: ${{ matrix.os }}-${{ matrix.arch }}
           path: |
-            dist/mihomo-party*
-            !dist/mihomo-party*blockmap
+            dist/sparkle*
+            !dist/sparkle*blockmap
             latest.yml
             changelog.md
 
