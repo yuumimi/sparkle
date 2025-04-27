@@ -1,6 +1,6 @@
 import { getAppConfig, getControledMihomoConfig } from '../config'
 import { Worker } from 'worker_threads'
-import { mihomoWorkDir, resourcesFilesDir, subStoreDir, substoreLogPath } from '../utils/dirs'
+import { mihomoWorkDir, subStoreDir, substoreLogPath } from '../utils/dirs'
 import subStoreIcon from '../../../resources/subStoreIcon.png?asset'
 import { createWriteStream, existsSync, mkdirSync } from 'fs'
 import { writeFile, rm, cp } from 'fs/promises'
@@ -77,7 +77,7 @@ export async function startSubStoreFrontendServer(): Promise<void> {
   await stopSubStoreFrontendServer()
   subStoreFrontendPort = await findAvailablePort(14122)
   const app = express()
-  app.use(express.static(path.join(resourcesFilesDir(), 'sub-store-frontend')))
+  app.use(express.static(path.join(mihomoWorkDir(), 'sub-store-frontend')))
   subStoreFrontendServer = app.listen(subStoreFrontendPort, subStoreHost)
 }
 
@@ -118,7 +118,7 @@ export async function startSubStoreBackendServer(): Promise<void> {
       SUB_STORE_MMDB_COUNTRY_PATH: path.join(mihomoWorkDir(), 'country.mmdb'),
       SUB_STORE_MMDB_ASN_PATH: path.join(mihomoWorkDir(), 'ASN.mmdb')
     }
-    subStoreBackendWorker = new Worker(path.join(resourcesFilesDir(), 'sub-store.bundle.js'), {
+    subStoreBackendWorker = new Worker(path.join(mihomoWorkDir(), 'sub-store.bundle.js'), {
       env: useProxyInSubStore
         ? {
             ...env,
@@ -141,9 +141,9 @@ export async function stopSubStoreBackendServer(): Promise<void> {
 
 export async function downloadSubStore(): Promise<void> {
   const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
-  const frontendDir = path.join(resourcesFilesDir(), 'sub-store-frontend')
-  const backendPath = path.join(resourcesFilesDir(), 'sub-store.bundle.js')
-  const tempDir = path.join(resourcesFilesDir(), 'temp')
+  const frontendDir = path.join(mihomoWorkDir(), 'sub-store-frontend')
+  const backendPath = path.join(mihomoWorkDir(), 'sub-store.bundle.js')
+  const tempDir = path.join(mihomoWorkDir(), 'temp')
 
   try {
     // 下载后端文件
