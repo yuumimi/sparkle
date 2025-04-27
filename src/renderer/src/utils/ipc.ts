@@ -211,10 +211,8 @@ export async function triggerSysProxy(enable: boolean): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('triggerSysProxy', enable))
 }
 
-export async function manualGrantCorePermition(password?: string): Promise<void> {
-  return ipcErrorWrapper(
-    await window.electron.ipcRenderer.invoke('manualGrantCorePermition', password)
-  )
+export async function manualGrantCorePermition(): Promise<void> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('manualGrantCorePermition'))
 }
 
 export async function getFilePath(ext: string[]): Promise<string[] | undefined> {

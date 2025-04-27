@@ -6,7 +6,6 @@ import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-c
 import { manualGrantCorePermition, restartCore, setupFirewall } from '@renderer/utils/ipc'
 import { platform } from '@renderer/utils/init'
 import React, { Key, useState } from 'react'
-import BasePasswordModal from '@renderer/components/base/base-password-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { MdDeleteForever } from 'react-icons/md'
 
@@ -16,7 +15,6 @@ const Tun: React.FC = () => {
   const { autoSetDNS = true } = appConfig || {}
   const { tun } = controledMihomoConfig || {}
   const [loading, setLoading] = useState(false)
-  const [openPasswordModal, setOpenPasswordModal] = useState(false)
   const {
     device = 'Mihomo',
     stack = 'mixed',
@@ -69,21 +67,6 @@ const Tun: React.FC = () => {
 
   return (
     <>
-      {openPasswordModal && (
-        <BasePasswordModal
-          onCancel={() => setOpenPasswordModal(false)}
-          onConfirm={async (password: string) => {
-            try {
-              await manualGrantCorePermition(password)
-              new Notification('内核授权成功')
-              await restartCore()
-              setOpenPasswordModal(false)
-            } catch (e) {
-              alert(e)
-            }
-          }}
-        />
-      )}
       <BasePage
         title="虚拟网卡设置"
         header={
@@ -143,16 +126,12 @@ const Tun: React.FC = () => {
                 size="sm"
                 color="primary"
                 onPress={async () => {
-                  if (platform === 'darwin') {
-                    try {
-                      await manualGrantCorePermition()
-                      new Notification('内核授权成功')
-                      await restartCore()
-                    } catch (e) {
-                      alert(e)
-                    }
-                  } else {
-                    setOpenPasswordModal(true)
+                  try {
+                    await manualGrantCorePermition()
+                    new Notification('内核授权成功')
+                    await restartCore()
+                  } catch (e) {
+                    alert(e)
                   }
                 }}
               >

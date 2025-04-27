@@ -175,9 +175,7 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('restartCore', ipcErrorWrapper(restartCore))
   ipcMain.handle('startMonitor', (_e, detached) => ipcErrorWrapper(startMonitor)(detached))
   ipcMain.handle('triggerSysProxy', (_e, enable) => ipcErrorWrapper(triggerSysProxy)(enable))
-  ipcMain.handle('manualGrantCorePermition', (_e, password) =>
-    ipcErrorWrapper(manualGrantCorePermition)(password)
-  )
+  ipcMain.handle('manualGrantCorePermition', () => ipcErrorWrapper(manualGrantCorePermition)())
   ipcMain.handle('getFilePath', (_e, ext) => getFilePath(ext))
   ipcMain.handle('readTextFile', (_e, filePath) => ipcErrorWrapper(readTextFile)(filePath))
   ipcMain.handle('getRuntimeConfigStr', ipcErrorWrapper(getRuntimeConfigStr))
