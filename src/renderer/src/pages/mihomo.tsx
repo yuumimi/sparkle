@@ -25,7 +25,7 @@ const CoreMap = {
 
 const Mihomo: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
-  const { 
+  const {
     core = 'mihomo',
     maxLogDays = 7,
     sysProxy,
@@ -132,6 +132,7 @@ const Mihomo: React.FC = () => {
               className="w-[100px]"
               size="sm"
               selectedKeys={new Set([core])}
+              disallowEmptySelection={true}
               onSelectionChange={async (v) => {
                 handleConfigChangeWithRestart('core', v.currentKey as 'mihomo' | 'mihomo-alpha')
               }}
@@ -679,6 +680,7 @@ const Mihomo: React.FC = () => {
               className="w-[100px]"
               size="sm"
               selectedKeys={new Set([logLevel])}
+              disallowEmptySelection={true}
               onSelectionChange={(v) => {
                 onChangeNeedRestart({ 'log-level': v.currentKey as LogLevel })
               }}
@@ -696,6 +698,7 @@ const Mihomo: React.FC = () => {
               className="w-[100px]"
               size="sm"
               selectedKeys={new Set([findProcessMode])}
+              disallowEmptySelection={true}
               onSelectionChange={(v) => {
                 onChangeNeedRestart({ 'find-process-mode': v.currentKey as FindProcessMode })
               }}

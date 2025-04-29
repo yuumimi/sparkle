@@ -238,6 +238,7 @@ const Connections: React.FC = () => {
             size="sm"
             className="w-[180px] min-w-[120px]"
             selectedKeys={new Set([connectionOrderBy])}
+            disallowEmptySelection={true}
             onSelectionChange={async (v) => {
               await patchAppConfig({
                 connectionOrderBy: v.currentKey as

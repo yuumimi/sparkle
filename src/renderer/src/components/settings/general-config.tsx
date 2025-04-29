@@ -183,6 +183,7 @@ const GeneralConfig: React.FC = () => {
             size="sm"
             selectionMode="multiple"
             selectedKeys={new Set(envType)}
+            disallowEmptySelection={true}
             onSelectionChange={async (v) => {
               try {
                 await patchAppConfig({
@@ -368,6 +369,7 @@ const GeneralConfig: React.FC = () => {
               className="w-[60%]"
               size="sm"
               selectedKeys={new Set([customTheme])}
+              disallowEmptySelection={true}
               onSelectionChange={async (v) => {
                 try {
                   await patchAppConfig({ customTheme: v.currentKey as string })
