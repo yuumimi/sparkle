@@ -168,6 +168,10 @@ const Mihomo: React.FC = () => {
                 max={65535}
                 min={0}
                 onValueChange={(v) => {
+                  if (v === '') {
+                    setMixedPortInput(0)
+                    return
+                  }
                   setMixedPortInput(parseInt(v))
                 }}
               />
@@ -196,6 +200,10 @@ const Mihomo: React.FC = () => {
                 max={65535}
                 min={0}
                 onValueChange={(v) => {
+                  if (v === '') {
+                    setSocksPortInput(0)
+                    return
+                  }
                   setSocksPortInput(parseInt(v))
                 }}
               />
@@ -224,6 +232,10 @@ const Mihomo: React.FC = () => {
                 max={65535}
                 min={0}
                 onValueChange={(v) => {
+                  if (v === '') {
+                    setHttpPortInput(0)
+                    return
+                  }
                   setHttpPortInput(parseInt(v))
                 }}
               />
@@ -253,6 +265,10 @@ const Mihomo: React.FC = () => {
                   max={65535}
                   min={0}
                   onValueChange={(v) => {
+                    if (v === '') {
+                      setRedirPortInput(0)
+                      return
+                    }
                     setRedirPortInput(parseInt(v))
                   }}
                 />
@@ -283,6 +299,10 @@ const Mihomo: React.FC = () => {
                   max={65535}
                   min={0}
                   onValueChange={(v) => {
+                    if (v === '') {
+                      setTproxyPortInput(0)
+                      return
+                    }
                     setTproxyPortInput(parseInt(v))
                   }}
                 />

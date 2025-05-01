@@ -97,26 +97,28 @@ async function enableSysProxy(): Promise<void> {
     }
 
     case 'manual': {
-      if (process.platform === 'win32') {
-        try {
-          await execFilePromise(path.join(resourcesFilesDir(), 'sysproxy.exe'), [
-            'global',
-            `${host || '127.0.0.1'}:${port}`,
-            bypass.join(';')
-          ])
-        } catch {
+      if (port != 0) {
+        if (process.platform === 'win32') {
+          try {
+            await execFilePromise(path.join(resourcesFilesDir(), 'sysproxy.exe'), [
+              'global',
+              `${host || '127.0.0.1'}:${port}`,
+              bypass.join(';')
+            ])
+          } catch {
+            triggerManualProxy(true, host || '127.0.0.1', port, bypass.join(','))
+          }
+        } else if (process.platform === 'darwin') {
+          await axios.post(
+            'http://localhost/global',
+            { host: host || '127.0.0.1', port: port.toString(), bypass: bypass.join(',') },
+            {
+              socketPath: helperSocketPath
+            }
+          )
+        } else {
           triggerManualProxy(true, host || '127.0.0.1', port, bypass.join(','))
         }
-      } else if (process.platform === 'darwin') {
-        await axios.post(
-          'http://localhost/global',
-          { host: host || '127.0.0.1', port: port.toString(), bypass: bypass.join(',') },
-          {
-            socketPath: helperSocketPath
-          }
-        )
-      } else {
-        triggerManualProxy(true, host || '127.0.0.1', port, bypass.join(','))
       }
       break
     }

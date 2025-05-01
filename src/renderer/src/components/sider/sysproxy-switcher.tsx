@@ -2,6 +2,7 @@ import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import BorderSwitch from '@renderer/components/base/border-swtich'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { triggerSysProxy } from '@renderer/utils/ipc'
 import { AiOutlineGlobal } from 'react-icons/ai'
 import React from 'react'
@@ -19,7 +20,9 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
   const match = location.pathname.includes('/sysproxy')
   const { appConfig, patchAppConfig } = useAppConfig()
   const { sysProxy, sysproxyCardStatus = 'col-span-1' } = appConfig || {}
-  const { enable } = sysProxy || {}
+  const { enable, mode } = sysProxy || {}
+  const { controledMihomoConfig } = useControledMihomoConfig()
+  const { 'mixed-port': mixedPort } = controledMihomoConfig || {}
   const {
     attributes,
     listeners,
@@ -31,7 +34,9 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
     id: 'sysproxy'
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
+  const disabled = mixedPort == 0
   const onChange = async (enable: boolean): Promise<void> => {
+    if (mode == 'manual' && disabled) return
     try {
       await triggerSysProxy(enable)
       await patchAppConfig({ sysProxy: { enable } })
@@ -93,7 +98,8 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
             </Button>
             <BorderSwitch
               isShowBorder={match && enable}
-              isSelected={enable}
+              isSelected={!(mode != 'auto' && disabled) && enable}
+              isDisabled={mode == 'manual' && disabled}
               onValueChange={onChange}
             />
           </div>
