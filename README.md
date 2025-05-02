@@ -1,8 +1,3 @@
-<h3 align="center">
-  <img height='48px' src='./images/icon-white.png#gh-dark-mode-only'>
-  <img height='48px' src='./images/icon-black.png#gh-light-mode-only'>
-</h3>
-
 <h3 align="center">Another <a href="https://github.com/MetaCubeX/mihomo">Mihomo</a> GUI</h3>
 
 <p align="center">
@@ -10,9 +5,6 @@
     <img src="https://img.shields.io/github/release/xishang0128/sparkle/all.svg">
   </a>
 </p>
-<div align='center'>
-<img width='90%' src="./images/preview.jpg">
-</div>
 
 ### 特性
 
