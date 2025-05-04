@@ -50,7 +50,6 @@ const GeneralConfig: React.FC = () => {
     customTheme = 'default.css',
     envType = [platform === 'win32' ? 'powershell' : 'bash'],
     autoCheckUpdate,
-    updateChannel = 'release',
     appTheme = 'system'
   } = appConfig || {}
 
