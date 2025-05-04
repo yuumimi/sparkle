@@ -39,7 +39,7 @@ const WebdavRestoreModal: React.FC<Props> = (props) => {
                       await webdavRestore(filename)
                       await relaunchApp()
                     } catch (e) {
-                      alert(`恢复失败: ${e}`)
+                      alert(`恢复失败：${e}`)
                     } finally {
                       setRestoring(false)
                     }
@@ -57,7 +57,7 @@ const WebdavRestoreModal: React.FC<Props> = (props) => {
                       await webdavDelete(filename)
                       setFilenames(filenames.filter((name) => name !== filename))
                     } catch (e) {
-                      alert(`删除失败: ${e}`)
+                      alert(`删除失败：${e}`)
                     }
                   }}
                 >

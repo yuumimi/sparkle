@@ -1,4 +1,4 @@
-import { Button, Divider, Input, Select, SelectItem, Switch } from '@heroui/react'
+import { Button, Input, Select, SelectItem, Switch } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
@@ -175,7 +175,6 @@ const Mihomo: React.FC = () => {
             }}
           />
         </SettingItem>
-        <Divider className="mb-2" />
         <SettingItem title="使用 RTT 延迟测试" divider>
           <Switch
             size="sm"

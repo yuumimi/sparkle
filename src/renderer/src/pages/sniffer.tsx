@@ -1,11 +1,11 @@
-import { Button, Divider, Input, Switch } from '@heroui/react'
+import { Button, Input, Switch } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
+import EditableList from '@renderer/components/base/base-list-editor'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import { restartCore } from '@renderer/utils/ipc'
-import React, { ReactNode, useState } from 'react'
-import { MdDeleteForever } from 'react-icons/md'
+import React, { useState } from 'react'
 
 const Sniffer: React.FC = () => {
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
@@ -74,46 +74,6 @@ const Sniffer: React.FC = () => {
         }
       }
     })
-  }
-  const handleListChange = (type: string, value: string, index: number): void => {
-    const list = [...values[type]]
-    if (value.trim()) {
-      if (index < list.length) {
-        list[index] = value
-      } else {
-        list.push(value)
-      }
-    } else {
-      list.splice(index, 1)
-    }
-    setValues({ ...values, [type]: list })
-  }
-  const renderListInputs = (type: string, placeholder: string): ReactNode => {
-    const currentItems = values[type]
-    const showNewLine = currentItems.every((item: string) => item.trim() !== '')
-
-    return [...currentItems, ...(showNewLine ? [''] : [])].map((item, index) => (
-      <div key={index} className="mt-2 flex">
-        <Input
-          fullWidth
-          size="sm"
-          placeholder={placeholder}
-          value={typeof item === 'string' ? item : item.domain}
-          onValueChange={(v) => handleListChange(type, v, index)}
-        />
-        {index < values[type].length && (
-          <Button
-            className="ml-2"
-            size="sm"
-            variant="flat"
-            color="warning"
-            onClick={() => handleListChange(type, '', index)}
-          >
-            <MdDeleteForever className="text-lg" />
-          </Button>
-        )}
-      </div>
-    ))
   }
 
   return (
@@ -209,25 +169,31 @@ const Sniffer: React.FC = () => {
             onValueChange={(v) => handleSniffPortChange('QUIC', v)}
           />
         </SettingItem>
-        <div className="flex flex-col items-stretch">
-          <h3>跳过域名嗅探</h3>
-          {renderListInputs('skipDomain', '例：+.push.apple.com')}
-        </div>
-        <Divider className="my-2" />
-        <div className="flex flex-col items-stretch">
-          <h3 className="mb-2">强制域名嗅探</h3>
-          {renderListInputs('forceDomain', '例：v2ex.com')}
-        </div>
-        <Divider className="my-2" />
-        <div className="flex flex-col items-stretch">
-          <h3 className="mb-2">跳过目标地址嗅探</h3>
-          {renderListInputs('skipDstAddress', '例：1.1.1.1/32')}
-        </div>
-        <Divider className="my-2" />
-        <div className="flex flex-col items-stretch">
-          <h3 className="mb-2">跳过来源地址嗅探</h3>
-          {renderListInputs('skipSrcAddress', '例：192.168.1.1/24')}
-        </div>
+        <EditableList
+          title="跳过域名嗅探"
+          items={values.skipDomain}
+          onChange={(list) => setValues({ ...values, skipDomain: list })}
+          placeholder="例：+.push.apple.com"
+        />
+        <EditableList
+          title="强制域名嗅探"
+          items={values.forceDomain}
+          onChange={(list) => setValues({ ...values, forceDomain: list })}
+          placeholder="例：v2ex.com"
+        />
+        <EditableList
+          title="跳过目标地址嗅探"
+          items={values.skipDstAddress}
+          onChange={(list) => setValues({ ...values, skipDstAddress: list })}
+          placeholder="例：1.1.1.1/32"
+        />
+        <EditableList
+          title="跳过来源地址嗅探"
+          items={values.skipSrcAddress}
+          onChange={(list) => setValues({ ...values, skipSrcAddress: list })}
+          placeholder="例：192.168.1.1/24"
+          divider={false}
+        />
       </SettingCard>
     </BasePage>
   )

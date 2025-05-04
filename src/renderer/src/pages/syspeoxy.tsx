@@ -2,13 +2,13 @@ import { Button, Input, Tab, Tabs } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
+import EditableList from '@renderer/components/base/base-list-editor'
 import PacEditorModal from '@renderer/components/sysproxy/pac-editor-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
 import { openUWPTool, triggerSysProxy } from '@renderer/utils/ipc'
 import { Key, useState } from 'react'
 import React from 'react'
-import { MdDeleteForever } from 'react-icons/md'
 
 const defaultBypass: string[] =
   platform === 'linux'
@@ -72,22 +72,6 @@ const Sysproxy: React.FC = () => {
   }
 
   const [openPacEditor, setOpenPacEditor] = useState(false)
-
-  const handleBypassChange = (value: string, index: number): void => {
-    const newBypass = [...values.bypass]
-    if (index === newBypass.length) {
-      if (value.trim() !== '') {
-        newBypass.push(value)
-      }
-    } else {
-      if (value.trim() === '') {
-        newBypass.splice(index, 1)
-      } else {
-        newBypass[index] = value
-      }
-    }
-    setValues({ ...values, bypass: newBypass })
-  }
 
   const onSave = async (): Promise<void> => {
     // check valid TODO
@@ -178,31 +162,13 @@ const Sysproxy: React.FC = () => {
                 添加默认代理绕过
               </Button>
             </SettingItem>
-            <div className="flex flex-col items-stretch">
-              <h3 className="mb-2">代理绕过</h3>
-              {[...values.bypass, ''].map((domain, index) => (
-                <div key={index} className="mb-2 flex">
-                  <Input
-                    fullWidth
-                    size="sm"
-                    placeholder="例: *.baidu.com"
-                    value={domain}
-                    onValueChange={(v) => handleBypassChange(v, index)}
-                  />
-                  {index < values.bypass.length && (
-                    <Button
-                      className="ml-2"
-                      size="sm"
-                      variant="flat"
-                      color="warning"
-                      onClick={() => handleBypassChange('', index)}
-                    >
-                      <MdDeleteForever className="text-lg" />
-                    </Button>
-                  )}
-                </div>
-              ))}
-            </div>
+            <EditableList
+              title="代理绕过"
+              items={values.bypass}
+              onChange={(list) => setValues({ ...values, bypass: list })}
+              placeholder="例：*.baidu.com"
+              divider={false}
+            />
           </>
         )}
       </SettingCard>

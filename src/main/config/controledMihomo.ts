@@ -19,7 +19,7 @@ export async function getControledMihomoConfig(force = false): Promise<Partial<I
 }
 
 export async function patchControledMihomoConfig(patch: Partial<IMihomoConfig>): Promise<void> {
-  const { useNameserverPolicy, controlDns = true, controlSniff = true } = await getAppConfig()
+  const { controlDns = true, controlSniff = true } = await getAppConfig()
   if (!controlDns) {
     delete controledMihomoConfig.dns
     delete controledMihomoConfig.hosts
@@ -45,9 +45,6 @@ export async function patchControledMihomoConfig(patch: Partial<IMihomoConfig>):
     controledMihomoConfig.hosts = patch.hosts
   }
   controledMihomoConfig = deepMerge(controledMihomoConfig, patch)
-  if (!useNameserverPolicy) {
-    delete controledMihomoConfig?.dns?.['nameserver-policy']
-  }
   if (process.platform === 'darwin') {
     delete controledMihomoConfig?.tun?.device
   }

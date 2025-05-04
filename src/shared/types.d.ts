@@ -328,8 +328,6 @@ interface IAppConfig {
   webdavDir?: string
   webdavUsername?: string
   webdavPassword?: string
-  useNameserverPolicy: boolean
-  nameserverPolicy: { [key: string]: string | string[] }
   hosts: IHost[]
   showWindowShortcut?: string
   showFloatingWindowShortcut?: string
