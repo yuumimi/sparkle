@@ -9,13 +9,22 @@ const ErrorFallback = ({ error }: FallbackProps): JSX.Element => {
         {'应用崩溃了 :( 请将以下信息提交给开发者以排查错误'}
       </h2>
 
-      <Button
+      {/* <Button
         size="sm"
         color="primary"
         variant="flat"
         onPress={() => open('https://github.com/xishang0128/sparkle/issues/new/choose')}
       >
         GitHub
+      </Button> */}
+      <Button
+        size="sm"
+        color="primary"
+        variant="flat"
+        className="ml-2"
+        onPress={() => open('https://t.me/+y7rcYjEKIiI1NzZl')}
+      >
+        Telegram
       </Button>
 
       <Button

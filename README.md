@@ -1,8 +1,13 @@
+# Sparkle
+
 <h3 align="center">Another <a href="https://github.com/MetaCubeX/mihomo">Mihomo</a> GUI</h3>
 
 <p align="center">
   <a href="https://github.com/xishang0128/sparkle/releases">
     <img src="https://img.shields.io/github/release/xishang0128/sparkle/all.svg">
+  </a>
+  <a href="https://t.me/+y7rcYjEKIiI1NzZl">
+    <img src="https://img.shields.io/badge/Telegram-Group-blue?logo=telegram">
   </a>
 </p>
 
