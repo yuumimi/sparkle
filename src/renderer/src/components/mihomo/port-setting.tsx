@@ -19,7 +19,7 @@ const PortSetting: React.FC = () => {
     authentication = [],
     'skip-auth-prefixes': skipAuthPrefixes = ['127.0.0.1/32'],
     'allow-lan': allowLan,
-    'lan-allowed-ips': lanAllowedIps = ['0.0.0.0/0', '::/0'],
+    'lan-allowed-ips': lanAllowedIps = [],
     'lan-disallowed-ips': lanDisallowedIps = [],
     'mixed-port': mixedPort = 7890,
     'socks-port': socksPort = 7891,
@@ -33,7 +33,9 @@ const PortSetting: React.FC = () => {
   const [httpPortInput, setHttpPortInput] = useState(httpPort)
   const [redirPortInput, setRedirPortInput] = useState(redirPort)
   const [tproxyPortInput, setTproxyPortInput] = useState(tproxyPort)
-  const [lanAllowedIpsInput, setLanAllowedIpsInput] = useState(lanAllowedIps)
+  const initialLanAllowedIps =
+    JSON.stringify(lanAllowedIps) === JSON.stringify(['0.0.0.0/0', '::/0']) ? [] : lanAllowedIps
+  const [lanAllowedIpsInput, setLanAllowedIpsInput] = useState(initialLanAllowedIps)
   const [lanDisallowedIpsInput, setLanDisallowedIpsInput] = useState(lanDisallowedIps)
   const [authenticationInput, setAuthenticationInput] = useState(authentication)
   const [skipAuthPrefixesInput, setSkipAuthPrefixesInput] = useState(skipAuthPrefixes)
