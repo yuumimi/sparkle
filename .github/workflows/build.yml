@@ -107,6 +107,7 @@ jobs:
       - name: Calculate checksums
         run: |
           cd bin/dist/
+          rm sparkle.app.plist
           find . -type f -not -name "checksums.*" -not -name "version.txt" | sort | xargs sha256sum > checksums.txt
         shell: bash
 
@@ -204,6 +205,13 @@ jobs:
         with:
           path: bin/
           merge-multiple: true
+
+      - name: Calculate checksums
+        run: |
+          cd bin/dist/
+          rm sparkle.app.plist
+          find . -type f -not -name "checksums.*" -not -name "version.txt" | sort | xargs sha256sum > checksums.txt
+        shell: bash
 
       - name: Delete Current
         uses: 8Mi-Tech/delete-release-assets-action@main
