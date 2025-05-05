@@ -265,6 +265,7 @@ interface IAppConfig {
   core: 'mihomo' | 'mihomo-alpha'
   disableLoopbackDetector: boolean
   skipSafePathCheck: boolean
+  safePaths: string[]
   proxyDisplayMode: 'simple' | 'full'
   proxyDisplayOrder: 'default' | 'delay' | 'name'
   profileDisplayDate?: 'expire' | 'update'
@@ -426,6 +427,10 @@ interface IMihomoConfig {
   'external-controller-pipe': string
   'external-controller-unix': string
   'external-controller': string
+  'external-controller-cors'?: {
+    'allow-origins'?: string[]
+    'allow-private-network'?: boolean
+  }
   secret?: string
   ipv6: boolean
   mode: OutboundMode

@@ -10,6 +10,8 @@ import { IoMdCloudDownload } from 'react-icons/io'
 import PubSub from 'pubsub-js'
 import { mihomoUpgrade, restartCore } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
+import ControllerSetting from '@renderer/components/mihomo/controller-setting'
+import EnvSetting from '@renderer/components/mihomo/env-setting'
 
 const CoreMap = {
   mihomo: '稳定版',
@@ -18,17 +20,10 @@ const CoreMap = {
 
 const Mihomo: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
-  const {
-    core = 'mihomo',
-    maxLogDays = 7,
-    disableLoopbackDetector,
-    skipSafePathCheck
-  } = appConfig || {}
+  const { core = 'mihomo', maxLogDays = 7 } = appConfig || {}
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
   const {
     ipv6,
-    'external-controller': externalController = '',
-    secret,
     'log-level': logLevel = 'info',
     'find-process-mode': findProcessMode = 'strict',
     'unified-delay': unifiedDelay,
@@ -37,8 +32,6 @@ const Mihomo: React.FC = () => {
   } = controledMihomoConfig || {}
   const { 'store-selected': storeSelected, 'store-fake-ip': storeFakeIp } = profile
 
-  const [externalControllerInput, setExternalControllerInput] = useState(externalController)
-  const [secretInput, setSecretInput] = useState(secret)
   const [upgrading, setUpgrading] = useState(false)
 
   const onChangeNeedRestart = async (patch: Partial<IMihomoConfig>): Promise<void> => {
@@ -60,6 +53,8 @@ const Mihomo: React.FC = () => {
   return (
     <BasePage title="内核设置">
       <PortSetting />
+      <ControllerSetting />
+      <EnvSetting />
       <SettingCard>
         <SettingItem
           title="内核版本"
@@ -113,59 +108,6 @@ const Mihomo: React.FC = () => {
           </Select>
         </SettingItem>
 
-        <SettingItem title="外部控制地址" divider>
-          <div className="flex">
-            {externalControllerInput !== externalController && (
-              <Button
-                size="sm"
-                color="primary"
-                className="mr-2"
-                onPress={() => {
-                  onChangeNeedRestart({
-                    'external-controller': externalControllerInput
-                  })
-                }}
-              >
-                确认
-              </Button>
-            )}
-
-            <Input
-              size="sm"
-              className="w-[200px]"
-              value={externalControllerInput}
-              onValueChange={(v) => {
-                setExternalControllerInput(v)
-              }}
-            />
-          </div>
-        </SettingItem>
-        <SettingItem title="外部控制访问密钥" divider>
-          <div className="flex">
-            {secretInput !== secret && (
-              <Button
-                size="sm"
-                color="primary"
-                className="mr-2"
-                onPress={() => {
-                  onChangeNeedRestart({ secret: secretInput })
-                }}
-              >
-                确认
-              </Button>
-            )}
-
-            <Input
-              size="sm"
-              type="password"
-              className="w-[200px]"
-              value={secretInput}
-              onValueChange={(v) => {
-                setSecretInput(v)
-              }}
-            />
-          </div>
-        </SettingItem>
         <SettingItem title="IPv6" divider>
           <Switch
             size="sm"
@@ -208,24 +150,6 @@ const Mihomo: React.FC = () => {
             isSelected={storeFakeIp}
             onValueChange={(v) => {
               onChangeNeedRestart({ profile: { 'store-fake-ip': v } })
-            }}
-          />
-        </SettingItem>
-        <SettingItem title="禁用回环检测器" divider>
-          <Switch
-            size="sm"
-            isSelected={disableLoopbackDetector}
-            onValueChange={(v) => {
-              handleConfigChangeWithRestart('disableLoopbackDetector', v)
-            }}
-          />
-        </SettingItem>
-        <SettingItem title="禁用安全路径检查" divider>
-          <Switch
-            size="sm"
-            isSelected={skipSafePathCheck}
-            onValueChange={(v) => {
-              handleConfigChangeWithRestart('skipSafePathCheck', v)
             }}
           />
         </SettingItem>

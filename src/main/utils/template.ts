@@ -13,10 +13,8 @@ export const defaultConfig: IAppConfig = {
   proxyDisplayOrder: 'default',
   autoCheckUpdate: true,
   autoCloseConnection: true,
-  useNameserverPolicy: false,
   controlDns: true,
   controlSniff: true,
-  nameserverPolicy: {},
   hosts: [],
   siderOrder: [
     'sysproxy',
@@ -36,11 +34,16 @@ export const defaultConfig: IAppConfig = {
   siderWidth: 250,
   sysProxy: { enable: false, mode: 'manual' },
   disableLoopbackDetector: false,
-  skipSafePathCheck: false
+  skipSafePathCheck: false,
+  safePaths: []
 }
 
 export const defaultControledMihomoConfig: Partial<IMihomoConfig> = {
   'external-controller': '',
+  'external-controller-cors': {
+    'allow-origins': ['*'],
+    'allow-private-network': true
+  },
   ipv6: true,
   mode: 'rule',
   'mixed-port': 7890,

@@ -64,7 +64,8 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     diffWorkDir = false,
     mihomoCpuPriority = 'PRIORITY_NORMAL',
     disableLoopbackDetector = false,
-    skipSafePathCheck = false
+    skipSafePathCheck = false,
+    safePaths = []
   } = await getAppConfig()
   const { 'log-level': logLevel } = await getControledMihomoConfig()
   if (existsSync(path.join(dataDir(), 'core.pid'))) {
@@ -95,9 +96,9 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
   const stdout = createWriteStream(logPath(), { flags: 'a' })
   const stderr = createWriteStream(logPath(), { flags: 'a' })
   const env = {
-    ...process.env,
     DISABLE_LOOPBACK_DETECTOR: String(disableLoopbackDetector),
-    SKIP_SAFE_PATH_CHECK: String(skipSafePathCheck)
+    SKIP_SAFE_PATH_CHECK: String(skipSafePathCheck),
+    SAFE_PATHS: safePaths.join(path.delimiter)
   }
   child = spawn(
     corePath,
@@ -222,22 +223,28 @@ async function checkProfile(): Promise<void> {
   const {
     core = 'mihomo',
     diffWorkDir = false,
-    skipSafePathCheck = false
+    skipSafePathCheck = false,
+    safePaths = []
   } = await getAppConfig()
   const { current } = await getProfileConfig()
   const corePath = mihomoCorePath(core)
   const execFilePromise = promisify(execFile)
   const env = {
-    SKIP_SAFE_PATH_CHECK: String(skipSafePathCheck)
+    SKIP_SAFE_PATH_CHECK: String(skipSafePathCheck),
+    SAFE_PATHS: safePaths.join(path.delimiter)
   }
   try {
-    await execFilePromise(corePath, [
-      '-t',
-      '-f',
-      diffWorkDir ? mihomoWorkConfigPath(current) : mihomoWorkConfigPath('work'),
-      '-d',
-      mihomoTestDir()
-    ], { env })
+    await execFilePromise(
+      corePath,
+      [
+        '-t',
+        '-f',
+        diffWorkDir ? mihomoWorkConfigPath(current) : mihomoWorkConfigPath('work'),
+        '-d',
+        mihomoTestDir()
+      ],
+      { env }
+    )
   } catch (error) {
     if (error instanceof Error && 'stdout' in error) {
       const { stdout } = error as { stdout: string }
