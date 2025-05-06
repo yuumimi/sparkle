@@ -20,6 +20,7 @@ import { deepMerge } from '../utils/merge'
 import vm from 'vm'
 import { existsSync, writeFileSync } from 'fs'
 import path from 'path'
+import util from 'util'
 
 let runtimeConfigStr: string
 let currentProfileStr: string
@@ -110,19 +111,14 @@ function runOverrideScript(
   try {
     const ctx = {
       console: Object.freeze({
-        log(data: never) {
-          log('log', JSON.stringify(data))
-        },
-        info(data: never) {
-          log('info', JSON.stringify(data))
-        },
-        error(data: never) {
-          log('error', JSON.stringify(data))
-        },
-        debug(data: never) {
-          log('debug', JSON.stringify(data))
-        }
-      })
+        log: (...args: unknown[]) => log('log', args.map(format).join(' ')),
+        info: (...args: unknown[]) => log('info', args.map(format).join(' ')),
+        error: (...args: unknown[]) => log('error', args.map(format).join(' ')),
+        debug: (...args: unknown[]) => log('debug', args.map(format).join(' '))
+      }),
+      fetch,
+      yaml,
+      Buffer
     }
     vm.createContext(ctx)
     const code = `${script} main(${JSON.stringify(profile)})`
@@ -134,8 +130,19 @@ function runOverrideScript(
     log('info', '脚本执行成功')
     return newProfile
   } catch (e) {
-    log('exception', `脚本执行失败：${e}`)
+    log('exception', '脚本执行失败：', util.inspect(e, { showHidden: true, depth: null }))
     return profile
+  }
+}
+
+function format(data: unknown): string {
+  if (data instanceof Error) {
+    return `${data.name}: ${data.message}\n${data.stack}`
+  }
+  try {
+    return JSON.stringify(data)
+  } catch {
+    return String(data)
   }
 }
 
