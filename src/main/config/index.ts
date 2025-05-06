@@ -12,6 +12,7 @@ export {
   removeProfileItem,
   createProfile,
   getProfileStr,
+  getProfileParseStr,
   setProfileStr,
   changeCurrentProfile,
   updateProfileItem

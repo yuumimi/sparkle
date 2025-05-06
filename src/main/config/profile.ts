@@ -10,6 +10,7 @@ import yaml from 'yaml'
 import { defaultProfile } from '../utils/template'
 import { subStorePort } from '../resolve/server'
 import { join } from 'path'
+import { deepMerge } from '../utils/merge'
 
 let profileConfig: IProfileConfig // profile.yaml
 
@@ -185,6 +186,17 @@ export async function getProfileStr(id: string | undefined): Promise<string> {
   } else {
     return yaml.stringify(defaultProfile)
   }
+}
+
+export async function getProfileParseStr(id: string | undefined): Promise<string> {
+  let data: string
+  if (existsSync(profilePath(id || 'default'))) {
+    data = await readFile(profilePath(id || 'default'), 'utf-8')
+  } else {
+    data = yaml.stringify(defaultProfile)
+  }
+  const profile = deepMerge(yaml.parse(data), {})
+  return yaml.stringify(profile)
 }
 
 export async function setProfileStr(id: string, content: string): Promise<void> {

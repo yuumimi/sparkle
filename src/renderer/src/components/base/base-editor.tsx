@@ -1,6 +1,6 @@
 import { useEffect, useRef } from 'react'
 import * as monaco from 'monaco-editor'
-import MonacoEditor from 'react-monaco-editor'
+import MonacoEditor, { MonacoDiffEditor } from 'react-monaco-editor'
 import { configureMonacoYaml } from 'monaco-yaml'
 import metaSchema from 'meta-json-schema/schemas/meta-json-schema.json'
 import pac from 'types-pac/pac.d.ts?raw'
@@ -11,6 +11,8 @@ type Language = 'yaml' | 'javascript' | 'css' | 'json' | 'text'
 
 interface Props {
   value: string
+  originalValue?: string
+  diffRenderSideBySide?: boolean
   readOnly?: boolean
   language: Language
   onChange?: (value: string) => void
@@ -87,7 +89,14 @@ const monacoInitialization = (): void => {
 export const BaseEditor: React.FC<Props> = (props) => {
   const { theme, systemTheme } = useTheme()
   const trueTheme = theme === 'system' ? systemTheme : theme
-  const { value, readOnly = false, language, onChange } = props
+  const {
+    value,
+    originalValue,
+    diffRenderSideBySide = false,
+    readOnly = false,
+    language,
+    onChange
+  } = props
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>(undefined)
 
@@ -100,7 +109,10 @@ export const BaseEditor: React.FC<Props> = (props) => {
 
     const uri = monaco.Uri.parse(`${nanoid()}.${language === 'yaml' ? 'clash' : ''}.${language}`)
     const model = monaco.editor.createModel(value, language, uri)
-    editorRef.current?.setModel(model)
+    editorRef.current.setModel(model)
+  }
+  const diffEditorDidMount = (editor: monaco.editor.IStandaloneDiffEditor): void => {
+    editorRef.current = editor.getModifiedEditor()
   }
 
   useEffect(() => {
@@ -116,32 +128,52 @@ export const BaseEditor: React.FC<Props> = (props) => {
     }
   }, [])
 
+  const options = {
+    tabSize: ['yaml', 'javascript', 'json'].includes(language) ? 2 : 4, // 根据语言类型设置缩进大小
+    minimap: {
+      enabled: document.documentElement.clientWidth >= 1500 // 超过一定宽度显示 minimap 滚动条
+    },
+    mouseWheelZoom: true, // 按住 Ctrl 滚轮调节缩放比例
+    readOnly: readOnly, // 只读模式
+    renderValidationDecorations: 'on' as 'off' | 'on' | 'editable', // 只读模式下显示校验信息
+    quickSuggestions: {
+      strings: true, // 字符串类型的建议
+      comments: true, // 注释类型的建议
+      other: true // 其他类型的建议
+    },
+    fontFamily: `Fira Code, JetBrains Mono, Roboto Mono, "Source Code Pro", Consolas, Menlo, Monaco, monospace, "Courier New", "Apple Color Emoji", "Noto Color Emoji"`,
+    fontLigatures: true, // 连字符
+    smoothScrolling: true, // 平滑滚动
+    renderSideBySide: diffRenderSideBySide // 侧边显示
+  }
+
+  if (originalValue !== undefined) {
+    return (
+      <MonacoDiffEditor
+        language={language}
+        original={originalValue}
+        value={value}
+        height="100%"
+        theme={trueTheme?.includes('light') ? 'vs' : 'vs-dark'}
+        options={options}
+        editorWillMount={editorWillMount}
+        editorDidMount={diffEditorDidMount}
+        editorWillUnmount={(): void => {}}
+        onChange={onChange}
+      />
+    )
+  }
+
   return (
     <MonacoEditor
       language={language}
       value={value}
       height="100%"
       theme={trueTheme?.includes('light') ? 'vs' : 'vs-dark'}
-      options={{
-        tabSize: ['yaml', 'javascript', 'json'].includes(language) ? 2 : 4, // 根据语言类型设置缩进大小
-        minimap: {
-          enabled: document.documentElement.clientWidth >= 1500 // 超过一定宽度显示 minimap 滚动条
-        },
-        mouseWheelZoom: true, // 按住 Ctrl 滚轮调节缩放比例
-        readOnly: readOnly, // 只读模式
-        renderValidationDecorations: 'on', // 只读模式下显示校验信息
-        quickSuggestions: {
-          strings: true, // 字符串类型的建议
-          comments: true, // 注释类型的建议
-          other: true // 其他类型的建议
-        },
-        fontFamily: `Fira Code, JetBrains Mono, Roboto Mono, "Source Code Pro", Consolas, Menlo, Monaco, monospace, "Courier New", "Apple Color Emoji", "Noto Color Emoji"`,
-        fontLigatures: true, // 连字符
-        smoothScrolling: true // 平滑滚动
-      }}
+      options={options}
       editorWillMount={editorWillMount}
       editorDidMount={editorDidMount}
-      editorWillUnmount={(): void => { }}
+      editorWillUnmount={(): void => {}}
       onChange={onChange}
     />
   )

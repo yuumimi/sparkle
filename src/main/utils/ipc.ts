@@ -32,6 +32,7 @@ import {
   removeProfileItem,
   changeCurrentProfile,
   getProfileStr,
+  getProfileParseStr,
   getFileStr,
   setFileStr,
   setProfileStr,
@@ -156,6 +157,7 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('setProfileConfig', (_e, config) => ipcErrorWrapper(setProfileConfig)(config))
   ipcMain.handle('getCurrentProfileItem', ipcErrorWrapper(getCurrentProfileItem))
   ipcMain.handle('getProfileItem', (_e, id) => ipcErrorWrapper(getProfileItem)(id))
+  ipcMain.handle('getProfileParseStr', (_e, id) => ipcErrorWrapper(getProfileParseStr)(id))
   ipcMain.handle('getProfileStr', (_e, id) => ipcErrorWrapper(getProfileStr)(id))
   ipcMain.handle('getFileStr', (_e, path) => ipcErrorWrapper(getFileStr)(path))
   ipcMain.handle('setFileStr', (_e, path, str) => ipcErrorWrapper(setFileStr)(path, str))
