@@ -24,7 +24,7 @@ const Settings: React.FC = () => {
             title="官方文档"
             className="app-nodrag"
             onPress={() => {
-              window.open('https://mihomo.party')
+              window.open('https://')
             }}
           >
             <CgWebsite className="text-lg" />

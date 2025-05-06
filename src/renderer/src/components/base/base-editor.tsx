@@ -113,6 +113,10 @@ export const BaseEditor: React.FC<Props> = (props) => {
   }
   const diffEditorDidMount = (editor: monaco.editor.IStandaloneDiffEditor): void => {
     editorRef.current = editor.getModifiedEditor()
+
+    const uri = monaco.Uri.parse(`${nanoid()}.${language === 'yaml' ? 'clash' : ''}.${language}`)
+    const model = monaco.editor.createModel(value, language, uri)
+    editorRef.current.setModel(model)
   }
 
   useEffect(() => {
@@ -141,10 +145,14 @@ export const BaseEditor: React.FC<Props> = (props) => {
       comments: true, // 注释类型的建议
       other: true // 其他类型的建议
     },
-    fontFamily: `Fira Code, JetBrains Mono, Roboto Mono, "Source Code Pro", Consolas, Menlo, Monaco, monospace, "Courier New", "Apple Color Emoji", "Noto Color Emoji"`,
+    fontFamily: `Maple Mono NF CN,Fira Code, JetBrains Mono, Roboto Mono, "Source Code Pro", Consolas, Menlo, Monaco, monospace, "Courier New", "Apple Color Emoji", "Noto Color Emoji"`,
     fontLigatures: true, // 连字符
     smoothScrolling: true, // 平滑滚动
-    renderSideBySide: diffRenderSideBySide // 侧边显示
+    pixelRatio: window.devicePixelRatio, // 设置像素比
+    renderSideBySide: diffRenderSideBySide, // 侧边显示
+    glyphMargin: false, // 禁用字形边距
+    folding: true, // 启用代码折叠
+    scrollBeyondLastLine: false // 禁止滚动超过最后一行
   }
 
   if (originalValue !== undefined) {
