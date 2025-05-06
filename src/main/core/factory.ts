@@ -23,13 +23,16 @@ import path from 'path'
 
 let runtimeConfigStr: string
 let currentProfileStr: string
+let overrideProfileStr: string
 let runtimeConfig: IMihomoConfig
 
 export async function generateProfile(): Promise<void> {
   const { current } = await getProfileConfig()
   const { diffWorkDir = false } = await getAppConfig()
-  const currentProfile = await overrideProfile(current, await getProfile(current))
-  currentProfileStr = yaml.stringify(currentProfile)
+  const currentProfileConfig = await getProfile(current)
+  currentProfileStr = yaml.stringify(currentProfileConfig)
+  const currentProfile = await overrideProfile(current, currentProfileConfig)
+  overrideProfileStr = yaml.stringify(currentProfile)
   const controledMihomoConfig = await getControledMihomoConfig()
   const profile = deepMerge(currentProfile, controledMihomoConfig)
   // 确保可以拿到基础日志信息
@@ -142,6 +145,10 @@ export async function getRuntimeConfigStr(): Promise<string> {
 
 export async function getCurrentProfileStr(): Promise<string> {
   return currentProfileStr
+}
+
+export async function getOverrideProfileStr(): Promise<string> {
+  return overrideProfileStr
 }
 
 export async function getRuntimeConfig(): Promise<IMihomoConfig> {

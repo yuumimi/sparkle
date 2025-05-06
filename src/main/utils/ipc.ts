@@ -32,7 +32,6 @@ import {
   removeProfileItem,
   changeCurrentProfile,
   getProfileStr,
-  getProfileParseStr,
   getFileStr,
   setFileStr,
   setProfileStr,
@@ -68,7 +67,12 @@ import {
   setNativeTheme,
   setupFirewall
 } from '../sys/misc'
-import { getRuntimeConfig, getRuntimeConfigStr, getCurrentProfileStr } from '../core/factory'
+import {
+  getRuntimeConfig,
+  getRuntimeConfigStr,
+  getCurrentProfileStr,
+  getOverrideProfileStr
+} from '../core/factory'
 import { listWebdavBackups, webdavBackup, webdavDelete, webdavRestore } from '../resolve/backup'
 import { getInterfaces } from '../sys/interface'
 import { closeTrayIcon, copyEnv, showTrayIcon } from '../resolve/tray'
@@ -157,7 +161,6 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('setProfileConfig', (_e, config) => ipcErrorWrapper(setProfileConfig)(config))
   ipcMain.handle('getCurrentProfileItem', ipcErrorWrapper(getCurrentProfileItem))
   ipcMain.handle('getProfileItem', (_e, id) => ipcErrorWrapper(getProfileItem)(id))
-  ipcMain.handle('getProfileParseStr', (_e, id) => ipcErrorWrapper(getProfileParseStr)(id))
   ipcMain.handle('getProfileStr', (_e, id) => ipcErrorWrapper(getProfileStr)(id))
   ipcMain.handle('getFileStr', (_e, path) => ipcErrorWrapper(getFileStr)(path))
   ipcMain.handle('setFileStr', (_e, path, str) => ipcErrorWrapper(setFileStr)(path, str))
@@ -182,6 +185,7 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('readTextFile', (_e, filePath) => ipcErrorWrapper(readTextFile)(filePath))
   ipcMain.handle('getRuntimeConfigStr', ipcErrorWrapper(getRuntimeConfigStr))
   ipcMain.handle('getCurrentProfileStr', ipcErrorWrapper(getCurrentProfileStr))
+  ipcMain.handle('getOverrideProfileStr', ipcErrorWrapper(getOverrideProfileStr))
   ipcMain.handle('getRuntimeConfig', ipcErrorWrapper(getRuntimeConfig))
   ipcMain.handle('downloadAndInstallUpdate', (_e, version) =>
     ipcErrorWrapper(downloadAndInstallUpdate)(version)

@@ -11,9 +11,9 @@ import React, { useEffect, useState, useCallback } from 'react'
 import { BaseEditor } from '../base/base-editor'
 import {
   getProfileConfig,
-  getProfileParseStr,
   getRuntimeConfigStr,
-  getCurrentProfileStr
+  getCurrentProfileStr,
+  getOverrideProfileStr
 } from '@renderer/utils/ipc'
 import useSWR from 'swr'
 
@@ -31,15 +31,9 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
   const { data: appConfig } = useSWR('getProfileConfig', getProfileConfig)
 
   const fetchConfigs = useCallback(async () => {
-    const runtime = await getRuntimeConfigStr()
-    setRuntimeConfig(runtime)
-    const override = await getCurrentProfileStr()
-    setOverrideConfig(override)
-
-    if (appConfig?.current) {
-      const profile = await getProfileParseStr(appConfig.current)
-      setProfileConfig(profile)
-    }
+    setRuntimeConfig(await getRuntimeConfigStr())
+    setProfileConfig(await getCurrentProfileStr())
+    setOverrideConfig(await getOverrideProfileStr())
   }, [appConfig])
 
   useEffect(() => {

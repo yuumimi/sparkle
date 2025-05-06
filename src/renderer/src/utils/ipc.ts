@@ -155,10 +155,6 @@ export async function getProfileStr(id: string): Promise<string> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getProfileStr', id))
 }
 
-export async function getProfileParseStr(id: string): Promise<string> {
-  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getProfileParseStr', id))
-}
-
 export async function getFileStr(id: string): Promise<string> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getFileStr', id))
 }
@@ -233,6 +229,10 @@ export async function getRuntimeConfigStr(): Promise<string> {
 
 export async function getCurrentProfileStr(): Promise<string> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getCurrentProfileStr'))
+}
+
+export async function getOverrideProfileStr(): Promise<string> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getOverrideProfileStr'))
 }
 
 export async function getRuntimeConfig(): Promise<IMihomoConfig> {
