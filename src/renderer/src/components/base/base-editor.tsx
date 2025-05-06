@@ -99,6 +99,7 @@ export const BaseEditor: React.FC<Props> = (props) => {
   } = props
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>(undefined)
+  const diffEditorRef = useRef<monaco.editor.IStandaloneDiffEditor>(undefined)
 
   const editorWillMount = (): void => {
     monacoInitialization()
@@ -112,23 +113,39 @@ export const BaseEditor: React.FC<Props> = (props) => {
     editorRef.current.setModel(model)
   }
   const diffEditorDidMount = (editor: monaco.editor.IStandaloneDiffEditor): void => {
-    editorRef.current = editor.getModifiedEditor()
+    diffEditorRef.current = editor
 
-    const uri = monaco.Uri.parse(`${nanoid()}.${language === 'yaml' ? 'clash' : ''}.${language}`)
-    const model = monaco.editor.createModel(value, language, uri)
-    editorRef.current.setModel(model)
+    const originalUri = monaco.Uri.parse(
+      `original-${nanoid()}.${language === 'yaml' ? 'clash' : ''}.${language}`
+    )
+    const modifiedUri = monaco.Uri.parse(
+      `modified-${nanoid()}.${language === 'yaml' ? 'clash' : ''}.${language}`
+    )
+    const originalModel = monaco.editor.createModel(originalValue || '', language, originalUri)
+    const modifiedModel = monaco.editor.createModel(value, language, modifiedUri)
+    diffEditorRef.current.setModel({
+      original: originalModel,
+      modified: modifiedModel
+    })
   }
 
   useEffect(() => {
     window.onresize = (): void => {
       setTimeout(() => {
         editorRef.current?.layout()
+        diffEditorRef.current?.layout()
       }, 0)
     }
     return (): void => {
       window.onresize = null
-      editorRef.current?.dispose()
-      editorRef.current = undefined
+      if (editorRef.current) {
+        editorRef.current.dispose()
+        editorRef.current = undefined
+      }
+      if (diffEditorRef.current) {
+        diffEditorRef.current.dispose()
+        diffEditorRef.current = undefined
+      }
     }
   }, [])
 
