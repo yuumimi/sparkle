@@ -22,12 +22,14 @@ import { existsSync, writeFileSync } from 'fs'
 import path from 'path'
 
 let runtimeConfigStr: string
+let currentProfileStr: string
 let runtimeConfig: IMihomoConfig
 
 export async function generateProfile(): Promise<void> {
   const { current } = await getProfileConfig()
   const { diffWorkDir = false } = await getAppConfig()
   const currentProfile = await overrideProfile(current, await getProfile(current))
+  currentProfileStr = yaml.stringify(currentProfile)
   const controledMihomoConfig = await getControledMihomoConfig()
   const profile = deepMerge(currentProfile, controledMihomoConfig)
   // 确保可以拿到基础日志信息
@@ -136,6 +138,10 @@ function runOverrideScript(
 
 export async function getRuntimeConfigStr(): Promise<string> {
   return runtimeConfigStr
+}
+
+export async function getCurrentProfileStr(): Promise<string> {
+  return currentProfileStr
 }
 
 export async function getRuntimeConfig(): Promise<IMihomoConfig> {

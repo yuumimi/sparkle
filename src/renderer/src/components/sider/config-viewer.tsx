@@ -9,7 +9,12 @@ import {
 } from '@heroui/react'
 import React, { useEffect, useState, useCallback } from 'react'
 import { BaseEditor } from '../base/base-editor'
-import { getProfileConfig, getProfileParseStr, getRuntimeConfigStr } from '@renderer/utils/ipc'
+import {
+  getProfileConfig,
+  getProfileParseStr,
+  getRuntimeConfigStr,
+  getCurrentProfileStr
+} from '@renderer/utils/ipc'
 import useSWR from 'swr'
 
 interface Props {
@@ -18,7 +23,9 @@ interface Props {
 const ConfigViewer: React.FC<Props> = ({ onClose }) => {
   const [runtimeConfig, setRuntimeConfig] = useState('')
   const [profileConfig, setProfileConfig] = useState('')
+  const [overrideConfig, setOverrideConfig] = useState('')
   const [isDiff, setIsDiff] = useState(false)
+  const [isOverride, setIsOverride] = useState(false)
   const [sideBySide, setSideBySide] = useState(false)
 
   const { data: appConfig } = useSWR('getProfileConfig', getProfileConfig)
@@ -26,6 +33,8 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
   const fetchConfigs = useCallback(async () => {
     const runtime = await getRuntimeConfigStr()
     setRuntimeConfig(runtime)
+    const override = await getCurrentProfileStr()
+    setOverrideConfig(override)
 
     if (appConfig?.current) {
       const profile = await getProfileParseStr(appConfig.current)
@@ -53,7 +62,7 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
           <BaseEditor
             language="yaml"
             value={runtimeConfig}
-            originalValue={isDiff ? profileConfig : undefined}
+            originalValue={isDiff ? (isOverride ? overrideConfig : profileConfig) : undefined}
             readOnly
             diffRenderSideBySide={sideBySide}
           />
@@ -64,6 +73,8 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
             <span className="text-sm">对比当前配置</span>
             <Switch size="sm" isSelected={sideBySide} onValueChange={setSideBySide} />
             <span className="text-sm">侧边显示</span>
+            <Switch size="sm" isSelected={isOverride} onValueChange={setIsOverride} />
+            <span className="text-sm">包含覆写</span>
           </div>
           <Button size="sm" variant="light" onPress={onClose}>
             关闭

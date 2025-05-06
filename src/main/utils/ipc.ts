@@ -68,7 +68,7 @@ import {
   setNativeTheme,
   setupFirewall
 } from '../sys/misc'
-import { getRuntimeConfig, getRuntimeConfigStr } from '../core/factory'
+import { getRuntimeConfig, getRuntimeConfigStr, getCurrentProfileStr } from '../core/factory'
 import { listWebdavBackups, webdavBackup, webdavDelete, webdavRestore } from '../resolve/backup'
 import { getInterfaces } from '../sys/interface'
 import { closeTrayIcon, copyEnv, showTrayIcon } from '../resolve/tray'
@@ -181,6 +181,7 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('getFilePath', (_e, ext) => getFilePath(ext))
   ipcMain.handle('readTextFile', (_e, filePath) => ipcErrorWrapper(readTextFile)(filePath))
   ipcMain.handle('getRuntimeConfigStr', ipcErrorWrapper(getRuntimeConfigStr))
+  ipcMain.handle('getCurrentProfileStr', ipcErrorWrapper(getCurrentProfileStr))
   ipcMain.handle('getRuntimeConfig', ipcErrorWrapper(getRuntimeConfig))
   ipcMain.handle('downloadAndInstallUpdate', (_e, version) =>
     ipcErrorWrapper(downloadAndInstallUpdate)(version)
