@@ -86,7 +86,16 @@ const RuleProvider: React.FC = () => {
           title={showDetails.title}
           format={showDetails.format}
           privderType={showDetails.privderType}
-          onClose={() => setShowDetails({ show: false, path: '', type: '', title: '', format: '', privderType: '' })}
+          onClose={() =>
+            setShowDetails({
+              show: false,
+              path: '',
+              type: '',
+              title: '',
+              format: '',
+              privderType: ''
+            })
+          }
         />
       )}
       <SettingItem title="规则集合" divider>
@@ -114,7 +123,7 @@ const RuleProvider: React.FC = () => {
           >
             <div className="flex h-[32px] leading-[32px] text-foreground-500">
               <div>{dayjs(provider.updatedAt).fromNow()}</div>
-              {provider.format !== 'MrsRule' && provider.vehicleType !== 'Inline' &&  (
+              {provider.format !== 'MrsRule' && provider.vehicleType !== 'Inline' && (
                 <Button
                   isIconOnly
                   title={provider.vehicleType == 'File' ? '编辑' : '查看'}
@@ -152,7 +161,7 @@ const RuleProvider: React.FC = () => {
             </div>
           </SettingItem>
           <SettingItem
-            title={<div className="text-foreground-500">{provider.format}</div>}
+            title={<div className="text-foreground-500">{provider.format || 'InlineRule'}</div>}
             divider={index !== providers.length - 1}
           >
             <div className="h-[32px] leading-[32px] text-foreground-500">
