@@ -21,7 +21,6 @@ import { deepMerge } from '../utils/merge'
 import vm from 'vm'
 import { existsSync, writeFileSync } from 'fs'
 import path from 'path'
-import util from 'util'
 
 let runtimeConfigStr: string,
   rawProfileStr: string,
@@ -112,6 +111,9 @@ async function runOverrideScript(
     })
   }
   try {
+    const b64d = (str: string): string => Buffer.from(str, 'base64').toString('utf-8')
+    const b64e = (data: Buffer | string): string =>
+      (Buffer.isBuffer(data) ? data : Buffer.from(String(data))).toString('base64')
     const ctx = {
       console: Object.freeze({
         log: (...args: unknown[]) => log('log', args.map(format).join(' ')),
@@ -121,6 +123,8 @@ async function runOverrideScript(
       }),
       fetch,
       yaml,
+      b64d,
+      b64e,
       Buffer
     }
     vm.createContext(ctx)
@@ -141,7 +145,7 @@ async function runOverrideScript(
     log('info', '脚本执行成功')
     return newProfile
   } catch (e) {
-    log('exception', '脚本执行失败：' + util.inspect(e, { showHidden: true, depth: null }))
+    log('exception', `脚本执行失败：${e}`)
     return profile
   }
 }
