@@ -5,7 +5,12 @@ import { useGroups } from '@renderer/hooks/use-groups'
 import { mihomoCloseAllConnections, patchMihomoConfig } from '@renderer/utils/ipc'
 import { Key } from 'react'
 
-const OutboundModeSwitcher: React.FC = () => {
+interface Props {
+  iconOnly?: boolean
+}
+
+const OutboundModeSwitcher: React.FC<Props> = (props) => {
+  const { iconOnly } = props
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
   const { mutate: mutateGroups } = useGroups()
   const { appConfig } = useAppConfig()
@@ -22,6 +27,23 @@ const OutboundModeSwitcher: React.FC = () => {
     window.electron.ipcRenderer.send('updateTrayMenu')
   }
   if (!mode) return null
+  if (iconOnly) {
+    return (
+      <Tabs
+        fullWidth
+        color="primary"
+        selectedKey={mode}
+        classNames={{
+          tabList: 'bg-content1 shadow-medium outbound-mode-card flex-col'
+        }}
+        onSelectionChange={(key: Key) => onChangeMode(key as OutboundMode)}
+      >
+        <Tab className={`${mode === 'rule' ? 'font-bold' : ''}`} key="rule" title="R" />
+        <Tab className={`${mode === 'global' ? 'font-bold' : ''}`} key="global" title="G" />
+        <Tab className={`${mode === 'direct' ? 'font-bold' : ''}`} key="direct" title="D" />
+      </Tabs>
+    )
+  }
   return (
     <Tabs
       fullWidth

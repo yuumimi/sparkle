@@ -202,7 +202,7 @@ const App: React.FC = () => {
             )}
             <UpdaterButton iconOnly={true} />
           </div>
-          <div className="h-[calc(100%-110px)] overflow-y-auto no-scrollbar">
+          <div className="h-[calc(100%-230px)] overflow-y-auto no-scrollbar">
             <div className="h-full w-full flex flex-col gap-2">
               {order.map((key: string) => {
                 const Component = componentMap[key]
@@ -211,16 +211,15 @@ const App: React.FC = () => {
               })}
             </div>
           </div>
-          <div className="mt-2 flex justify-center items-center h-[48px]">
+          <div className="p-2 flex flex-col items-center space-y-2">
+            <OutboundModeSwitcher iconOnly />
             <Button
               size="sm"
               className="app-nodrag"
               isIconOnly
               color={location.pathname.includes('/settings') ? 'primary' : 'default'}
               variant={location.pathname.includes('/settings') ? 'solid' : 'light'}
-              onPress={() => {
-                navigate('/settings')
-              }}
+              onPress={() => navigate('/settings')}
             >
               <IoSettings className="text-[20px]" />
             </Button>
