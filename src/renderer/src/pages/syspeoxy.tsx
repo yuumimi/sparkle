@@ -7,8 +7,8 @@ import PacEditorModal from '@renderer/components/sysproxy/pac-editor-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
 import { openUWPTool, triggerSysProxy } from '@renderer/utils/ipc'
-import { Key, useState } from 'react'
-import React from 'react'
+import React, { Key, useState } from 'react'
+import ByPassEditorModal from '@renderer/components/sysproxy/bypass-editor-modal'
 
 const defaultBypass: string[] =
   platform === 'linux'
@@ -65,6 +65,7 @@ const Sysproxy: React.FC = () => {
     mode: sysProxy.mode ?? 'manual',
     pacScript: sysProxy.pacScript ?? defaultPacScript
   })
+  const [openEditor, setOpenEditor] = useState(false)
 
   const setValues = (v: typeof values): void => {
     originSetValues(v)
@@ -107,6 +108,19 @@ const Sysproxy: React.FC = () => {
           }}
         />
       )}
+      {openEditor && (
+        <ByPassEditorModal
+          bypass={values.bypass}
+          onCancel={() => setOpenEditor(false)}
+          onConfirm={async (list: string[]) => {
+            setOpenEditor(false)
+            setValues({
+              ...values,
+              bypass: Array.from(new Set([...values.bypass, ...list]))
+            })
+          }}
+        />
+      )}
       <SettingCard className="sysproxy-settings">
         <SettingItem title="代理主机" divider>
           <Input
@@ -142,7 +156,6 @@ const Sysproxy: React.FC = () => {
             </Button>
           </SettingItem>
         )}
-
         {values.mode === 'auto' && (
           <SettingItem title="代理模式">
             <Button size="sm" onPress={() => setOpenPacEditor(true)} variant="bordered">
@@ -156,14 +169,26 @@ const Sysproxy: React.FC = () => {
               <Button
                 size="sm"
                 onPress={() => {
-                  setValues({ ...values, bypass: defaultBypass.concat(values.bypass) })
+                  setValues({
+                    ...values,
+                    bypass: Array.from(new Set([...defaultBypass, ...values.bypass]))
+                  })
                 }}
               >
                 添加默认代理绕过
               </Button>
             </SettingItem>
+            <SettingItem title="代理绕过列表">
+              <Button
+                size="sm"
+                onPress={async () => {
+                  setOpenEditor(true)
+                }}
+              >
+                编辑
+              </Button>
+            </SettingItem>
             <EditableList
-              title="代理绕过"
               items={values.bypass}
               onChange={(list) => setValues({ ...values, bypass: list })}
               placeholder="例：*.baidu.com"
