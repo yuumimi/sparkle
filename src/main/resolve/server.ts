@@ -121,11 +121,11 @@ export async function startSubStoreBackendServer(): Promise<void> {
     subStoreBackendWorker = new Worker(path.join(mihomoWorkDir(), 'sub-store.bundle.js'), {
       env: useProxyInSubStore
         ? {
-            ...env,
-            HTTP_PROXY: `http://127.0.0.1:${port}`,
-            HTTPS_PROXY: `http://127.0.0.1:${port}`,
-            ALL_PROXY: `http://127.0.0.1:${port}`
-          }
+          ...env,
+          HTTP_PROXY: `http://127.0.0.1:${port}`,
+          HTTPS_PROXY: `http://127.0.0.1:${port}`,
+          ALL_PROXY: `http://127.0.0.1:${port}`
+        }
         : env
     })
     subStoreBackendWorker.stdout.pipe(stdout)
@@ -152,11 +152,13 @@ export async function downloadSubStore(): Promise<void> {
       {
         responseType: 'arraybuffer',
         headers: { 'Content-Type': 'application/octet-stream' },
-        proxy: {
-          protocol: 'http',
-          host: '127.0.0.1',
-          port: mixedPort
-        }
+        ...(mixedPort != 0 && {
+          proxy: {
+            protocol: 'http',
+            host: '127.0.0.1',
+            port: mixedPort
+          }
+        })
       }
     )
     await writeFile(backendPath, Buffer.from(backendRes.data))
@@ -167,11 +169,13 @@ export async function downloadSubStore(): Promise<void> {
       {
         responseType: 'arraybuffer',
         headers: { 'Content-Type': 'application/octet-stream' },
-        proxy: {
-          protocol: 'http',
-          host: '127.0.0.1',
-          port: mixedPort
-        }
+        ...(mixedPort != 0 && {
+          proxy: {
+            protocol: 'http',
+            host: '127.0.0.1',
+            port: mixedPort
+          }
+        })
       }
     )
 

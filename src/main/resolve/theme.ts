@@ -38,11 +38,13 @@ export async function fetchThemes(): Promise<void> {
   const zipData = await axios.get(zipUrl, {
     responseType: 'arraybuffer',
     headers: { 'Content-Type': 'application/octet-stream' },
-    proxy: {
-      protocol: 'http',
-      host: '127.0.0.1',
-      port: mixedPort
-    }
+    ...(mixedPort != 0 && {
+      proxy: {
+        protocol: 'http',
+        host: '127.0.0.1',
+        port: mixedPort
+      }
+    })
   })
   const zip = new AdmZip(zipData.data as Buffer)
   zip.extractAllTo(themesDir(), true)

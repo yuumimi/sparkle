@@ -16,11 +16,13 @@ export async function checkUpdate(): Promise<IAppVersion | undefined> {
     'https://github.com/xishang0128/sparkle/releases/latest/download/latest.yml',
     {
       headers: { 'Content-Type': 'application/octet-stream' },
-      proxy: {
-        protocol: 'http',
-        host: '127.0.0.1',
-        port: mixedPort
-      },
+      ...(mixedPort != 0 && {
+        proxy: {
+          protocol: 'http',
+          host: '127.0.0.1',
+          port: mixedPort
+        }
+      }),
       responseType: 'text'
     }
   )
@@ -64,11 +66,13 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
     if (!existsSync(path.join(dataDir(), file))) {
       const res = await axios.get(`${baseUrl}${file}`, {
         responseType: 'arraybuffer',
-        proxy: {
-          protocol: 'http',
-          host: '127.0.0.1',
-          port: mixedPort
-        },
+        ...(mixedPort != 0 && {
+          proxy: {
+            protocol: 'http',
+            host: '127.0.0.1',
+            port: mixedPort
+          }
+        }),
         headers: {
           'Content-Type': 'application/octet-stream'
         }

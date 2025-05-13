@@ -71,11 +71,13 @@ export async function createOverride(item: Partial<IOverrideItem>): Promise<IOve
       const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
       if (!item.url) throw new Error('Empty URL')
       const res = await axios.get(item.url, {
-        proxy: {
-          protocol: 'http',
-          host: '127.0.0.1',
-          port: mixedPort
-        },
+        ...(mixedPort != 0 && {
+          proxy: {
+            protocol: 'http',
+            host: '127.0.0.1',
+            port: mixedPort
+          }
+        }),
         responseType: 'text'
       })
       const data = res.data

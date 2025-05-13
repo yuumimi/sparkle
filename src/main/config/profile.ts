@@ -127,7 +127,7 @@ export async function createProfile(item: Partial<IProfileItem>): Promise<IProfi
         const urlObj = new URL(`http://127.0.0.1:${subStorePort}${item.url}`)
         urlObj.searchParams.set('target', 'ClashMeta')
         urlObj.searchParams.set('noCache', 'true')
-        if (newItem.useProxy) {
+        if (newItem.useProxy && mixedPort != 0) {
           urlObj.searchParams.set('proxy', `http://127.0.0.1:${mixedPort}`)
         } else {
           urlObj.searchParams.delete('proxy')
@@ -140,13 +140,14 @@ export async function createProfile(item: Partial<IProfileItem>): Promise<IProfi
         })
       } else {
         res = await axios.get(item.url, {
-          proxy: newItem.useProxy
-            ? {
+          proxy:
+            newItem.useProxy && mixedPort != 0
+              ? {
                 protocol: 'http',
                 host: '127.0.0.1',
                 port: mixedPort
               }
-            : false,
+              : false,
           headers: {
             'User-Agent': userAgent || 'clash.meta/alpha-de19f92'
           },
