@@ -22,8 +22,8 @@ const PortSetting: React.FC = () => {
     'lan-allowed-ips': lanAllowedIps = [],
     'lan-disallowed-ips': lanDisallowedIps = [],
     'mixed-port': mixedPort = 7890,
-    'socks-port': socksPort = 7891,
-    port: httpPort = 7892,
+    'socks-port': socksPort = 0,
+    port: httpPort = 0,
     'redir-port': redirPort = 0,
     'tproxy-port': tproxyPort = 0
   } = controledMihomoConfig || {}
@@ -46,6 +46,16 @@ const PortSetting: React.FC = () => {
     return { part1: user, part2: pass }
   }
   const formatAuth = (user: string, pass?: string) => `${user}:${pass || ''}`
+  const hasPortConflict = (): boolean => {
+    const ports = [
+      mixedPortInput,
+      socksPortInput,
+      httpPortInput,
+      redirPortInput,
+      tproxyPortInput
+    ].filter((p) => p !== 0)
+    return new Set(ports).size !== ports.length
+  }
 
   const onChangeNeedRestart = async (patch: Partial<IMihomoConfig>): Promise<void> => {
     await patchControledMihomoConfig(patch)
@@ -63,6 +73,7 @@ const PortSetting: React.FC = () => {
                 size="sm"
                 color="primary"
                 className="mr-2"
+                isDisabled={hasPortConflict()}
                 onPress={async () => {
                   await onChangeNeedRestart({ 'mixed-port': mixedPortInput })
                   await startSubStoreBackendServer()
@@ -94,6 +105,7 @@ const PortSetting: React.FC = () => {
                 size="sm"
                 color="primary"
                 className="mr-2"
+                isDisabled={hasPortConflict()}
                 onPress={() => {
                   onChangeNeedRestart({ 'socks-port': socksPortInput })
                 }}
@@ -122,6 +134,7 @@ const PortSetting: React.FC = () => {
                 size="sm"
                 color="primary"
                 className="mr-2"
+                isDisabled={hasPortConflict()}
                 onPress={() => {
                   onChangeNeedRestart({ port: httpPortInput })
                 }}
@@ -151,6 +164,7 @@ const PortSetting: React.FC = () => {
                   size="sm"
                   color="primary"
                   className="mr-2"
+                  isDisabled={hasPortConflict()}
                   onPress={() => {
                     onChangeNeedRestart({ 'redir-port': redirPortInput })
                   }}
@@ -181,6 +195,7 @@ const PortSetting: React.FC = () => {
                   size="sm"
                   color="primary"
                   className="mr-2"
+                  isDisabled={hasPortConflict()}
                   onPress={() => {
                     onChangeNeedRestart({ 'tproxy-port': tproxyPortInput })
                   }}
