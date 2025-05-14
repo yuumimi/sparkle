@@ -116,7 +116,7 @@ const Sysproxy: React.FC = () => {
             setOpenEditor(false)
             setValues({
               ...values,
-              bypass: Array.from(new Set([...values.bypass, ...list]))
+              bypass: list
             })
           }}
         />
