@@ -49,9 +49,9 @@ mac:
 pkg:
   allowAnywhere: false
   allowCurrentUserHome: false
-  background:
-    alignment: bottomleft
-    file: build/background.png
+  # background:
+  #   alignment: bottomleft
+  #   file: build/background.png
 linux:
   desktop:
     entry:
