@@ -36,6 +36,22 @@ type FindProcessMode = 'off' | 'strict' | 'always'
 type DnsMode = 'normal' | 'fake-ip' | 'redir-host'
 type FilterMode = 'blacklist' | 'whitelist'
 type NetworkInterfaceInfo = os.NetworkInterfaceInfo
+type Fingerprints =
+  | 'random'
+  | 'randomized'
+  | 'chrome'
+  | 'chrome_psk'
+  | 'chrome_psk_shuffle'
+  | 'chrome_padding_psk_shuffle'
+  | 'chrome_pq'
+  | 'chrome_pq_psk'
+  | 'firefox'
+  | 'safari'
+  | 'ios'
+  | 'android'
+  | 'edge'
+  | '360'
+  | 'qq'
 
 interface IAppVersion {
   version: string
@@ -68,7 +84,7 @@ interface IMihomoConfigs {
   'tcp-concurrent': boolean
   'find-process-mode': FindProcessMode
   'geodata-mode': boolean
-  'global-client-fingerprint': string
+  'global-client-fingerprint': Fingerprints
   'global-ua': string
   'etag-support': boolean
   'keep-alive-idle': number
@@ -438,11 +454,16 @@ interface IMihomoConfig {
   'allow-lan': boolean
   'unified-delay': boolean
   'tcp-concurrent': boolean
+  'interface-name': string
+  'global-client-fingerprint': Fingerprints
   'log-level': LogLevel
   'find-process-mode': FindProcessMode
   'socks-port'?: number
   'redir-port'?: number
   'tproxy-port'?: number
+  'keep-alive-idle': number
+  'keep-alive-interval': number
+  'disable-keep-alive': boolean
   'skip-auth-prefixes'?: string[]
   'bind-address'?: string
   'lan-allowed-ips'?: string[]

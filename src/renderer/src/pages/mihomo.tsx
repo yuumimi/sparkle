@@ -12,6 +12,7 @@ import { mihomoUpgrade, restartCore } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import ControllerSetting from '@renderer/components/mihomo/controller-setting'
 import EnvSetting from '@renderer/components/mihomo/env-setting'
+import AdvancedSetting from '@renderer/components/mihomo/advanced-settings'
 
 const CoreMap = {
   mihomo: '稳定版',
@@ -22,15 +23,7 @@ const Mihomo: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
   const { core = 'mihomo', maxLogDays = 7 } = appConfig || {}
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
-  const {
-    ipv6,
-    'log-level': logLevel = 'info',
-    'find-process-mode': findProcessMode = 'strict',
-    'unified-delay': unifiedDelay,
-    'tcp-concurrent': tcpConcurrent,
-    profile = {}
-  } = controledMihomoConfig || {}
-  const { 'store-selected': storeSelected, 'store-fake-ip': storeFakeIp } = profile
+  const { ipv6, 'log-level': logLevel = 'info' } = controledMihomoConfig || {}
 
   const [upgrading, setUpgrading] = useState(false)
 
@@ -52,9 +45,6 @@ const Mihomo: React.FC = () => {
 
   return (
     <BasePage title="内核设置">
-      <PortSetting />
-      <ControllerSetting />
-      <EnvSetting />
       <SettingCard>
         <SettingItem
           title="内核版本"
@@ -107,49 +97,12 @@ const Mihomo: React.FC = () => {
             <SelectItem key="mihomo-alpha">{CoreMap['mihomo-alpha']}</SelectItem>
           </Select>
         </SettingItem>
-
         <SettingItem title="IPv6" divider>
           <Switch
             size="sm"
             isSelected={ipv6}
             onValueChange={(v) => {
               onChangeNeedRestart({ ipv6: v })
-            }}
-          />
-        </SettingItem>
-        <SettingItem title="使用 RTT 延迟测试" divider>
-          <Switch
-            size="sm"
-            isSelected={unifiedDelay}
-            onValueChange={(v) => {
-              onChangeNeedRestart({ 'unified-delay': v })
-            }}
-          />
-        </SettingItem>
-        <SettingItem title="TCP 并发" divider>
-          <Switch
-            size="sm"
-            isSelected={tcpConcurrent}
-            onValueChange={(v) => {
-              onChangeNeedRestart({ 'tcp-concurrent': v })
-            }}
-          />
-        </SettingItem>
-        <SettingItem title="存储选择节点" divider>
-          <Switch
-            size="sm"
-            isSelected={storeSelected}
-            onValueChange={(v) => {
-              onChangeNeedRestart({ profile: { 'store-selected': v } })
-            }}
-          />
-        </SettingItem>
-        <SettingItem title="存储 FakeIP" divider>
-          <Switch
-            size="sm"
-            isSelected={storeFakeIp}
-            onValueChange={(v) => {
-              onChangeNeedRestart({ profile: { 'store-fake-ip': v } })
             }}
           />
         </SettingItem>
@@ -164,7 +117,7 @@ const Mihomo: React.FC = () => {
             }}
           />
         </SettingItem>
-        <SettingItem title="日志等级" divider>
+        <SettingItem title="日志等级">
           <Select
             classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
             className="w-[100px]"
@@ -182,23 +135,11 @@ const Mihomo: React.FC = () => {
             <SelectItem key="debug">调试</SelectItem>
           </Select>
         </SettingItem>
-        <SettingItem title="查找进程">
-          <Select
-            classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
-            className="w-[100px]"
-            size="sm"
-            selectedKeys={new Set([findProcessMode])}
-            disallowEmptySelection={true}
-            onSelectionChange={(v) => {
-              onChangeNeedRestart({ 'find-process-mode': v.currentKey as FindProcessMode })
-            }}
-          >
-            <SelectItem key="strict">自动</SelectItem>
-            <SelectItem key="off">关闭</SelectItem>
-            <SelectItem key="always">开启</SelectItem>
-          </Select>
-        </SettingItem>
       </SettingCard>
+      <PortSetting />
+      <ControllerSetting />
+      <EnvSetting />
+      <AdvancedSetting />
     </BasePage>
   )
 }

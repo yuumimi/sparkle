@@ -55,7 +55,7 @@ export const defaultControledMihomoConfig: Partial<IMihomoConfig> = {
   'unified-delay': false,
   'tcp-concurrent': false,
   'log-level': 'info',
-  'find-process-mode': 'strict',
+  'find-process-mode': 'always',
   'bind-address': '*',
   'lan-allowed-ips': ['0.0.0.0/0', '::/0'],
   'lan-disallowed-ips': [],
