@@ -86,6 +86,10 @@ jobs:
       - name: Generate latest.yml
         run: pnpm updater
 
+      - name: Generate checksums
+        if: matrix.os == 'windows-latest'
+        run: pnpm checksum portable.7z
+
       - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
@@ -113,7 +117,7 @@ jobs:
         run: |
           cd bin/dist/
           rm sparkle.app.plist
-          find . -type f -not -name "checksums.*" -not -name "version.txt" | sort | xargs sha256sum > checksums.txt
+          find . -type f -not -name "checksums.*" -not -name "*.sha256" -not -name "version.txt" | sort | xargs sha256sum > checksums.txt
         shell: bash
 
       - name: Delete current release assets
