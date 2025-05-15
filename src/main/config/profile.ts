@@ -1,6 +1,6 @@
 import { getControledMihomoConfig } from './controledMihomo'
 import { mihomoProfileWorkDir, mihomoWorkDir, profileConfigPath, profilePath } from '../utils/dirs'
-import { addProfileUpdater } from '../core/profileUpdater'
+import { addProfileUpdater, delProfileUpdater } from '../core/profileUpdater'
 import { readFile, rm, writeFile } from 'fs/promises'
 import { restartCore } from '../core/manager'
 import { getAppConfig } from './app'
@@ -97,6 +97,7 @@ export async function removeProfileItem(id: string): Promise<void> {
   if (existsSync(mihomoProfileWorkDir(id))) {
     await rm(mihomoProfileWorkDir(id), { recursive: true })
   }
+  await delProfileUpdater(id)
 }
 
 export async function getCurrentProfileItem(): Promise<IProfileItem> {
