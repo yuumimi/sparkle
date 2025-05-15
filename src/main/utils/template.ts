@@ -43,6 +43,8 @@ export const defaultConfig: IAppConfig = {
 
 export const defaultControledMihomoConfig: Partial<IMihomoConfig> = {
   'external-controller': '',
+  'external-ui': '',
+  'external-ui-url': 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip',
   'external-controller-cors': {
     'allow-origins': ['*'],
     'allow-private-network': true

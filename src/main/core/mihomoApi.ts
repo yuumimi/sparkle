@@ -139,11 +139,6 @@ export const mihomoUnfixedProxy = async (group: string): Promise<IMihomoProxy> =
   return await instance.delete(`/proxies/${encodeURIComponent(group)}`)
 }
 
-export const mihomoUpgradeGeo = async (): Promise<void> => {
-  const instance = await getAxios()
-  return await instance.post('/configs/geo')
-}
-
 export const mihomoProxyDelay = async (proxy: string, url?: string): Promise<IMihomoDelay> => {
   const appConfig = await getAppConfig()
   const { delayTestUrl, delayTestTimeout } = appConfig
@@ -171,6 +166,16 @@ export const mihomoGroupDelay = async (group: string, url?: string): Promise<IMi
 export const mihomoUpgrade = async (): Promise<void> => {
   const instance = await getAxios()
   return await instance.post('/upgrade')
+}
+
+export const mihomoUpgradeGeo = async (): Promise<void> => {
+  const instance = await getAxios()
+  return await instance.post('/upgrade/geo')
+}
+
+export const mihomoUpgradeUI = async (): Promise<void> => {
+  const instance = await getAxios()
+  return await instance.post('/upgrade/ui')
 }
 
 export const startMihomoTraffic = async (): Promise<void> => {

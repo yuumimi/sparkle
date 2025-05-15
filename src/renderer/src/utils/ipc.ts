@@ -71,6 +71,10 @@ export async function mihomoUpgradeGeo(): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoUpgradeGeo'))
 }
 
+export async function mihomoUpgradeUI(): Promise<void> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoUpgradeUI'))
+}
+
 export async function mihomoUpgrade(): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoUpgrade'))
 }

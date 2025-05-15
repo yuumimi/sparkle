@@ -446,6 +446,8 @@ interface IMihomoConfig {
   'external-controller-pipe': string
   'external-controller-unix': string
   'external-controller': string
+  'external-ui': string
+  'external-ui-url': string
   'external-controller-cors'?: {
     'allow-origins'?: string[]
     'allow-private-network'?: boolean
