@@ -64,6 +64,9 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     diffWorkDir = false,
     mihomoCpuPriority = 'PRIORITY_NORMAL',
     disableLoopbackDetector = false,
+    disableEmbedCA = false,
+    disableSystemCA = false,
+    disableNftables = false,
     skipSafePathCheck = false,
     safePaths = []
   } = await getAppConfig()
@@ -97,6 +100,9 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
   const stderr = createWriteStream(logPath(), { flags: 'a' })
   const env = {
     DISABLE_LOOPBACK_DETECTOR: String(disableLoopbackDetector),
+    DISABLE_EMBED_CA: String(disableEmbedCA),
+    DISABLE_SYSTEM_CA: String(disableSystemCA),
+    DISABLE_NFTABLES: String(disableNftables),
     SKIP_SAFE_PATH_CHECK: String(skipSafePathCheck),
     SAFE_PATHS: safePaths.join(path.delimiter)
   }

@@ -280,6 +280,9 @@ interface IHost {
 interface IAppConfig {
   core: 'mihomo' | 'mihomo-alpha'
   disableLoopbackDetector: boolean
+  disableEmbedCA: boolean
+  disableSystemCA: boolean
+  disableNftables: boolean
   skipSafePathCheck: boolean
   safePaths: string[]
   proxyDisplayMode: 'simple' | 'full'

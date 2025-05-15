@@ -5,10 +5,18 @@ import { Button, Divider, Switch } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { restartCore } from '@renderer/utils/ipc'
 import EditableList from '../base/base-list-editor'
+import { platform } from '@renderer/utils/init'
 
 const EnvSetting: React.FC = () => {
   const { appConfig, patchAppConfig } = useAppConfig()
-  const { disableLoopbackDetector, skipSafePathCheck, safePaths = [] } = appConfig || {}
+  const {
+    disableLoopbackDetector,
+    disableEmbedCA,
+    disableSystemCA,
+    disableNftables,
+    skipSafePathCheck,
+    safePaths = []
+  } = appConfig || {}
   const handleConfigChangeWithRestart = async (key: string, value: any) => {
     try {
       await patchAppConfig({ [key]: value })
@@ -23,7 +31,25 @@ const EnvSetting: React.FC = () => {
 
   return (
     <SettingCard title="环境变量">
-      <SettingItem title="禁用回环检测器" divider>
+      <SettingItem title="禁用系统 CA" divider>
+        <Switch
+          size="sm"
+          isSelected={disableSystemCA}
+          onValueChange={(v) => {
+            handleConfigChangeWithRestart('disableSystemCA', v)
+          }}
+        />
+      </SettingItem>
+      <SettingItem title="禁用内置 CA" divider>
+        <Switch
+          size="sm"
+          isSelected={disableEmbedCA}
+          onValueChange={(v) => {
+            handleConfigChangeWithRestart('disableEmbedCA', v)
+          }}
+        />
+      </SettingItem>
+      <SettingItem title="禁用回环检测" divider>
         <Switch
           size="sm"
           isSelected={disableLoopbackDetector}
@@ -32,6 +58,17 @@ const EnvSetting: React.FC = () => {
           }}
         />
       </SettingItem>
+      {platform == 'linux' && (
+        <SettingItem title="禁用 nftables" divider>
+          <Switch
+            size="sm"
+            isSelected={disableNftables}
+            onValueChange={(v) => {
+              handleConfigChangeWithRestart('disableNftables', v)
+            }}
+          />
+        </SettingItem>
+      )}
       <SettingItem title="禁用可信路径检查">
         <Switch
           size="sm"

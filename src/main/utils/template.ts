@@ -34,6 +34,9 @@ export const defaultConfig: IAppConfig = {
   siderWidth: 250,
   sysProxy: { enable: false, mode: 'manual' },
   disableLoopbackDetector: false,
+  disableEmbedCA: false,
+  disableSystemCA: false,
+  disableNftables: false,
   skipSafePathCheck: false,
   safePaths: []
 }
