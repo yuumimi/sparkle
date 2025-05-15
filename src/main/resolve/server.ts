@@ -111,7 +111,7 @@ export async function startSubStoreBackendServer(): Promise<void> {
       SUB_STORE_BACKEND_API_HOST: subStoreHost,
       SUB_STORE_DATA_BASE_PATH: subStoreDir(),
       SUB_STORE_BACKEND_CUSTOM_ICON: icon.toDataURL(),
-      SUB_STORE_BACKEND_CUSTOM_NAME: 'Mihomo Party',
+      SUB_STORE_BACKEND_CUSTOM_NAME: 'Sparkle',
       SUB_STORE_BACKEND_SYNC_CRON: subStoreBackendSyncCron,
       SUB_STORE_BACKEND_DOWNLOAD_CRON: subStoreBackendDownloadCron,
       SUB_STORE_BACKEND_UPLOAD_CRON: subStoreBackendUploadCron,
@@ -121,11 +121,11 @@ export async function startSubStoreBackendServer(): Promise<void> {
     subStoreBackendWorker = new Worker(path.join(mihomoWorkDir(), 'sub-store.bundle.js'), {
       env: useProxyInSubStore
         ? {
-          ...env,
-          HTTP_PROXY: `http://127.0.0.1:${port}`,
-          HTTPS_PROXY: `http://127.0.0.1:${port}`,
-          ALL_PROXY: `http://127.0.0.1:${port}`
-        }
+            ...env,
+            HTTP_PROXY: `http://127.0.0.1:${port}`,
+            HTTPS_PROXY: `http://127.0.0.1:${port}`,
+            ALL_PROXY: `http://127.0.0.1:${port}`
+          }
         : env
     })
     subStoreBackendWorker.stdout.pipe(stdout)
