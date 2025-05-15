@@ -6,6 +6,8 @@ import { mihomoUpgradeUI, restartCore } from '@renderer/utils/ipc'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import EditableList from '../base/base-list-editor'
 import { IoMdCloudDownload } from 'react-icons/io'
+import { HiExternalLink } from 'react-icons/hi'
+import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 
 const ControllerSetting: React.FC = () => {
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
@@ -28,6 +30,7 @@ const ControllerSetting: React.FC = () => {
   const [secretInput, setSecretInput] = useState(secret)
   const [enableExternalUi, setEnableExternalUi] = useState(externalUi == 'ui')
   const [upgrading, setUpgrading] = useState(false)
+  const [showPassword, setShowPassword] = useState(false)
 
   const onChangeNeedRestart = async (patch: Partial<IMihomoConfig>): Promise<void> => {
     await patchControledMihomoConfig(patch)
@@ -76,10 +79,23 @@ const ControllerSetting: React.FC = () => {
           )}
           <Input
             size="sm"
-            type="password"
+            type={showPassword ? 'text' : 'password'}
             className="w-[200px]"
             value={secretInput}
             onValueChange={setSecretInput}
+            startContent={
+              <button
+                type="button"
+                onClick={() => setShowPassword((prev) => !prev)}
+                className="text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? (
+                  <AiOutlineEyeInvisible className="w-4 h-4" />
+                ) : (
+                  <AiOutlineEye className="w-4 h-4" />
+                )}
+              </button>
+            }
           />
         </div>
       </SettingItem>
@@ -99,26 +115,63 @@ const ControllerSetting: React.FC = () => {
         <SettingItem
           title="控制器面板"
           actions={
-            <Button
-              size="sm"
-              isIconOnly
-              title="更新面板"
-              variant="light"
-              isLoading={upgrading}
-              onPress={async () => {
-                try {
-                  setUpgrading(true)
-                  await mihomoUpgradeUI()
-                  new Notification('面板更新成功')
-                } catch (e) {
-                  alert(e)
-                } finally {
-                  setUpgrading(false)
-                }
-              }}
-            >
-              <IoMdCloudDownload className="text-lg" />
-            </Button>
+            <>
+              <Button
+                size="sm"
+                isIconOnly
+                title="更新面板"
+                variant="light"
+                isLoading={upgrading}
+                onPress={async () => {
+                  try {
+                    setUpgrading(true)
+                    await mihomoUpgradeUI()
+                    new Notification('面板更新成功')
+                  } catch (e) {
+                    alert(e)
+                  } finally {
+                    setUpgrading(false)
+                  }
+                }}
+              >
+                <IoMdCloudDownload className="text-lg" />
+              </Button>
+              <Button
+                title="在浏览器中打开"
+                isIconOnly
+                size="sm"
+                className="app-nodrag"
+                variant="light"
+                onPress={() => {
+                  const controller = externalController.startsWith(':')
+                    ? `127.0.0.1${externalController}`
+                    : externalController
+                  const host = controller.split(':')[0]
+                  const port = controller.split(':')[1]
+                  if (
+                    ['zashboard', 'metacubexd'].find((keyword) => externalUiUrl.includes(keyword))
+                  ) {
+                    open(
+                      `http://${controller}/ui/#/setup?hostname=${host}&port=${port}&secret=${secret}`
+                    )
+                  } else if (externalUiUrl.includes('Razord')) {
+                    open(
+                      `http://${controller}/ui/#/proxies?host=${host}&port=${port}&secret=${secret}`
+                    )
+                  } else {
+                    if (secret && secret.length > 0) {
+                      open(
+                        `http://${controller}/ui/?hostname=${host}&port=${port}&secret=${secret}`
+                      )
+                    } else {
+                      open(`http://${controller}/ui/?hostname=${host}&port=${port}`)
+                    }
+                  }
+                }}
+              >
+                <HiExternalLink className="text-lg" />
+              </Button>
+            </>
           }
           divider
         >
