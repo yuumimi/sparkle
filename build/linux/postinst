@@ -5,14 +5,14 @@ if type update-alternatives 2>/dev/null >&1; then
     if [ -L '/usr/bin/sparkle' -a -e '/usr/bin/sparkle' -a "`readlink '/usr/bin/sparkle'`" != '/etc/alternatives/sparkle' ]; then
         rm -f '/usr/bin/sparkle'
     fi
-    update-alternatives --install '/usr/bin/sparkle' 'sparkle' '/opt/Sparkle/sparkle' 100 || ln -sf '/opt/Sparkle/sparkle' '/usr/bin/sparkle'
+    update-alternatives --install '/usr/bin/sparkle' 'sparkle' '/opt/sparkle/sparkle' 100 || ln -sf '/opt/sparkle/sparkle' '/usr/bin/sparkle'
 else
-    ln -sf '/opt/Sparkle/sparkle' '/usr/bin/sparkle'
+    ln -sf '/opt/sparkle/sparkle' '/usr/bin/sparkle'
 fi
 
-chmod 4755 '/opt/Sparkle/chrome-sandbox' || true
-chmod +sx /opt/Sparkle/resources/sidecar/mihomo
-chmod +sx /opt/Sparkle/resources/sidecar/mihomo-alpha
+chmod 4755 '/opt/sparkle/chrome-sandbox' || true
+chmod +sx /opt/sparkle/resources/sidecar/mihomo
+chmod +sx /opt/sparkle/resources/sidecar/mihomo-alpha
 
 if hash update-mime-database 2>/dev/null; then
     update-mime-database /usr/share/mime || true
