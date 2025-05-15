@@ -149,7 +149,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
         resolve([
           new Promise((resolve) => {
             child.stdout?.on('data', async (data) => {
-              if (data.toString().includes('Start initial Compatible provider default')) {
+              if (data.toString().includes('Start initial compatible provider default')) {
                 try {
                   mainWindow?.webContents.send('groupsUpdated')
                   mainWindow?.webContents.send('rulesUpdated')
