@@ -196,6 +196,7 @@ const GeneralConfig: React.FC = () => {
             <SelectItem key="bash">Bash</SelectItem>
             <SelectItem key="cmd">CMD</SelectItem>
             <SelectItem key="powershell">PowerShell</SelectItem>
+            <SelectItem key="nushell">NuShell</SelectItem>
           </Select>
         </SettingItem>
         <SettingItem title="显示悬浮窗" divider>

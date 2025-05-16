@@ -302,7 +302,7 @@ export async function createTray(): Promise<void> {
   tray?.setToolTip('Sparkle')
   tray?.setIgnoreDoubleClickEvents(true)
   if (process.platform === 'darwin') {
-    if (!useDockIcon) {
+    if (!useDockIcon && app.dock) {
       app.dock.hide()
     }
     ipcMain.on('trayIconUpdate', async (_, png: string) => {
@@ -343,7 +343,7 @@ async function updateTrayMenu(): Promise<void> {
   }
 }
 
-export async function copyEnv(type: 'bash' | 'cmd' | 'powershell'): Promise<void> {
+export async function copyEnv(type: 'bash' | 'cmd' | 'powershell' | 'nushell'): Promise<void> {
   const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
   const { sysProxy } = await getAppConfig()
   const { host } = sysProxy
@@ -363,6 +363,12 @@ export async function copyEnv(type: 'bash' | 'cmd' | 'powershell'): Promise<void
     case 'powershell': {
       clipboard.writeText(
         `$env:HTTP_PROXY="http://${host || '127.0.0.1'}:${mixedPort}"; $env:HTTPS_PROXY="http://${host || '127.0.0.1'}:${mixedPort}"`
+      )
+      break
+    }
+    case 'nushell': {
+      clipboard.writeText(
+        `load-env {http_proxy:"http://${host || '127.0.0.1'}:${mixedPort}", https_proxy:"http://${host || '127.0.0.1'}:${mixedPort}"}`
       )
       break
     }
