@@ -34,7 +34,7 @@ nsis:
   allowToChangeInstallationDirectory: true
   oneClick: false
   perMachine: true
-  createDesktopShortcut: always
+  createDesktopShortcut: true
 mac:
   target:
     - pkg
