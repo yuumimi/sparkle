@@ -9,6 +9,21 @@ import { buildContextMenu, showTrayIcon } from './tray'
 export let floatingWindow: BrowserWindow | null = null
 
 async function createFloatingWindow(): Promise<void> {
+  const preallocWin = new BrowserWindow({
+    width: 1,
+    height: 1,
+    show: false,
+    frame: false,
+    webPreferences: {
+      offscreen: true,
+      sandbox: true
+    }
+  })
+  preallocWin.loadURL('about:blank')
+  setTimeout(() => {
+    if (!preallocWin.isDestroyed()) preallocWin.destroy()
+  }, 300)
+
   const floatingWindowState = windowStateKeeper({
     file: 'floating-window-state.json'
   })
