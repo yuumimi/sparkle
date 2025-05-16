@@ -5,7 +5,7 @@ import { Button, Input, Select, SelectItem, Switch } from '@heroui/react'
 import { mihomoUpgradeUI, restartCore } from '@renderer/utils/ipc'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 import EditableList from '../base/base-list-editor'
-import { IoMdCloudDownload } from 'react-icons/io'
+import { IoMdCloudDownload, IoMdRefresh } from 'react-icons/io'
 import { HiExternalLink } from 'react-icons/hi'
 import { AiOutlineEye, AiOutlineEyeInvisible } from 'react-icons/ai'
 
@@ -36,6 +36,10 @@ const ControllerSetting: React.FC = () => {
     await patchControledMihomoConfig(patch)
     await restartCore()
   }
+  const generateRandomString = (length: number) => {
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
+    return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
+  }
 
   return (
     <SettingCard title="外部控制器">
@@ -63,7 +67,21 @@ const ControllerSetting: React.FC = () => {
           />
         </div>
       </SettingItem>
-      <SettingItem title="访问密钥" divider>
+      <SettingItem
+        title="访问密钥"
+        actions={
+          <Button
+            size="sm"
+            isIconOnly
+            title="生成密钥"
+            variant="light"
+            onPress={() => setSecretInput(generateRandomString(32))}
+          >
+            <IoMdRefresh className="text-lg" />
+          </Button>
+        }
+        divider
+      >
         <div className="flex">
           {secretInput != secret && (
             <Button
