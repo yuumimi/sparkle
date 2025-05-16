@@ -284,7 +284,7 @@ const resolveMonitor = async () => {
     fs.mkdirSync(tempDir, { recursive: true })
   }
   await downloadFile(
-    `https://github.com/mihomo-party-org/mihomo-party-run/releases/download/monitor/${arch}.zip`,
+    `https://github.com/xishang0128/sparkle-run/releases/download/monitor/${arch}.zip`,
     tempZip
   )
   const zip = new AdmZip(tempZip)
