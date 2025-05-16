@@ -8,7 +8,7 @@ import { buildContextMenu, showTrayIcon } from './tray'
 
 export let floatingWindow: BrowserWindow | null = null
 
-async function createFloatingWindow(): Promise<void> {
+async function preallocateGpuResources(): Promise<void> {
   const preallocWin = new BrowserWindow({
     width: 1,
     height: 1,
@@ -19,10 +19,18 @@ async function createFloatingWindow(): Promise<void> {
       sandbox: true
     }
   })
-  preallocWin.loadURL('about:blank')
-  setTimeout(() => {
-    if (!preallocWin.isDestroyed()) preallocWin.destroy()
-  }, 300)
+  await preallocWin.loadURL('about:blank')
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      if (!preallocWin.isDestroyed()) preallocWin.destroy()
+      resolve()
+    }, 300)
+  })
+}
+
+async function createFloatingWindow(): Promise<void> {
+  // 预分配 GPU 资源,防止在创建悬浮窗时卡死
+  await preallocateGpuResources()
 
   const floatingWindowState = windowStateKeeper({
     file: 'floating-window-state.json'
@@ -75,7 +83,7 @@ export async function showFloatingWindow(): Promise<void> {
   if (floatingWindow) {
     floatingWindow.show()
   } else {
-    createFloatingWindow()
+    await createFloatingWindow()
   }
 }
 
