@@ -13,12 +13,14 @@ import UpdaterModal from '../updater/updater-modal'
 import { version } from '@renderer/utils/init'
 import { IoIosHelpCircle } from 'react-icons/io'
 import { firstDriver } from '@renderer/App'
+import ConfirmModal from '../base/base-confirm'
 
 const Actions: React.FC = () => {
   const [newVersion, setNewVersion] = useState('')
   const [changelog, setChangelog] = useState('')
   const [openUpdate, setOpenUpdate] = useState(false)
   const [checkingUpdate, setCheckingUpdate] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   return (
     <>
@@ -27,6 +29,21 @@ const Actions: React.FC = () => {
           onClose={() => setOpenUpdate(false)}
           version={newVersion}
           changelog={changelog}
+        />
+      )}
+      {confirmOpen && (
+        <ConfirmModal
+          onChange={setConfirmOpen}
+          title="确认删除配置？"
+          description={
+            <>
+              ⚠️ 删除配置，
+              <span className="text-red-500">操作不可撤销</span>
+            </>
+          }
+          confirmText="确认删除"
+          cancelText="取消"
+          onConfirm={resetAppConfig}
         />
       )}
       <SettingCard>
@@ -71,7 +88,7 @@ const Actions: React.FC = () => {
           }
           divider
         >
-          <Button size="sm" onPress={resetAppConfig}>
+          <Button size="sm" onPress={() => setConfirmOpen(true)}>
             重置软件
           </Button>
         </SettingItem>

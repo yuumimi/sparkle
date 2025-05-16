@@ -21,6 +21,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { openFile } from '@renderer/utils/ipc'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
+import ConfirmModal from '../base/base-confirm'
 
 interface Props {
   info: IProfileItem
@@ -70,6 +71,7 @@ const ProfileItem: React.FC<Props> = (props) => {
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const [disableSelect, setDisableSelect] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
 
   const menuItems: MenuItem[] = useMemo(() => {
     const list = [
@@ -129,8 +131,7 @@ const ProfileItem: React.FC<Props> = (props) => {
         break
       }
       case 'delete': {
-        await removeProfileItem(info.id)
-        mutateProfileConfig()
+        setConfirmOpen(true)
         break
       }
 
@@ -169,6 +170,18 @@ const ProfileItem: React.FC<Props> = (props) => {
           item={info}
           onClose={() => setOpenInfoEditor(false)}
           updateProfileItem={updateProfileItem}
+        />
+      )}
+      {confirmOpen && (
+        <ConfirmModal
+          onChange={setConfirmOpen}
+          title="确认删除配置？"
+          confirmText="确认删除"
+          cancelText="取消"
+          onConfirm={() => {
+            removeProfileItem(info.id)
+            mutateProfileConfig()
+          }}
         />
       )}
       <Card

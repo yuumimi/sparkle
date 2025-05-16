@@ -17,6 +17,7 @@ import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import ExecLogModal from './exec-log-modal'
 import { openFile, restartCore } from '@renderer/utils/ipc'
+import ConfirmModal from '../base/base-confirm'
 
 interface Props {
   info: IOverrideItem
@@ -53,6 +54,7 @@ const OverrideItem: React.FC<Props> = (props) => {
   })
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
   const [disableOpen, setDisableOpen] = useState(false)
+  const [confirmOpen, setConfirmOpen] = useState(false)
   const menuItems: MenuItem[] = useMemo(() => {
     const list = [
       {
@@ -115,8 +117,7 @@ const OverrideItem: React.FC<Props> = (props) => {
         break
       }
       case 'delete': {
-        removeOverrideItem(info.id)
-        mutateOverrideConfig()
+        setConfirmOpen(true)
         break
       }
     }
@@ -156,6 +157,18 @@ const OverrideItem: React.FC<Props> = (props) => {
           item={info}
           onClose={() => setOpenInfoEditor(false)}
           updateOverrideItem={updateOverrideItem}
+        />
+      )}
+      {confirmOpen && (
+        <ConfirmModal
+          onChange={setConfirmOpen}
+          title="确认删除覆写？"
+          confirmText="确认删除"
+          cancelText="取消"
+          onConfirm={() => {
+            removeOverrideItem(info.id)
+            mutateOverrideConfig()
+          }}
         />
       )}
       {openLog && <ExecLogModal id={info.id} onClose={() => setOpenLog(false)} />}
