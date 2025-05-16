@@ -274,7 +274,7 @@ const resolveSysproxy = () =>
 const resolveRunner = () =>
   resolveResource({
     file: 'sparkle-run.exe',
-    downloadURL: `https://github.com/mihomo-party-org/mihomo-party-run/releases/download/${arch}/mihomo-party-run.exe`
+    downloadURL: `https://github.com/xishang0128/sparkle-run/releases/download/${arch}/sparkle-run.exe`
   })
 
 const resolveMonitor = async () => {
