@@ -57,6 +57,7 @@ jobs:
         if: matrix.os == 'ubuntu-latest'
         run: |
           sed -i "s/productName: Sparkle/productName: sparkle/" electron-builder.yml
+          sudo apt-get update && sudo apt-get install -y libarchive-tools
 
       - name: Install Dependencies and Prepare
         env:
