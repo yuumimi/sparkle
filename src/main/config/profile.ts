@@ -1,7 +1,7 @@
 import { getControledMihomoConfig } from './controledMihomo'
 import { mihomoProfileWorkDir, mihomoWorkDir, profileConfigPath, profilePath } from '../utils/dirs'
 import { addProfileUpdater, delProfileUpdater } from '../core/profileUpdater'
-import { readFile, rm, writeFile } from 'fs/promises'
+import { readFile, writeFile, rm, mkdir } from 'fs/promises'
 import { restartCore } from '../core/manager'
 import { getAppConfig } from './app'
 import { existsSync } from 'fs'
@@ -9,7 +9,7 @@ import axios, { AxiosResponse } from 'axios'
 import yaml from 'yaml'
 import { defaultProfile } from '../utils/template'
 import { subStorePort } from '../resolve/server'
-import { join } from 'path'
+import { dirname, join } from 'path'
 import { deepMerge } from '../utils/merge'
 
 let profileConfig: IProfileConfig // profile.yaml
@@ -144,10 +144,10 @@ export async function createProfile(item: Partial<IProfileItem>): Promise<IProfi
           proxy:
             newItem.useProxy && mixedPort != 0
               ? {
-                protocol: 'http',
-                host: '127.0.0.1',
-                port: mixedPort
-              }
+                  protocol: 'http',
+                  host: '127.0.0.1',
+                  port: mixedPort
+                }
               : false,
           headers: {
             'User-Agent': userAgent || 'clash.meta/alpha-de19f92'
@@ -257,12 +257,11 @@ export async function setFileStr(path: string, content: string): Promise<void> {
   const { diffWorkDir = false } = await getAppConfig()
   const { current } = await getProfileConfig()
   if (isAbsolutePath(path)) {
+    await mkdir(dirname(path), { recursive: true })
     await writeFile(path, content, 'utf-8')
   } else {
-    await writeFile(
-      join(diffWorkDir ? mihomoProfileWorkDir(current) : mihomoWorkDir(), path),
-      content,
-      'utf-8'
-    )
+    const target = join(diffWorkDir ? mihomoProfileWorkDir(current) : mihomoWorkDir(), path)
+    await mkdir(dirname(target), { recursive: true })
+    await writeFile(target, content, 'utf-8')
   }
 }
