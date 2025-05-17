@@ -110,6 +110,8 @@ const Logs: React.FC = () => {
         <Virtuoso
           ref={virtuosoRef}
           data={filteredLogs}
+          initialTopMostItemIndex={filteredLogs.length - 1}
+          followOutput={trace}
           itemContent={(i, log) => {
             return (
               <LogItem
