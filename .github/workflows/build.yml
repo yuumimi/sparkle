@@ -128,6 +128,13 @@ jobs:
           tag: pre-release
           deleteOnlyFromDrafts: false
 
+      - name: Tag Repo
+        uses: richardsimko/update-tag@v1
+        with:
+          tag_name: pre-release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Create Changelog
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
