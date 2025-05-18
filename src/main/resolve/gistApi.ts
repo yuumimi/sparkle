@@ -16,11 +16,13 @@ async function listGists(token: string): Promise<GistInfo[]> {
       Authorization: `Bearer ${token}`,
       'X-GitHub-Api-Version': '2022-11-28'
     },
-    proxy: {
-      protocol: 'http',
-      host: '127.0.0.1',
-      port
-    },
+    ...(port != 0 && {
+      proxy: {
+        protocol: 'http',
+        host: '127.0.0.1',
+        port
+      }
+    }),
     responseType: 'json'
   })
   return res.data as GistInfo[]
@@ -41,11 +43,13 @@ async function createGist(token: string, content: string): Promise<void> {
         Authorization: `Bearer ${token}`,
         'X-GitHub-Api-Version': '2022-11-28'
       },
-      proxy: {
-        protocol: 'http',
-        host: '127.0.0.1',
-        port
-      }
+      ...(port != 0 && {
+        proxy: {
+          protocol: 'http',
+          host: '127.0.0.1',
+          port
+        }
+      })
     }
   )
 }
@@ -64,11 +68,13 @@ async function updateGist(token: string, id: string, content: string): Promise<v
         Authorization: `Bearer ${token}`,
         'X-GitHub-Api-Version': '2022-11-28'
       },
-      proxy: {
-        protocol: 'http',
-        host: '127.0.0.1',
-        port
-      }
+      ...(port != 0 && {
+        proxy: {
+          protocol: 'http',
+          host: '127.0.0.1',
+          port
+        }
+      })
     }
   )
 }
@@ -83,9 +89,7 @@ export async function getGistUrl(): Promise<string> {
   } else {
     await uploadRuntimeConfig()
     const gists = await listGists(githubToken)
-    const gist = gists.find(
-      (gist) => gist.description === 'Auto Synced Sparkle Runtime Config'
-    )
+    const gist = gists.find((gist) => gist.description === 'Auto Synced Sparkle Runtime Config')
     if (!gist) throw new Error('Gist not found')
     return gist.html_url
   }
