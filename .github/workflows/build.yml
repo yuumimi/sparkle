@@ -58,11 +58,10 @@ jobs:
 
           - os: macos-latest
             arch: x64
-            format: mac
           - os: macos-latest
             arch: arm64
-            format: mac
-    name: Build ${{ matrix.os }}-${{ matrix.arch }}-${{ matrix.format }}
+
+    name: Build ${{ matrix.os }}-${{ matrix.arch }}${{ matrix.format && '-' || '' }}${{ matrix.format || '' }}
 
     steps:
       - name: Checkout
@@ -122,15 +121,15 @@ jobs:
         shell: bash
         run: |
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            pnpm build:win ${{ matrix.format }}
+            pnpm build:win ${{ matrix.format }} --${{ matrix.arch }}
           elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            pnpm build:linux ${{ matrix.format }}
+            pnpm build:linux ${{ matrix.format }} --${{ matrix.arch }}
           else
-            pnpm build:mac
+            pnpm build:mac --${{ matrix.arch }}
           fi
 
       - name: Add Portable Flag
-        if: matrix.os == 'windows-latest'
+        if: matrix.os == 'windows-latest' && matrix.format == '7z'
         shell: pwsh
         run: |
           New-Item -Path "PORTABLE" -ItemType File
