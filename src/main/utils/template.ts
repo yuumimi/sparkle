@@ -46,8 +46,8 @@ export const defaultControledMihomoConfig: Partial<IMihomoConfig> = {
   'external-ui': '',
   'external-ui-url': 'https://github.com/Zephyruso/zashboard/releases/latest/download/dist.zip',
   'external-controller-cors': {
-    'allow-origins': ['*'],
-    'allow-private-network': true
+    'allow-origins': ['https://metacubex.github.io', 'https://board.zash.run.place'],
+    'allow-private-network': false
   },
   ipv6: true,
   mode: 'rule',
@@ -79,7 +79,7 @@ export const defaultControledMihomoConfig: Partial<IMihomoConfig> = {
   },
   dns: {
     enable: true,
-    ipv6: false,
+    ipv6: true,
     'enhanced-mode': 'fake-ip',
     'fake-ip-range': '198.18.0.1/16',
     'fake-ip-filter': ['*', '+.lan', '+.local', 'time.*.com', 'ntp.*.com', '+.market.xiaomi.com'],
