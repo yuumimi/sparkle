@@ -150,7 +150,8 @@ export const BaseEditor: React.FC<Props> = (props) => {
     glyphMargin: false, // 禁用字形边距
     folding: true, // 启用代码折叠
     scrollBeyondLastLine: false, // 禁止滚动超过最后一行
-    automaticLayout: true // 自动布局
+    automaticLayout: true, // 自动布局
+    wordWrap: 'on' as 'on' | 'off' // 自动换行
   }
 
   if (originalValue !== undefined) {
