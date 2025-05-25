@@ -66,6 +66,11 @@ export function mihomoCorePath(core: string): string {
   return path.join(mihomoCoreDir(), `${core}${isWin ? '.exe' : ''}`)
 }
 
+export function sysproxyPath(): string {
+  const isWin = process.platform === 'win32'
+  return path.join(resourcesFilesDir(), `sysproxy${isWin ? '.exe' : ''}`)
+}
+
 export function appConfigPath(): string {
   return path.join(dataDir(), 'config.yaml')
 }

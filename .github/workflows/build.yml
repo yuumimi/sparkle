@@ -105,13 +105,6 @@ jobs:
         shell: bash
         run: |
           pnpm install
-          if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
-            pnpm add @mihomo-party/sysproxy-win32-${{ matrix.arch }}-msvc
-          elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            pnpm add @mihomo-party/sysproxy-linux-${{ matrix.arch }}-gnu
-          else
-            pnpm add @mihomo-party/sysproxy-darwin-${{ matrix.arch }}
-          fi
           pnpm prepare --${{ matrix.arch }}
 
       - name: Build

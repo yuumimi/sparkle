@@ -1,10 +1,8 @@
-import { triggerAutoProxy, triggerManualProxy } from '@mihomo-party/sysproxy'
 import { getAppConfig, getControledMihomoConfig } from '../config'
 import { pacPort, startPacServer, stopPacServer } from '../resolve/server'
 import { promisify } from 'util'
 import { execFile } from 'child_process'
-import path from 'path'
-import { resourcesFilesDir } from '../utils/dirs'
+import { sysproxyPath } from '../utils/dirs'
 import { net } from 'electron'
 import axios from 'axios'
 
@@ -72,16 +70,7 @@ async function enableSysProxy(): Promise<void> {
   const execFilePromise = promisify(execFile)
   switch (mode || 'manual') {
     case 'auto': {
-      if (process.platform === 'win32') {
-        try {
-          await execFilePromise(path.join(resourcesFilesDir(), 'sysproxy.exe'), [
-            'pac',
-            `http://${host || '127.0.0.1'}:${pacPort}/pac`
-          ])
-        } catch {
-          triggerAutoProxy(true, `http://${host || '127.0.0.1'}:${pacPort}/pac`)
-        }
-      } else if (process.platform === 'darwin') {
+      if (process.platform === 'darwin') {
         await axios.post(
           'http://localhost/pac',
           { url: `http://${host || '127.0.0.1'}:${pacPort}/pac` },
@@ -90,25 +79,18 @@ async function enableSysProxy(): Promise<void> {
           }
         )
       } else {
-        triggerAutoProxy(true, `http://${host || '127.0.0.1'}:${pacPort}/pac`)
+        await execFilePromise(sysproxyPath(), [
+          'pac',
+          '--pacurl',
+          `http://${host || '127.0.0.1'}:${pacPort}/pac`
+        ])
       }
-
       break
     }
 
     case 'manual': {
       if (port != 0) {
-        if (process.platform === 'win32') {
-          try {
-            await execFilePromise(path.join(resourcesFilesDir(), 'sysproxy.exe'), [
-              'global',
-              `${host || '127.0.0.1'}:${port}`,
-              bypass.join(';')
-            ])
-          } catch {
-            triggerManualProxy(true, host || '127.0.0.1', port, bypass.join(','))
-          }
-        } else if (process.platform === 'darwin') {
+        if (process.platform === 'darwin') {
           await axios.post(
             'http://localhost/global',
             { host: host || '127.0.0.1', port: port.toString(), bypass: bypass.join(',') },
@@ -117,7 +99,13 @@ async function enableSysProxy(): Promise<void> {
             }
           )
         } else {
-          triggerManualProxy(true, host || '127.0.0.1', port, bypass.join(','))
+          await execFilePromise(sysproxyPath(), [
+            'sys',
+            '--server',
+            `${host || '127.0.0.1'}:${port}`,
+            '--bypass',
+            bypass.join(';')
+          ])
         }
       }
       break
@@ -128,19 +116,11 @@ async function enableSysProxy(): Promise<void> {
 async function disableSysProxy(): Promise<void> {
   await stopPacServer()
   const execFilePromise = promisify(execFile)
-  if (process.platform === 'win32') {
-    try {
-      await execFilePromise(path.join(resourcesFilesDir(), 'sysproxy.exe'), ['set', '1'])
-    } catch {
-      triggerAutoProxy(false, '')
-      triggerManualProxy(false, '', 0, '')
-    }
-  } else if (process.platform === 'darwin') {
+  if (process.platform === 'darwin') {
     await axios.get('http://localhost/off', {
       socketPath: helperSocketPath
     })
   } else {
-    triggerAutoProxy(false, '')
-    triggerManualProxy(false, '', 0, '')
+    await execFilePromise(sysproxyPath(), ['unset'])
   }
 }

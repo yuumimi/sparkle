@@ -13,6 +13,7 @@ fi
 sed -i 's/Name=sparkle/Name=Sparkle/' '/usr/share/applications/sparkle.desktop'
 
 chmod 4755 '/opt/sparkle/chrome-sandbox' || true
+chmod +x /opt/sparkle/files/sysproxy
 chmod +sx /opt/sparkle/resources/sidecar/mihomo
 chmod +sx /opt/sparkle/resources/sidecar/mihomo-alpha
 
