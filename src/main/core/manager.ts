@@ -151,7 +151,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
       if ((process.platform !== 'win32' && str.includes('External controller unix listen error')) ||
         (process.platform === 'win32' && str.includes('External controller pipe listen error'))
       ) {
-        reject('控制器监听错误')
+        reject(`控制器监听错误:\n${str}`)
       }
 
       if (
