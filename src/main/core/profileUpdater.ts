@@ -63,6 +63,7 @@ export async function addProfileUpdater(item: IProfileItem): Promise<void> {
 
 export async function delProfileUpdater(id: string): Promise<void> {
   if (intervalPool[id]) {
+    clearTimeout(intervalPool[id])
     delete intervalPool[id]
   }
 }
