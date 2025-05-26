@@ -27,7 +27,8 @@ const MIHOMO_ALPHA_MAP = {
   'darwin-x64': 'mihomo-darwin-amd64',
   'darwin-arm64': 'mihomo-darwin-arm64',
   'linux-x64': 'mihomo-linux-amd64',
-  'linux-arm64': 'mihomo-linux-arm64'
+  'linux-arm64': 'mihomo-linux-arm64',
+  'linux-loong64': 'mihomo-linux-loong64-abi2'
 }
 
 // Fetch the latest alpha release version from the version.txt file
@@ -58,7 +59,8 @@ const MIHOMO_MAP = {
   'darwin-x64': 'mihomo-darwin-amd64',
   'darwin-arm64': 'mihomo-darwin-arm64',
   'linux-x64': 'mihomo-linux-amd64',
-  'linux-arm64': 'mihomo-linux-arm64'
+  'linux-arm64': 'mihomo-linux-arm64',
+  'linux-loong64': 'mihomo-linux-loong64-abi2'
 }
 
 // Fetch the latest release version from the version.txt file
@@ -279,7 +281,8 @@ const resolveSysproxy = () => {
     'darwin-x64': 'sysproxy-darwin--v3',
     'darwin-arm64': 'sysproxy-darwin-arm64',
     'linux-x64': 'sysproxy-linux-amd64-v3',
-    'linux-arm64': 'sysproxy-linux-arm64'
+    'linux-arm64': 'sysproxy-linux-arm64',
+    'linux-loong64': 'sysproxy-linux-loong64-abi2'
   }
   if (!map[`${platform}-${arch}`]) {
     throw new Error(`unsupported platform "${platform}-${arch}"`)
