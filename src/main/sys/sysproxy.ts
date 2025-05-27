@@ -8,7 +8,7 @@ import axios from 'axios'
 
 let defaultBypass: string[]
 let triggerSysProxyTimer: NodeJS.Timeout | null = null
-const helperSocketPath = '/tmp/mihomo-party-helper.sock'
+const helperSocketPath = '/tmp/sparkle-helper.sock'
 
 export async function triggerSysProxy(enable: boolean): Promise<void> {
   if (net.isOnline()) {
@@ -99,8 +99,8 @@ async function enableSysProxy(): Promise<void> {
       if (port != 0) {
         if (process.platform === 'darwin') {
           await axios.post(
-            'http://localhost/global',
-            { host: host || '127.0.0.1', port: port.toString(), bypass: bypass.join(',') },
+            'http://localhost/proxy',
+            { server: `${host || '127.0.0.1'}:${port}`, bypass: bypass.join(',') },
             {
               socketPath: helperSocketPath
             }
@@ -124,9 +124,13 @@ async function disableSysProxy(): Promise<void> {
   await stopPacServer()
   const execFilePromise = promisify(execFile)
   if (process.platform === 'darwin') {
-    await axios.get('http://localhost/off', {
-      socketPath: helperSocketPath
-    })
+    await axios.post(
+      'http://localhost/disable',
+      {},
+      {
+        socketPath: helperSocketPath
+      }
+    )
   } else {
     await execFilePromise(sysproxyPath(), ['unset'])
   }

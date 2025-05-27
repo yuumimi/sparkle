@@ -5,7 +5,7 @@ chmod +s $2/Sparkle.app/Contents/Resources/sidecar/mihomo
 chmod +s $2/Sparkle.app/Contents/Resources/sidecar/mihomo-alpha
 
 mkdir -p /Library/PrivilegedHelperTools
-cp $2/Sparkle.app/Contents/Resources/files/sparkle.helper /Library/PrivilegedHelperTools/sparkle.helper
+cp $2/Sparkle.app/Contents/Resources/files/sysproxy /Library/PrivilegedHelperTools/sparkle.helper
 chown root:wheel /Library/PrivilegedHelperTools/sparkle.helper
 chmod 544 /Library/PrivilegedHelperTools/sparkle.helper
 cat << EOF > /Library/LaunchDaemons/sparkle.helper.plist
@@ -27,6 +27,7 @@ cat << EOF > /Library/LaunchDaemons/sparkle.helper.plist
         <key>ProgramArguments</key>
         <array>
                 <string>/Library/PrivilegedHelperTools/sparkle.helper</string>
+                <string>server</string>
         </array>
         <key>StandardErrorPath</key>
         <string>/tmp/sparkle.helper.err</string>

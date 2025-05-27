@@ -268,11 +268,6 @@ const resolveEnableLoopback = () =>
     file: 'enableLoopback.exe',
     downloadURL: `https://github.com/Kuingsmile/uwp-tool/releases/download/latest/enableLoopback.exe`
   })
-// const resolveSysproxy = () =>
-//   resolveResource({
-//     file: 'sysproxy.exe',
-//     downloadURL: `https://github.com/mihomo-party-org/sysproxy/releases/download/${arch}/sysproxy.exe`
-//   })
 const resolveSysproxy = () => {
   const map = {
     'win32-x64': 'sysproxy-windows-amd64-v3',
@@ -332,11 +327,6 @@ const resolveSubstore = () =>
     file: 'sub-store.bundle.js',
     downloadURL:
       'https://github.com/sub-store-org/Sub-Store/releases/latest/download/sub-store.bundle.js'
-  })
-const resolveHelper = () =>
-  resolveResource({
-    file: 'sparkle.helper',
-    downloadURL: `https://github.com/mihomo-party-org/mihomo-party-helper/releases/download/${arch}/party.mihomo.helper`
   })
 const resolveSubstoreFrontend = async () => {
   const tempDir = path.join(TEMP_DIR, 'substore-frontend')
@@ -433,12 +423,6 @@ const tasks = [
     func: resolve7zip,
     retry: 5,
     winOnly: true
-  },
-  {
-    name: 'helper',
-    func: resolveHelper,
-    retry: 5,
-    darwinOnly: true
   }
 ]
 
