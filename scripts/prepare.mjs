@@ -273,7 +273,7 @@ const resolveSysproxy = () => {
     'win32-x64': 'sysproxy-windows-amd64-v3',
     'win32-ia32': 'sysproxy-windows-386',
     'win32-arm64': 'sysproxy-windows-arm64',
-    'darwin-x64': 'sysproxy-darwin--v3',
+    'darwin-x64': 'sysproxy-darwin-amd64-v3',
     'darwin-arm64': 'sysproxy-darwin-arm64',
     'linux-x64': 'sysproxy-linux-amd64-v3',
     'linux-arm64': 'sysproxy-linux-arm64',
