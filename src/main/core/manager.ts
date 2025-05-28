@@ -9,7 +9,7 @@ import {
   mihomoWorkConfigPath,
   mihomoWorkDir
 } from '../utils/dirs'
-import { generateProfile } from './factory'
+import { generateProfile, getRuntimeConfig } from './factory'
 import {
   getAppConfig,
   getControledMihomoConfig,
@@ -96,6 +96,10 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
       })
     }
   }
+  const { 'rule-providers': ruleProviders = {}, 'proxy-providers': proxyProviders = {} } =
+    await getRuntimeConfig()
+  const providerNames = new Set([...Object.keys(ruleProviders), ...Object.keys(proxyProviders)])
+  const matchedProviders = new Set<string>()
   const stdout = createWriteStream(logPath(), { flags: 'a' })
   const stderr = createWriteStream(logPath(), { flags: 'a' })
   const env = {
@@ -148,7 +152,8 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
         reject('虚拟网卡启动失败，请尝试手动授予内核权限')
       }
 
-      if ((process.platform !== 'win32' && str.includes('External controller unix listen error')) ||
+      if (
+        (process.platform !== 'win32' && str.includes('External controller unix listen error')) ||
         (process.platform === 'win32' && str.includes('External controller pipe listen error'))
       ) {
         reject(`控制器监听错误:\n${str}`)
@@ -160,18 +165,30 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
       ) {
         resolve([
           new Promise((resolve) => {
-            child.stdout?.on('data', async (data) => {
-              if (data.toString().includes('Start initial compatible provider default')) {
-                try {
-                  mainWindow?.webContents.send('groupsUpdated')
-                  mainWindow?.webContents.send('rulesUpdated')
-                  await uploadRuntimeConfig()
-                } catch {
-                  // ignore
-                }
-                await patchMihomoConfig({ 'log-level': logLevel })
-                resolve()
+            const handleProviderInitialization = async (logLine: string) => {
+              for (const match of logLine.matchAll(/Start initial provider ([\w\-!@#$%^&*()]+)/g)) {
+                matchedProviders.add(match[1])
               }
+
+              const isDefaultProvider = logLine.includes(
+                'Start initial compatible provider default'
+              )
+              const isAllProvidersMatched =
+                providerNames.size > 0 && matchedProviders.size === providerNames.size
+
+              if ((providerNames.size === 0 && isDefaultProvider) || isAllProvidersMatched) {
+                Promise.all([
+                  new Promise((r) => setTimeout(r, 500)).then(() => {
+                    mainWindow?.webContents.send('groupsUpdated')
+                    mainWindow?.webContents.send('rulesUpdated')
+                  }),
+                  uploadRuntimeConfig(),
+                  patchMihomoConfig({ 'log-level': logLevel })
+                ]).then(() => resolve())
+              }
+            }
+            child.stdout?.on('data', (data) => {
+              handleProviderInitialization(data.toString())
             })
           })
         ])
