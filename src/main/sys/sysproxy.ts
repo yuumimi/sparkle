@@ -13,8 +13,7 @@ const helperSocketPath = '/tmp/sparkle-helper.sock'
 export async function triggerSysProxy(enable: boolean): Promise<void> {
   if (net.isOnline()) {
     if (enable) {
-      await disableSysProxy()
-      await enableSysProxy()
+      await setSysProxy()
     } else {
       await disableSysProxy()
     }
@@ -24,7 +23,7 @@ export async function triggerSysProxy(enable: boolean): Promise<void> {
   }
 }
 
-async function enableSysProxy(): Promise<void> {
+async function setSysProxy(): Promise<void> {
   if (process.platform === 'linux')
     defaultBypass = [
       'localhost',
