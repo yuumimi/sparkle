@@ -87,7 +87,7 @@ async function setSysProxy(): Promise<void> {
       } else {
         await execFilePromise(sysproxyPath(), [
           'pac',
-          '--pacurl',
+          '--url',
           `http://${host || '127.0.0.1'}:${pacPort}/pac`
         ])
       }
@@ -106,7 +106,7 @@ async function setSysProxy(): Promise<void> {
           )
         } else {
           await execFilePromise(sysproxyPath(), [
-            'sys',
+            'proxy',
             '--server',
             `${host || '127.0.0.1'}:${port}`,
             '--bypass',
@@ -131,6 +131,6 @@ async function disableSysProxy(): Promise<void> {
       }
     )
   } else {
-    await execFilePromise(sysproxyPath(), ['unset'])
+    await execFilePromise(sysproxyPath(), ['disable'])
   }
 }
