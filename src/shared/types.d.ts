@@ -358,6 +358,7 @@ interface IAppConfig {
   directModeShortcut?: string
   restartAppShortcut?: string
   quitWithoutCoreShortcut?: string
+  onlyActiveDevice?: boolean
 }
 
 interface IMihomoTunConfig {

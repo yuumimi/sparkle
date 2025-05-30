@@ -13,7 +13,7 @@ import InterfaceModal from '@renderer/components/mihomo/interface-modal'
 
 const PortSetting: React.FC = () => {
   const { appConfig } = useAppConfig()
-  const { sysProxy } = appConfig || {}
+  const { sysProxy, onlyActiveDevice = false } = appConfig || {}
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
   const {
     authentication = [],
@@ -78,7 +78,7 @@ const PortSetting: React.FC = () => {
                   await onChangeNeedRestart({ 'mixed-port': mixedPortInput })
                   await startSubStoreBackendServer()
                   if (sysProxy?.enable) {
-                    triggerSysProxy(true)
+                    triggerSysProxy(true, onlyActiveDevice)
                   }
                 }}
               >

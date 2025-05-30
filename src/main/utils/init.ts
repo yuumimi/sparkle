@@ -159,7 +159,7 @@ async function migration(): Promise<void> {
     showFloatingWindow = false,
     disableTray = false,
     encryptedPassword,
-    hosts = [],
+    hosts = []
   } = await getAppConfig()
   const {
     'external-controller-pipe': externalControllerPipe,
@@ -249,12 +249,12 @@ export async function init(): Promise<void> {
   await cleanup()
   await startSubStoreFrontendServer()
   await startSubStoreBackendServer()
-  const { sysProxy } = await getAppConfig()
+  const { sysProxy, onlyActiveDevice = false } = await getAppConfig()
   try {
     if (sysProxy.enable) {
       await startPacServer()
     }
-    await triggerSysProxy(sysProxy.enable)
+    await triggerSysProxy(sysProxy.enable, onlyActiveDevice)
   } catch {
     // ignore
   }

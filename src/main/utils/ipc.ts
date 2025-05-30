@@ -182,7 +182,9 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('setOverride', (_e, id, ext, str) => ipcErrorWrapper(setOverride)(id, ext, str))
   ipcMain.handle('restartCore', ipcErrorWrapper(restartCore))
   ipcMain.handle('startMonitor', (_e, detached) => ipcErrorWrapper(startMonitor)(detached))
-  ipcMain.handle('triggerSysProxy', (_e, enable) => ipcErrorWrapper(triggerSysProxy)(enable))
+  ipcMain.handle('triggerSysProxy', (_e, enable, onlyActiveDevice) =>
+    ipcErrorWrapper(triggerSysProxy)(enable, onlyActiveDevice)
+  )
   ipcMain.handle('manualGrantCorePermition', () => ipcErrorWrapper(manualGrantCorePermition)())
   ipcMain.handle('getFilePath', (_e, ext) => getFilePath(ext))
   ipcMain.handle('readTextFile', (_e, filePath) => ipcErrorWrapper(readTextFile)(filePath))

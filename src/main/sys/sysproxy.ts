@@ -10,20 +10,20 @@ let defaultBypass: string[]
 let triggerSysProxyTimer: NodeJS.Timeout | null = null
 const helperSocketPath = '/tmp/sparkle-helper.sock'
 
-export async function triggerSysProxy(enable: boolean): Promise<void> {
+export async function triggerSysProxy(enable: boolean, onlyActiveDevice: boolean): Promise<void> {
   if (net.isOnline()) {
     if (enable) {
-      await setSysProxy()
+      await setSysProxy(onlyActiveDevice)
     } else {
-      await disableSysProxy()
+      await disableSysProxy(onlyActiveDevice)
     }
   } else {
     if (triggerSysProxyTimer) clearTimeout(triggerSysProxyTimer)
-    triggerSysProxyTimer = setTimeout(() => triggerSysProxy(enable), 5000)
+    triggerSysProxyTimer = setTimeout(() => triggerSysProxy(enable, onlyActiveDevice), 5000)
   }
 }
 
-async function setSysProxy(): Promise<void> {
+async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
   if (process.platform === 'linux')
     defaultBypass = [
       'localhost',
@@ -79,7 +79,10 @@ async function setSysProxy(): Promise<void> {
       if (process.platform === 'darwin') {
         await axios.post(
           'http://localhost/pac',
-          { url: `http://${host || '127.0.0.1'}:${pacPort}/pac` },
+          {
+            url: `http://${host || '127.0.0.1'}:${pacPort}/pac`,
+            only_active_device: onlyActiveDevice
+          },
           {
             socketPath: helperSocketPath
           }
@@ -99,7 +102,11 @@ async function setSysProxy(): Promise<void> {
         if (process.platform === 'darwin') {
           await axios.post(
             'http://localhost/proxy',
-            { server: `${host || '127.0.0.1'}:${port}`, bypass: bypass.join(',') },
+            {
+              server: `${host || '127.0.0.1'}:${port}`,
+              bypass: bypass.join(','),
+              only_active_device: onlyActiveDevice
+            },
             {
               socketPath: helperSocketPath
             }
@@ -119,13 +126,13 @@ async function setSysProxy(): Promise<void> {
   }
 }
 
-async function disableSysProxy(): Promise<void> {
+async function disableSysProxy(onlyActiveDevice: boolean): Promise<void> {
   await stopPacServer()
   const execFilePromise = promisify(execFile)
   if (process.platform === 'darwin') {
     await axios.post(
       'http://localhost/disable',
-      {},
+      { only_active_device: onlyActiveDevice },
       {
         socketPath: helperSocketPath
       }

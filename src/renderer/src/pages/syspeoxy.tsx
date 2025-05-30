@@ -1,4 +1,4 @@
-import { Button, Input, Tab, Tabs } from '@heroui/react'
+import { Button, Input, Switch, Tab, Tabs, Tooltip } from '@heroui/react'
 import BasePage from '@renderer/components/base/base-page'
 import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
@@ -9,6 +9,7 @@ import { platform } from '@renderer/utils/init'
 import { openUWPTool, triggerSysProxy } from '@renderer/utils/ipc'
 import React, { Key, useState } from 'react'
 import ByPassEditorModal from '@renderer/components/sysproxy/bypass-editor-modal'
+import { IoIosHelpCircle } from 'react-icons/io'
 
 const defaultPacScript = `
 function FindProxyForURL(url, host) {
@@ -64,7 +65,8 @@ const Sysproxy: React.FC = () => {
           ]
 
   const { appConfig, patchAppConfig } = useAppConfig()
-  const { sysProxy } = appConfig || ({ sysProxy: { enable: false } } as IAppConfig)
+  const { sysProxy, onlyActiveDevice = false } =
+    appConfig || ({ sysProxy: { enable: false } } as IAppConfig)
   const [changed, setChanged] = useState(false)
   const [values, originSetValues] = useState({
     enable: sysProxy.enable,
@@ -86,7 +88,7 @@ const Sysproxy: React.FC = () => {
     // check valid TODO
     await patchAppConfig({ sysProxy: values })
     try {
-      await triggerSysProxy(true)
+      await triggerSysProxy(true, onlyActiveDevice)
       await patchAppConfig({ sysProxy: { enable: true } })
       setChanged(false)
     } catch (e) {
@@ -169,6 +171,27 @@ const Sysproxy: React.FC = () => {
             <Button size="sm" onPress={() => setOpenPacEditor(true)} variant="bordered">
               编辑 PAC 脚本
             </Button>
+          </SettingItem>
+        )}
+        {platform == 'darwin' && (
+          <SettingItem
+            title="仅为活跃接口设置"
+            actions={
+              <Tooltip content="开启后，系统代理仅会为当前活跃的网络接口设置，其他接口将不会被设置代理。">
+                <Button isIconOnly size="sm" variant="light">
+                  <IoIosHelpCircle className="text-lg" />
+                </Button>
+              </Tooltip>
+            }
+            divider
+          >
+            <Switch
+              size="sm"
+              isSelected={onlyActiveDevice}
+              onValueChange={(v) => {
+                patchAppConfig({ onlyActiveDevice: v })
+              }}
+            />
           </SettingItem>
         )}
         {values.mode === 'manual' && (

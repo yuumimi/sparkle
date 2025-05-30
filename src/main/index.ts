@@ -111,13 +111,13 @@ app.on('open-url', async (_event, url) => {
 
 app.on('before-quit', async (e) => {
   e.preventDefault()
-  triggerSysProxy(false)
+  triggerSysProxy(false, false)
   await stopCore()
   app.exit()
 })
 
 powerMonitor.on('shutdown', async () => {
-  triggerSysProxy(false)
+  triggerSysProxy(false, false)
   await stopCore()
   app.exit()
 })
@@ -281,7 +281,7 @@ export async function createWindow(): Promise<void> {
   })
 
   mainWindow.on('session-end', async () => {
-    triggerSysProxy(false)
+    triggerSysProxy(false, false)
     await stopCore()
   })
 

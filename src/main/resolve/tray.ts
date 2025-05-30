@@ -28,6 +28,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
   const { mode, tun } = await getControledMihomoConfig()
   const {
     sysProxy,
+    onlyActiveDevice = false,
     envType = process.platform === 'win32' ? ['powershell'] : ['bash'],
     autoCloseConnection,
     proxyInTray = true,
@@ -152,7 +153,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
       click: async (item): Promise<void> => {
         const enable = item.checked
         try {
-          await triggerSysProxy(enable)
+          await triggerSysProxy(enable, onlyActiveDevice)
           await patchAppConfig({ sysProxy: { enable } })
           mainWindow?.webContents.send('appConfigUpdated')
           floatingWindow?.webContents.send('appConfigUpdated')

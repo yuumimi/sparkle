@@ -36,10 +36,11 @@ export async function registerShortcut(
     case 'triggerSysProxyShortcut': {
       return globalShortcut.register(newShortcut, async () => {
         const {
-          sysProxy: { enable }
+          sysProxy: { enable },
+          onlyActiveDevice = false
         } = await getAppConfig()
         try {
-          await triggerSysProxy(!enable)
+          await triggerSysProxy(!enable, onlyActiveDevice)
           await patchAppConfig({ sysProxy: { enable: !enable } })
           new Notification({
             title: `系统代理已${!enable ? '开启' : '关闭'}`

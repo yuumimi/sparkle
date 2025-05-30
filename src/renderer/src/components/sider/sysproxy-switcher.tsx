@@ -19,7 +19,7 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
   const navigate = useNavigate()
   const match = location.pathname.includes('/sysproxy')
   const { appConfig, patchAppConfig } = useAppConfig()
-  const { sysProxy, sysproxyCardStatus = 'col-span-1' } = appConfig || {}
+  const { sysProxy, sysproxyCardStatus = 'col-span-1', onlyActiveDevice = false } = appConfig || {}
   const { enable, mode } = sysProxy || {}
   const { controledMihomoConfig } = useControledMihomoConfig()
   const { 'mixed-port': mixedPort } = controledMihomoConfig || {}
@@ -38,7 +38,7 @@ const SysproxySwitcher: React.FC<Props> = (props) => {
   const onChange = async (enable: boolean): Promise<void> => {
     if (mode == 'manual' && disabled) return
     try {
-      await triggerSysProxy(enable)
+      await triggerSysProxy(enable, onlyActiveDevice)
       await patchAppConfig({ sysProxy: { enable } })
       window.electron.ipcRenderer.send('updateFloatingWindow')
       window.electron.ipcRenderer.send('updateTrayMenu')
