@@ -1,0 +1,10 @@
+#!/bin/sh
+
+if [ -e "/Library/LaunchDaemons/sparkle.helper.plist" ]; then
+  launchctl unload /Library/LaunchDaemons/sparkle.helper.plist
+  rm /Library/LaunchDaemons/sparkle.helper.plist
+fi
+
+if [ -e "/Library/PrivilegedHelperTools/sparkle.helper" ]; then
+  rm /Library/PrivilegedHelperTools/sparkle.helper
+fi
