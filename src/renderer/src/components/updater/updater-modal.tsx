@@ -38,12 +38,16 @@ const UpdaterModal: React.FC<Props> = (props) => {
     >
       <ModalContent className="h-full w-[calc(100%-100px)]">
         <ModalHeader className="flex justify-between app-drag">
-          <div>v{version} 版本就绪</div>
+          <div>{version} 版本就绪</div>
           <Button
             color="primary"
             size="sm"
             className="flex app-nodrag"
             onPress={() => {
+              if (version.includes('beta')) {
+                open('https://github.com/xishang0128/sparkle/releases/tag/pre-release')
+                return
+              }
               open(`https://github.com/xishang0128/sparkle/releases/tag/${version}`)
             }}
           >
