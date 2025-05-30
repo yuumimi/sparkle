@@ -166,13 +166,6 @@ const Sysproxy: React.FC = () => {
             </Button>
           </SettingItem>
         )}
-        {values.mode === 'auto' && (
-          <SettingItem title="代理模式">
-            <Button size="sm" onPress={() => setOpenPacEditor(true)} variant="bordered">
-              编辑 PAC 脚本
-            </Button>
-          </SettingItem>
-        )}
         {platform == 'darwin' && (
           <SettingItem
             title="仅为活跃接口设置"
@@ -192,6 +185,13 @@ const Sysproxy: React.FC = () => {
                 patchAppConfig({ onlyActiveDevice: v })
               }}
             />
+          </SettingItem>
+        )}
+        {values.mode === 'auto' && (
+          <SettingItem title="代理模式">
+            <Button size="sm" onPress={() => setOpenPacEditor(true)}>
+              编辑 PAC 脚本
+            </Button>
           </SettingItem>
         )}
         {values.mode === 'manual' && (

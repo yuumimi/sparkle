@@ -8,7 +8,7 @@ import PortSetting from '@renderer/components/mihomo/port-setting'
 import { platform } from '@renderer/utils/init'
 import { IoMdCloudDownload } from 'react-icons/io'
 import PubSub from 'pubsub-js'
-import { mihomoUpgrade, restartCore } from '@renderer/utils/ipc'
+import { manualGrantCorePermition, mihomoUpgrade, restartCore } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import ControllerSetting from '@renderer/components/mihomo/controller-setting'
 import EnvSetting from '@renderer/components/mihomo/env-setting'
@@ -97,6 +97,25 @@ const Mihomo: React.FC = () => {
             <SelectItem key="mihomo-alpha">{CoreMap['mihomo-alpha']}</SelectItem>
           </Select>
         </SettingItem>
+        {platform !== 'win32' && (
+          <SettingItem title="手动授权内核" divider>
+            <Button
+              size="sm"
+              color="primary"
+              onPress={async () => {
+                try {
+                  await manualGrantCorePermition()
+                  new Notification('内核授权成功')
+                  await restartCore()
+                } catch (e) {
+                  alert(e)
+                }
+              }}
+            >
+              授权内核
+            </Button>
+          </SettingItem>
+        )}
         <SettingItem title="IPv6" divider>
           <Switch
             size="sm"

@@ -4,7 +4,7 @@ import SettingCard from '@renderer/components/base/base-setting-card'
 import SettingItem from '@renderer/components/base/base-setting-item'
 import EditableList from '@renderer/components/base/base-list-editor'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
-import { manualGrantCorePermition, restartCore, setupFirewall } from '@renderer/utils/ipc'
+import { restartCore, setupFirewall } from '@renderer/utils/ipc'
 import { platform } from '@renderer/utils/init'
 import React, { Key, useState } from 'react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
@@ -104,25 +104,6 @@ const Tun: React.FC = () => {
               </Button>
             </SettingItem>
           )}
-          {platform !== 'win32' && (
-            <SettingItem title="手动授权内核" divider>
-              <Button
-                size="sm"
-                color="primary"
-                onPress={async () => {
-                  try {
-                    await manualGrantCorePermition()
-                    new Notification('内核授权成功')
-                    await restartCore()
-                  } catch (e) {
-                    alert(e)
-                  }
-                }}
-              >
-                手动授权内核
-              </Button>
-            </SettingItem>
-          )}
           {platform === 'darwin' && (
             <SettingItem title="自动设置系统DNS" divider>
               <Switch
@@ -134,7 +115,6 @@ const Tun: React.FC = () => {
               />
             </SettingItem>
           )}
-
           <SettingItem title="Tun 模式堆栈" divider>
             <Tabs
               size="sm"
@@ -148,28 +128,29 @@ const Tun: React.FC = () => {
             </Tabs>
           </SettingItem>
           {platform !== 'darwin' && (
-            <SettingItem title="Tun 网卡名称" divider>
-              <Input
-                size="sm"
-                className="w-[100px]"
-                value={values.device}
-                onValueChange={(v) => {
-                  setValues({ ...values, device: v })
-                }}
-              />
-            </SettingItem>
+            <>
+              <SettingItem title="Tun 网卡名称" divider>
+                <Input
+                  size="sm"
+                  className="w-[100px]"
+                  value={values.device}
+                  onValueChange={(v) => {
+                    setValues({ ...values, device: v })
+                  }}
+                />
+              </SettingItem>
+              <SettingItem title="严格路由" divider>
+                <Switch
+                  size="sm"
+                  isSelected={values.strictRoute}
+                  onValueChange={(v) => {
+                    setValues({ ...values, strictRoute: v })
+                  }}
+                />
+              </SettingItem>
+            </>
           )}
-
-          <SettingItem title="严格路由" divider>
-            <Switch
-              size="sm"
-              isSelected={values.strictRoute}
-              onValueChange={(v) => {
-                setValues({ ...values, strictRoute: v })
-              }}
-            />
-          </SettingItem>
-          <SettingItem title="自动设置全局路由" divider>
+          <SettingItem title="自动设置路由规则" divider>
             <Switch
               size="sm"
               isSelected={values.autoRoute}
