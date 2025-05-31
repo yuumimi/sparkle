@@ -438,6 +438,14 @@ export async function writeTheme(theme: string, css: string): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('writeTheme', theme, css))
 }
 
+export async function startNetworkDetection(): Promise<void> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('startNetworkDetection'))
+}
+
+export async function stopNetworkDetection(): Promise<void> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('stopNetworkDetection'))
+}
+
 let applyThemeRunning = false
 const waitList: string[] = []
 export async function applyTheme(theme: string): Promise<void> {

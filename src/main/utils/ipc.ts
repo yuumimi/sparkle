@@ -56,7 +56,13 @@ import {
   subStoreFrontendPort,
   subStorePort
 } from '../resolve/server'
-import { manualGrantCorePermition, quitWithoutCore, restartCore } from '../core/manager'
+import {
+  manualGrantCorePermition,
+  quitWithoutCore,
+  restartCore,
+  startNetworkDetection,
+  stopNetworkDetection
+} from '../core/manager'
 import { triggerSysProxy } from '../sys/sysproxy'
 import { checkUpdate, downloadAndInstallUpdate } from '../resolve/autoUpdater'
 import {
@@ -268,5 +274,7 @@ export function registerIpcMainHandlers(): void {
     app.quit()
   })
   ipcMain.handle('quitWithoutCore', ipcErrorWrapper(quitWithoutCore))
+  ipcMain.handle('startNetworkDetection', ipcErrorWrapper(startNetworkDetection))
+  ipcMain.handle('stopNetworkDetection', ipcErrorWrapper(stopNetworkDetection))
   ipcMain.handle('quitApp', () => app.quit())
 }

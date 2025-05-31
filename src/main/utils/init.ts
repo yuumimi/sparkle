@@ -39,6 +39,7 @@ import {
 } from '../config'
 import { app } from 'electron'
 import { startSSIDCheck } from '../sys/ssid'
+import { startNetworkDetection } from '../core/manager'
 
 async function initDirs(): Promise<void> {
   if (!existsSync(dataDir())) {
@@ -249,7 +250,10 @@ export async function init(): Promise<void> {
   await cleanup()
   await startSubStoreFrontendServer()
   await startSubStoreBackendServer()
-  const { sysProxy, onlyActiveDevice = false } = await getAppConfig()
+  const { sysProxy, onlyActiveDevice = false, networkDetection = true } = await getAppConfig()
+  if (networkDetection) {
+    await startNetworkDetection()
+  }
   try {
     if (sysProxy.enable) {
       await startPacServer()

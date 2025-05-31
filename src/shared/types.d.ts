@@ -360,6 +360,9 @@ interface IAppConfig {
   restartAppShortcut?: string
   quitWithoutCoreShortcut?: string
   onlyActiveDevice?: boolean
+  networkDetection?: boolean
+  networkDetectionBypass?: string[]
+  networkDetectionInterval?: number
 }
 
 interface IMihomoTunConfig {

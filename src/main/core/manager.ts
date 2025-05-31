@@ -38,6 +38,7 @@ import os from 'os'
 import { createWriteStream, existsSync } from 'fs'
 import { uploadRuntimeConfig } from '../resolve/gistApi'
 import { startMonitor } from '../resolve/trafficMonitor'
+import { disableSysProxy, triggerSysProxy } from '../sys/sysproxy'
 
 chokidar.watch(path.join(mihomoCoreDir(), 'meta-update'), {}).on('unlinkDir', async () => {
   try {
@@ -54,6 +55,7 @@ const ctlParam = process.platform === 'win32' ? '-ext-ctl-pipe' : '-ext-ctl-unix
 
 let setPublicDNSTimer: NodeJS.Timeout | null = null
 let recoverDNSTimer: NodeJS.Timeout | null = null
+let networkDetectionTimer: NodeJS.Timeout | null = null
 let child: ChildProcess
 let retry = 10
 
@@ -373,4 +375,47 @@ async function recoverDNS(): Promise<void> {
     if (recoverDNSTimer) clearTimeout(recoverDNSTimer)
     recoverDNSTimer = setTimeout(() => recoverDNS(), 5000)
   }
+}
+
+export async function startNetworkDetection(): Promise<void> {
+  const {
+    onlyActiveDevice = false,
+    networkDetectionBypass = [],
+    networkDetectionInterval = 10
+  } = await getAppConfig()
+  const { tun: { device = 'utun' } = {} } = await getControledMihomoConfig()
+  if (networkDetectionTimer) {
+    clearInterval(networkDetectionTimer)
+  }
+  const extendedBypass = networkDetectionBypass.concat([device, 'lo', 'docker0'])
+
+  networkDetectionTimer = setInterval(() => {
+    if (isAnyNetworkInterfaceUp(extendedBypass) && net.isOnline()) {
+      if (child && child.killed) {
+        startCore()
+        triggerSysProxy(true, onlyActiveDevice)
+      }
+    } else {
+      disableSysProxy(false)
+      stopCore()
+    }
+  }, networkDetectionInterval * 1000)
+}
+
+export async function stopNetworkDetection(): Promise<void> {
+  if (networkDetectionTimer) {
+    clearInterval(networkDetectionTimer)
+    networkDetectionTimer = null
+  }
+}
+
+function isAnyNetworkInterfaceUp(excludedKeywords: string[] = []): boolean {
+  const interfaces = os.networkInterfaces()
+  return Object.entries(interfaces).some(([name, ifaces]) => {
+    if (excludedKeywords.some((keyword) => name.includes(keyword))) return false
+
+    return ifaces?.some((iface) => {
+      return !iface.internal && (iface.family === 'IPv4' || iface.family === 'IPv6')
+    })
+  })
 }

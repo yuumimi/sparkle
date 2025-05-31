@@ -36,7 +36,7 @@ const MihomoConfig: React.FC = () => {
     patchAppConfig({ userAgent: v })
   }, 500)
   return (
-    <SettingCard>
+    <SettingCard title="订阅与代理组设置">
       <SettingItem title="订阅拉取 UA" divider>
         <Input
           size="sm"

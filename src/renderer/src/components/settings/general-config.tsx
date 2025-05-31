@@ -1,78 +1,42 @@
-import React, { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import SettingCard from '../base/base-setting-card'
 import SettingItem from '../base/base-setting-item'
-import { Button, Input, Select, SelectItem, Switch, Tab, Tabs, Tooltip } from '@heroui/react'
-import { BiCopy, BiSolidFileImport } from 'react-icons/bi'
+import { Button, Input, Select, SelectItem, Switch, Tooltip } from '@heroui/react'
+import { BiCopy } from 'react-icons/bi'
 import useSWR from 'swr'
 import {
-  applyTheme,
   checkAutoRun,
-  closeFloatingWindow,
-  closeTrayIcon,
   copyEnv,
   disableAutoRun,
   enableAutoRun,
-  fetchThemes,
-  getFilePath,
-  importThemes,
-  relaunchApp,
-  resolveThemes,
-  showFloatingWindow,
-  showTrayIcon,
-  startMonitor,
-  writeTheme
+  startNetworkDetection,
+  stopNetworkDetection
 } from '@renderer/utils/ipc'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import { useTheme } from 'next-themes'
-import { IoIosHelpCircle, IoMdCloudDownload } from 'react-icons/io'
-import { MdEditDocument } from 'react-icons/md'
-import CSSEditorModal from './css-editor-modal'
+import { IoIosHelpCircle } from 'react-icons/io'
+import EditableList from '../base/base-list-editor'
 
 const GeneralConfig: React.FC = () => {
   const { data: enable, mutate: mutateEnable } = useSWR('checkAutoRun', checkAutoRun)
   const { appConfig, patchAppConfig } = useAppConfig()
-  const [customThemes, setCustomThemes] = useState<{ key: string; label: string }[]>()
-  const [openCSSEditor, setOpenCSSEditor] = useState(false)
-  const [fetching, setFetching] = useState(false)
-  const { setTheme } = useTheme()
   const {
     silentStart = false,
-    useDockIcon = true,
-    showTraffic = false,
-    proxyInTray = true,
-    disableTray = false,
-    showFloatingWindow: showFloating = false,
-    spinFloatingIcon = true,
-    useWindowFrame = false,
     autoQuitWithoutCore = false,
     autoQuitWithoutCoreDelay = 60,
-    customTheme = 'default.css',
     envType = [platform === 'win32' ? 'powershell' : 'bash'],
     autoCheckUpdate,
-    appTheme = 'system',
-    updateChannel = 'stable'
+    updateChannel = 'stable',
+    networkDetection = false,
+    networkDetectionBypass = ['VMware', 'vEthernet'],
+    networkDetectionInterval = 10
   } = appConfig || {}
 
-  useEffect(() => {
-    resolveThemes().then((themes) => {
-      setCustomThemes(themes)
-    })
-  }, [])
+  const [bypass, setBypass] = useState(networkDetectionBypass)
+  const [interval, setInterval] = useState(networkDetectionInterval)
 
   return (
     <>
-      {openCSSEditor && (
-        <CSSEditorModal
-          theme={customTheme}
-          onCancel={() => setOpenCSSEditor(false)}
-          onConfirm={async (css: string) => {
-            await writeTheme(customTheme, css)
-            await applyTheme(customTheme)
-            setOpenCSSEditor(false)
-          }}
-        />
-      )}
       <SettingCard>
         <SettingItem title="开机自启" divider>
           <Switch
@@ -90,6 +54,15 @@ const GeneralConfig: React.FC = () => {
               } finally {
                 mutateEnable()
               }
+            }}
+          />
+        </SettingItem>
+        <SettingItem title="静默启动" divider>
+          <Switch
+            size="sm"
+            isSelected={silentStart}
+            onValueChange={(v) => {
+              patchAppConfig({ silentStart: v })
             }}
           />
         </SettingItem>
@@ -116,15 +89,6 @@ const GeneralConfig: React.FC = () => {
             <SelectItem key="stable">正式版</SelectItem>
             <SelectItem key="beta">测试版</SelectItem>
           </Select>
-        </SettingItem>
-        <SettingItem title="静默启动" divider>
-          <Switch
-            size="sm"
-            isSelected={silentStart}
-            onValueChange={(v) => {
-              patchAppConfig({ silentStart: v })
-            }}
-          />
         </SettingItem>
         <SettingItem
           title="自动开启轻量模式"
@@ -201,191 +165,76 @@ const GeneralConfig: React.FC = () => {
             <SelectItem key="nushell">NuShell</SelectItem>
           </Select>
         </SettingItem>
-        <SettingItem title="显示悬浮窗" divider>
+        <SettingItem
+          title="断网时停止内核"
+          actions={
+            <Tooltip content="开启后，应用会在检测到网络断开时自动停止内核，并在网络恢复后自动重启内核">
+              <Button isIconOnly size="sm" variant="light">
+                <IoIosHelpCircle className="text-lg" />
+              </Button>
+            </Tooltip>
+          }
+          divider={networkDetection}
+        >
           <Switch
             size="sm"
-            isSelected={showFloating}
-            onValueChange={async (v) => {
-              await patchAppConfig({ showFloatingWindow: v })
+            isSelected={networkDetection}
+            onValueChange={(v) => {
+              patchAppConfig({ networkDetection: v })
               if (v) {
-                showFloatingWindow()
+                startNetworkDetection()
               } else {
-                closeFloatingWindow()
+                stopNetworkDetection()
               }
             }}
           />
         </SettingItem>
-
-        {showFloating && (
+        {networkDetection && (
           <>
-            <SettingItem title="根据网速旋转悬浮窗图标" divider>
-              <Switch
-                size="sm"
-                isSelected={spinFloatingIcon}
-                onValueChange={async (v) => {
-                  await patchAppConfig({ spinFloatingIcon: v })
-                  window.electron.ipcRenderer.send('updateFloatingWindow')
-                }}
-              />
+            <SettingItem title="断网检测间隔" divider>
+              <div className="flex">
+                {interval !== networkDetectionInterval && (
+                  <Button
+                    size="sm"
+                    color="primary"
+                    className="mr-2"
+                    onPress={async () => {
+                      await patchAppConfig({ networkDetectionInterval: interval })
+                      await startNetworkDetection()
+                    }}
+                  >
+                    确认
+                  </Button>
+                )}
+                <Input
+                  size="sm"
+                  type="number"
+                  className="w-[100px]"
+                  value={interval.toString()}
+                  min={1}
+                  onValueChange={(v) => {
+                    setInterval(parseInt(v))
+                  }}
+                />
+              </div>
             </SettingItem>
-            <SettingItem title="禁用托盘图标" divider>
-              <Switch
-                size="sm"
-                isSelected={disableTray}
-                onValueChange={async (v) => {
-                  await patchAppConfig({ disableTray: v })
-                  if (v) {
-                    closeTrayIcon()
-                  } else {
-                    showTrayIcon()
-                  }
-                }}
-              />
+            <SettingItem title="绕过检测的接口">
+              {bypass.length != networkDetectionBypass.length && (
+                <Button
+                  size="sm"
+                  color="primary"
+                  onPress={async () => {
+                    await patchAppConfig({ networkDetectionBypass: bypass })
+                    await startNetworkDetection()
+                  }}
+                >
+                  确认
+                </Button>
+              )}
             </SettingItem>
+            <EditableList items={bypass} onChange={(list) => setBypass(list)} divider={false} />
           </>
         )}
-        {platform !== 'linux' && (
-          <>
-            <SettingItem title="托盘菜单显示节点信息" divider>
-              <Switch
-                size="sm"
-                isSelected={proxyInTray}
-                onValueChange={async (v) => {
-                  await patchAppConfig({ proxyInTray: v })
-                }}
-              />
-            </SettingItem>
-            <SettingItem
-              title={`${platform === 'win32' ? '任务栏' : '状态栏'}显示网速信息`}
-              divider
-            >
-              <Switch
-                size="sm"
-                isSelected={showTraffic}
-                onValueChange={async (v) => {
-                  await patchAppConfig({ showTraffic: v })
-                  await startMonitor()
-                }}
-              />
-            </SettingItem>
-          </>
-        )}
-        {platform === 'darwin' && (
-          <>
-            <SettingItem title="显示 Dock 图标" divider>
-              <Switch
-                size="sm"
-                isSelected={useDockIcon}
-                onValueChange={async (v) => {
-                  await patchAppConfig({ useDockIcon: v })
-                }}
-              />
-            </SettingItem>
-          </>
-        )}
-
-        <SettingItem title="使用系统标题栏" divider>
-          <Switch
-            size="sm"
-            isSelected={useWindowFrame}
-            onValueChange={async (v) => {
-              await patchAppConfig({ useWindowFrame: v })
-              await relaunchApp()
-            }}
-          />
-        </SettingItem>
-        <SettingItem title="背景色" divider>
-          <Tabs
-            size="sm"
-            color="primary"
-            selectedKey={appTheme}
-            onSelectionChange={(key) => {
-              setTheme(key.toString())
-              patchAppConfig({ appTheme: key as AppTheme })
-            }}
-          >
-            <Tab key="system" title="自动" />
-            <Tab key="dark" title="深色" />
-            <Tab key="light" title="浅色" />
-          </Tabs>
-        </SettingItem>
-        <SettingItem
-          title="主题"
-          actions={
-            <>
-              <Button
-                size="sm"
-                isLoading={fetching}
-                isIconOnly
-                title="拉取主题"
-                variant="light"
-                onPress={async () => {
-                  setFetching(true)
-                  try {
-                    await fetchThemes()
-                    setCustomThemes(await resolveThemes())
-                  } catch (e) {
-                    alert(e)
-                  } finally {
-                    setFetching(false)
-                  }
-                }}
-              >
-                <IoMdCloudDownload className="text-lg" />
-              </Button>
-              <Button
-                size="sm"
-                isIconOnly
-                title="导入主题"
-                variant="light"
-                onPress={async () => {
-                  const files = await getFilePath(['css'])
-                  if (!files) return
-                  try {
-                    await importThemes(files)
-                    setCustomThemes(await resolveThemes())
-                  } catch (e) {
-                    alert(e)
-                  }
-                }}
-              >
-                <BiSolidFileImport className="text-lg" />
-              </Button>
-              <Button
-                size="sm"
-                isIconOnly
-                title="编辑主题"
-                variant="light"
-                onPress={async () => {
-                  setOpenCSSEditor(true)
-                }}
-              >
-                <MdEditDocument className="text-lg" />
-              </Button>
-            </>
-          }
-        >
-          {customThemes && (
-            <Select
-              classNames={{ trigger: 'data-[hover=true]:bg-default-200' }}
-              className="w-[60%]"
-              size="sm"
-              selectedKeys={new Set([customTheme])}
-              disallowEmptySelection={true}
-              onSelectionChange={async (v) => {
-                try {
-                  await patchAppConfig({ customTheme: v.currentKey as string })
-                } catch (e) {
-                  alert(e)
-                }
-              }}
-            >
-              {customThemes.map((theme) => (
-                <SelectItem key={theme.key}>{theme.label}</SelectItem>
-              ))}
-            </Select>
-          )}
-        </SettingItem>
       </SettingCard>
     </>
   )

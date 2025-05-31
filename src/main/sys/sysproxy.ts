@@ -126,7 +126,7 @@ async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
   }
 }
 
-async function disableSysProxy(onlyActiveDevice: boolean): Promise<void> {
+export async function disableSysProxy(onlyActiveDevice: boolean): Promise<void> {
   await stopPacServer()
   const execFilePromise = promisify(execFile)
   if (process.platform === 'darwin') {
