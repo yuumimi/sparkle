@@ -191,7 +191,17 @@ const GeneralConfig: React.FC = () => {
         </SettingItem>
         {networkDetection && (
           <>
-            <SettingItem title="断网检测间隔" divider>
+            <SettingItem
+              title="断网检测间隔"
+              actions={
+                <Tooltip content="设置断网检测的间隔时间，单位为秒">
+                  <Button isIconOnly size="sm" variant="light">
+                    <IoIosHelpCircle className="text-lg" />
+                  </Button>
+                </Tooltip>
+              }
+              divider
+            >
               <div className="flex">
                 {interval !== networkDetectionInterval && (
                   <Button
