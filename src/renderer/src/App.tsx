@@ -28,13 +28,14 @@ import MihomoCoreCard from '@renderer/components/sider/mihomo-core-card'
 import ResourceCard from '@renderer/components/sider/resource-card'
 import UpdaterButton from '@renderer/components/updater/updater-button'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { applyTheme, setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
+import { applyTheme, checkUpdate, setNativeTheme, setTitleBarOverlay } from '@renderer/utils/ipc'
 import { platform } from '@renderer/utils/init'
 import { TitleBarOverlayOptions } from 'electron'
 import SubStoreCard from '@renderer/components/sider/substore-card'
 import MihomoIcon from './components/base/mihomo-icon'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
+import useSWR from 'swr'
 
 let navigate: NavigateFunction
 
@@ -59,7 +60,8 @@ const App: React.FC = () => {
       'sniff',
       'log',
       'substore'
-    ]
+    ],
+    autoCheckUpdate
   } = appConfig || {}
   const narrowWidth = platform === 'darwin' ? 70 : 60
   const [order, setOrder] = useState(siderOrder)
@@ -86,6 +88,13 @@ const App: React.FC = () => {
       }
     }
   }
+  const { data: latest } = useSWR(
+    autoCheckUpdate ? 'checkUpdate' : undefined,
+    autoCheckUpdate ? checkUpdate : (): undefined => {},
+    {
+      refreshInterval: 1000 * 60 * 10
+    }
+  )
 
   useEffect(() => {
     setOrder(siderOrder)
@@ -196,13 +205,14 @@ const App: React.FC = () => {
     >
       {siderWidthValue === narrowWidth ? (
         <div style={{ width: `${narrowWidth}px` }} className="side h-full">
-          <div className="app-drag flex justify-center items-center z-40 bg-transparent h-[49px]">
+          <div className="app-drag flex justify-center items-center z-40 bg-transparent h-[45px]">
             {platform !== 'darwin' && (
               <MihomoIcon className="h-[32px] leading-[32px] text-lg mx-[1px]" />
             )}
-            <UpdaterButton iconOnly={true} />
           </div>
-          <div className="h-[calc(100%-230px)] overflow-y-auto no-scrollbar">
+          <div
+            className={`${latest ? 'h-[calc(100%-275px)]' : 'h-[calc(100%-227px)]'} overflow-y-auto no-scrollbar`}
+          >
             <div className="h-full w-full flex flex-col gap-2">
               {order.map((key: string) => {
                 const Component = componentMap[key]
@@ -212,6 +222,7 @@ const App: React.FC = () => {
             </div>
           </div>
           <div className="p-2 flex flex-col items-center space-y-2">
+            {latest && latest.version && <UpdaterButton iconOnly={true} latest={latest} />}
             <OutboundModeSwitcher iconOnly />
             <Button
               size="sm"
@@ -237,7 +248,7 @@ const App: React.FC = () => {
               <div className="flex ml-1">
                 <h3 className="text-lg font-bold leading-[32px]">Sparkle</h3>
               </div>
-              <UpdaterButton />
+              {latest && latest.version && <UpdaterButton latest={latest} />}
               <Button
                 size="sm"
                 className="app-nodrag"
