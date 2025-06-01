@@ -8,7 +8,8 @@ import {
   Dropdown,
   DropdownTrigger,
   DropdownMenu,
-  DropdownItem
+  DropdownItem,
+  Tooltip
 } from '@heroui/react'
 import React from 'react'
 import SettingItem from '../base/base-setting-item'
@@ -31,60 +32,68 @@ const CopyableSettingItem: React.FC<{
     domain.split('.').length <= 2
       ? [domain]
       : domain
-        .split('.')
-        .map((_, i, parts) => parts.slice(i).join('.'))
-        .slice(0, -1)
+          .split('.')
+          .map((_, i, parts) => parts.slice(i).join('.'))
+          .slice(0, -1)
+
   const isIPv6 = (ip: string) => ip.includes(':')
 
   const menuItems = [
     { key: 'raw', text: displayName || (Array.isArray(value) ? value.join(', ') : value) },
     ...(Array.isArray(value)
-      ? value.map((v, i) => {
-          const p = prefix[i]
-          if (!p || !v) return null
-  
-          if (p === 'DOMAIN-SUFFIX') {
-            return getSubDomains(v).map((subV) => ({
-              key: `${p},${subV}`,
-              text: `${p},${subV}`
-            }))
-          }
-  
-          if (p === 'IP-ASN' || p === 'SRC-IP-ASN') {
-            return {
-              key: `${p},${v.split(' ')[0]}`,
-              text: `${p},${v.split(' ')[0]}`
+      ? value
+          .map((v, i) => {
+            const p = prefix[i]
+            if (!p || !v) return null
+
+            if (p === 'DOMAIN-SUFFIX') {
+              return getSubDomains(v).map((subV) => ({
+                key: `${p},${subV}`,
+                text: `${p},${subV}`
+              }))
             }
-          }
-  
-          const suffix = (p === 'IP-CIDR' || p === 'SRC-IP-CIDR') ? (isIPv6(v) ? '/128' : '/32') : ''
-          return {
-            key: `${p},${v}${suffix}`,
-            text: `${p},${v}${suffix}`
-          }
-        }).filter(Boolean).flat()
-      : prefix.map(p => {
-          const v = value as string
-          if (p === 'DOMAIN-SUFFIX') {
-            return getSubDomains(v).map((subV) => ({
-              key: `${p},${subV}`,
-              text: `${p},${subV}`
-            }))
-          }
-  
-          if (p === 'IP-ASN' || p === 'SRC-IP-ASN') {
-            return {
-              key: `${p},${v.split(' ')[0]}`,
-              text: `${p},${v.split(' ')[0]}`
+
+            if (p === 'IP-ASN' || p === 'SRC-IP-ASN') {
+              return {
+                key: `${p},${v.split(' ')[0]}`,
+                text: `${p},${v.split(' ')[0]}`
+              }
             }
-          }
-  
-          const suffix = (p === 'IP-CIDR' || p === 'SRC-IP-CIDR') ? (isIPv6(v) ? '/128' : '/32') : ''
-          return {
-            key: `${p},${v}${suffix}`,
-            text: `${p},${v}${suffix}`
-          }
-        }).flat())
+
+            const suffix =
+              p === 'IP-CIDR' || p === 'SRC-IP-CIDR' ? (isIPv6(v) ? '/128' : '/32') : ''
+            return {
+              key: `${p},${v}${suffix}`,
+              text: `${p},${v}${suffix}`
+            }
+          })
+          .filter(Boolean)
+          .flat()
+      : prefix
+          .map((p) => {
+            const v = value as string
+            if (p === 'DOMAIN-SUFFIX') {
+              return getSubDomains(v).map((subV) => ({
+                key: `${p},${subV}`,
+                text: `${p},${subV}`
+              }))
+            }
+
+            if (p === 'IP-ASN' || p === 'SRC-IP-ASN') {
+              return {
+                key: `${p},${v.split(' ')[0]}`,
+                text: `${p},${v.split(' ')[0]}`
+              }
+            }
+
+            const suffix =
+              p === 'IP-CIDR' || p === 'SRC-IP-CIDR' ? (isIPv6(v) ? '/128' : '/32') : ''
+            return {
+              key: `${p},${v}${suffix}`,
+              text: `${p},${v}${suffix}`
+            }
+          })
+          .flat())
   ]
 
   return (
@@ -113,7 +122,16 @@ const CopyableSettingItem: React.FC<{
         </Dropdown>
       }
     >
-      {displayName || (Array.isArray(value) ? value.join(', ') : value)}
+      <div className="flex items-center gap-2 truncate">
+        <Tooltip
+          delay={2000}
+          content={displayName || (Array.isArray(value) ? value.join(', ') : value)}
+        >
+          <div className="truncate">
+            {displayName || (Array.isArray(value) ? value.join(', ') : value)}
+          </div>
+        </Tooltip>
+      </div>
     </SettingItem>
   )
 }
@@ -133,16 +151,50 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
       <ModalContent className="flag-emoji break-all">
         <ModalHeader className="flex app-drag">连接详情</ModalHeader>
         <ModalBody>
-          <SettingItem title="连接建立时间">{dayjs(connection.start).fromNow()}</SettingItem>
-          <SettingItem title="规则">
-            {connection.rule ? connection.rule : '未命中任何规则'}
-            {connection.rulePayload ? `(${connection.rulePayload})` : ''}
+          <SettingItem title="连接建立时间">
+            <Tooltip content={dayjs(connection.start).format('YYYY-MM-DD HH:mm:ss')}>
+              <div className="truncate">{dayjs(connection.start).fromNow()}</div>
+            </Tooltip>
           </SettingItem>
-          <SettingItem title="代理链">{[...connection.chains].reverse().join('>>')}</SettingItem>
-          <SettingItem title="上传速度">{calcTraffic(connection.uploadSpeed || 0)}/s</SettingItem>
-          <SettingItem title="下载速度">{calcTraffic(connection.downloadSpeed || 0)}/s</SettingItem>
-          <SettingItem title="上传量">{calcTraffic(connection.upload)}</SettingItem>
-          <SettingItem title="下载量">{calcTraffic(connection.download)}</SettingItem>
+          <SettingItem title="规则">
+            <Tooltip
+              content={
+                connection.rule
+                  ? `${connection.rule}${connection.rulePayload ? ` (${connection.rulePayload})` : ''}`
+                  : '未命中任何规则'
+              }
+            >
+              <div className="truncate">
+                {connection.rule ? connection.rule : '未命中任何规则'}
+                {connection.rulePayload ? `(${connection.rulePayload})` : ''}
+              </div>
+            </Tooltip>
+          </SettingItem>
+          <SettingItem title="代理链">
+            <Tooltip content={[...connection.chains].reverse().join(' >> ')}>
+              <div className="truncate">{[...connection.chains].reverse().join('>>')}</div>
+            </Tooltip>
+          </SettingItem>
+          <SettingItem title="上传速度">
+            <Tooltip content={`${calcTraffic(connection.uploadSpeed || 0)}/s`}>
+              <div className="truncate">{calcTraffic(connection.uploadSpeed || 0)}/s</div>
+            </Tooltip>
+          </SettingItem>
+          <SettingItem title="下载速度">
+            <Tooltip content={`${calcTraffic(connection.downloadSpeed || 0)}/s`}>
+              <div className="truncate">{calcTraffic(connection.downloadSpeed || 0)}/s</div>
+            </Tooltip>
+          </SettingItem>
+          <SettingItem title="上传量">
+            <Tooltip content={calcTraffic(connection.upload)}>
+              <div className="truncate">{calcTraffic(connection.upload)}</div>
+            </Tooltip>
+          </SettingItem>
+          <SettingItem title="下载量">
+            <Tooltip content={calcTraffic(connection.download)}>
+              <div className="truncate">{calcTraffic(connection.download)}</div>
+            </Tooltip>
+          </SettingItem>
           <CopyableSettingItem
             title="连接类型"
             value={[connection.metadata.type, connection.metadata.network]}
@@ -170,7 +222,9 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
                 connection.metadata.process,
                 ...(connection.metadata.uid ? [connection.metadata.uid.toString()] : [])
               ]}
-              displayName={`${connection.metadata.process}${connection.metadata.uid ? `(${connection.metadata.uid})` : ''}`}
+              displayName={`${connection.metadata.process}${
+                connection.metadata.uid ? `(${connection.metadata.uid})` : ''
+              }`}
               prefix={['PROCESS-NAME', ...(connection.metadata.uid ? ['UID'] : [])]}
             />
           )}
@@ -245,7 +299,7 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
               prefix={['SRC-IP-CIDR']}
             />
           )}
-          {connection.metadata.inboundPort && (
+          {connection.metadata.inboundPort !== '0' && (
             <CopyableSettingItem
               title="入站端口"
               value={connection.metadata.inboundPort}
@@ -266,24 +320,40 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
               prefix={['IN-USER']}
             />
           )}
-
-          <CopyableSettingItem
-            title="DSCP"
-            value={connection.metadata.dscp.toString()}
-            prefix={['DSCP']}
-          />
-
+          {connection.metadata.dscp !== 0 && (
+            <CopyableSettingItem
+              title="DSCP"
+              value={connection.metadata.dscp.toString()}
+              prefix={['DSCP']}
+            />
+          )}
           {connection.metadata.remoteDestination && (
-            <SettingItem title="远程目标">{connection.metadata.remoteDestination}</SettingItem>
+            <SettingItem title="远程目标">
+              <Tooltip content={connection.metadata.remoteDestination}>
+                <div className="truncate">{connection.metadata.remoteDestination}</div>
+              </Tooltip>
+            </SettingItem>
           )}
           {connection.metadata.dnsMode && (
-            <SettingItem title="DNS模式">{connection.metadata.dnsMode}</SettingItem>
+            <SettingItem title="DNS模式">
+              <Tooltip content={connection.metadata.dnsMode}>
+                <div className="truncate">{connection.metadata.dnsMode}</div>
+              </Tooltip>
+            </SettingItem>
           )}
           {connection.metadata.specialProxy && (
-            <SettingItem title="特殊代理">{connection.metadata.specialProxy}</SettingItem>
+            <SettingItem title="特殊代理">
+              <Tooltip content={connection.metadata.specialProxy}>
+                <div className="truncate">{connection.metadata.specialProxy}</div>
+              </Tooltip>
+            </SettingItem>
           )}
           {connection.metadata.specialRules && (
-            <SettingItem title="特殊规则">{connection.metadata.specialRules}</SettingItem>
+            <SettingItem title="特殊规则">
+              <Tooltip content={connection.metadata.specialRules}>
+                <div className="truncate">{connection.metadata.specialRules}</div>
+              </Tooltip>
+            </SettingItem>
           )}
         </ModalBody>
         <ModalFooter>
