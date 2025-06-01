@@ -30,7 +30,6 @@ const OutboundModeSwitcher: React.FC<Props> = (props) => {
   if (iconOnly) {
     return (
       <Tabs
-        fullWidth
         color="primary"
         selectedKey={mode}
         classNames={{
