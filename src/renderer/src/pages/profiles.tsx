@@ -121,9 +121,9 @@ const Profiles: React.FC = () => {
     }
     return items
   }, [subs, collections])
-  const handleImport = async (): Promise<void> => {
+  const handleImport = async (importUrl: string): Promise<void> => {
     setImporting(true)
-    await addProfileItem({ name: '', type: 'remote', url, useProxy })
+    await addProfileItem({ name: '', type: 'remote', url: importUrl, useProxy })
     setUrl('')
     setImporting(false)
   }
@@ -147,7 +147,7 @@ const Profiles: React.FC = () => {
   const handleInputKeyUp = useCallback(
     (e: KeyboardEvent<HTMLInputElement>) => {
       if (e.key !== 'Enter' || isUrlEmpty) return
-      handleImport()
+      handleImport((e.currentTarget as HTMLInputElement).value)
     },
     [isUrlEmpty]
   )
@@ -260,7 +260,7 @@ const Profiles: React.FC = () => {
             className="ml-2"
             isDisabled={isUrlEmpty}
             isLoading={importing}
-            onPress={handleImport}
+            onPress={() => handleImport(url)}
           >
             导入
           </Button>
