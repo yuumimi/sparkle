@@ -61,7 +61,8 @@ const App: React.FC = () => {
       'log',
       'substore'
     ],
-    autoCheckUpdate
+    autoCheckUpdate,
+    updateChannel = 'stable'
   } = appConfig || {}
   const narrowWidth = platform === 'darwin' ? 70 : 60
   const [order, setOrder] = useState(siderOrder)
@@ -89,7 +90,7 @@ const App: React.FC = () => {
     }
   }
   const { data: latest } = useSWR(
-    autoCheckUpdate ? 'checkUpdate' : undefined,
+    autoCheckUpdate ? ['checkUpdate', updateChannel] : undefined,
     autoCheckUpdate ? checkUpdate : (): undefined => {},
     {
       refreshInterval: 1000 * 60 * 10
