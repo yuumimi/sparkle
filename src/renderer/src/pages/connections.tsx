@@ -52,6 +52,8 @@ const Connections: React.FC = () => {
               return (a.uploadSpeed || 0) - (b.uploadSpeed || 0)
             case 'downloadSpeed':
               return (a.downloadSpeed || 0) - (b.downloadSpeed || 0)
+            case 'process':
+              return (a.metadata.process || '').localeCompare(b.metadata.process || '')
           }
         } else {
           switch (connectionOrderBy) {
@@ -65,6 +67,8 @@ const Connections: React.FC = () => {
               return (b.uploadSpeed || 0) - (a.uploadSpeed || 0)
             case 'downloadSpeed':
               return (b.downloadSpeed || 0) - (a.downloadSpeed || 0)
+            case 'process':
+              return (b.metadata.process || '').localeCompare(a.metadata.process || '')
           }
         }
       })
@@ -288,6 +292,7 @@ const Connections: React.FC = () => {
                   | 'download'
                   | 'uploadSpeed'
                   | 'downloadSpeed'
+                  | 'process'
               })
             }}
           >
@@ -296,6 +301,7 @@ const Connections: React.FC = () => {
             <SelectItem key="uploadSpeed">上传速度</SelectItem>
             <SelectItem key="downloadSpeed">下载速度</SelectItem>
             <SelectItem key="time">时间</SelectItem>
+            <SelectItem key="process">进程名称</SelectItem>
           </Select>
           <Button
             size="sm"
