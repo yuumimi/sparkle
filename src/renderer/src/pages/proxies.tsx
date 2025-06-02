@@ -231,7 +231,7 @@ const Proxies: React.FC = () => {
                   <Card
                     isPressable
                     fullWidth
-                    onClick={() => {
+                    onPress={() => {
                       setIsOpen((prev) => {
                         const newOpen = [...prev]
                         newOpen[index] = !prev[index]

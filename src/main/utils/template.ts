@@ -1,5 +1,6 @@
 export const defaultConfig: IAppConfig = {
   core: 'mihomo',
+  updateChannel: 'stable',
   silentStart: false,
   appTheme: 'system',
   useWindowFrame: false,

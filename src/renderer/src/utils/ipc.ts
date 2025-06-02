@@ -418,6 +418,10 @@ export async function getImageDataURL(url: string): Promise<string> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getImageDataURL', url))
 }
 
+export async function getIconDataURL(appPath: string): Promise<string> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getIconDataURL', appPath))
+}
+
 export async function resolveThemes(): Promise<{ key: string; label: string; content: string }[]> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('resolveThemes'))
 }

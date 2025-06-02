@@ -123,14 +123,9 @@ const CopyableSettingItem: React.FC<{
       }
     >
       <div className="flex items-center gap-2 truncate">
-        <Tooltip
-          delay={2000}
-          content={displayName || (Array.isArray(value) ? value.join(', ') : value)}
-        >
-          <div className="truncate">
-            {displayName || (Array.isArray(value) ? value.join(', ') : value)}
-          </div>
-        </Tooltip>
+        <div className="truncate">
+          {displayName || (Array.isArray(value) ? value.join(', ') : value)}
+        </div>
       </div>
     </SettingItem>
   )
@@ -152,48 +147,28 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
         <ModalHeader className="flex app-drag">连接详情</ModalHeader>
         <ModalBody>
           <SettingItem title="连接建立时间">
-            <Tooltip content={dayjs(connection.start).format('YYYY-MM-DD HH:mm:ss')}>
-              <div className="truncate">{dayjs(connection.start).fromNow()}</div>
-            </Tooltip>
+            <div className="truncate">{dayjs(connection.start).fromNow()}</div>
           </SettingItem>
           <SettingItem title="规则">
-            <Tooltip
-              content={
-                connection.rule
-                  ? `${connection.rule}${connection.rulePayload ? ` (${connection.rulePayload})` : ''}`
-                  : '未命中任何规则'
-              }
-            >
-              <div className="truncate">
-                {connection.rule ? connection.rule : '未命中任何规则'}
-                {connection.rulePayload ? `(${connection.rulePayload})` : ''}
-              </div>
-            </Tooltip>
+            <div className="truncate">
+              {connection.rule ? connection.rule : '未命中任何规则'}
+              {connection.rulePayload ? `(${connection.rulePayload})` : ''}
+            </div>
           </SettingItem>
           <SettingItem title="代理链">
-            <Tooltip content={[...connection.chains].reverse().join(' >> ')}>
-              <div className="truncate">{[...connection.chains].reverse().join('>>')}</div>
-            </Tooltip>
+            <div className="truncate">{[...connection.chains].reverse().join('>>')}</div>
           </SettingItem>
           <SettingItem title="上传速度">
-            <Tooltip content={`${calcTraffic(connection.uploadSpeed || 0)}/s`}>
-              <div className="truncate">{calcTraffic(connection.uploadSpeed || 0)}/s</div>
-            </Tooltip>
+            <div className="truncate">{calcTraffic(connection.uploadSpeed || 0)}/s</div>
           </SettingItem>
           <SettingItem title="下载速度">
-            <Tooltip content={`${calcTraffic(connection.downloadSpeed || 0)}/s`}>
-              <div className="truncate">{calcTraffic(connection.downloadSpeed || 0)}/s</div>
-            </Tooltip>
+            <div className="truncate">{calcTraffic(connection.downloadSpeed || 0)}/s</div>
           </SettingItem>
           <SettingItem title="上传量">
-            <Tooltip content={calcTraffic(connection.upload)}>
-              <div className="truncate">{calcTraffic(connection.upload)}</div>
-            </Tooltip>
+            <div className="truncate">{calcTraffic(connection.upload)}</div>
           </SettingItem>
           <SettingItem title="下载量">
-            <Tooltip content={calcTraffic(connection.download)}>
-              <div className="truncate">{calcTraffic(connection.download)}</div>
-            </Tooltip>
+            <div className="truncate">{calcTraffic(connection.download)}</div>
           </SettingItem>
           <CopyableSettingItem
             title="连接类型"

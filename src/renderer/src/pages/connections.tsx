@@ -1,6 +1,6 @@
 import BasePage from '@renderer/components/base/base-page'
 import { mihomoCloseAllConnections, mihomoCloseConnection } from '@renderer/utils/ipc'
-import { Key, useEffect, useMemo, useState } from 'react'
+import React, { Key, useEffect, useMemo, useState } from 'react'
 import { Badge, Button, Divider, Input, Select, SelectItem, Tab, Tabs } from '@heroui/react'
 import { calcTraffic } from '@renderer/utils/calc'
 import ConnectionItem from '@renderer/components/connections/connection-item'
@@ -9,22 +9,31 @@ import dayjs from 'dayjs'
 import ConnectionDetailModal from '@renderer/components/connections/connection-detail-modal'
 import { CgClose, CgTrash } from 'react-icons/cg'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
-import { HiSortAscending, HiSortDescending } from 'react-icons/hi'
 import { includesIgnoreCase } from '@renderer/utils/includes'
 import { differenceWith, unionWith } from 'lodash'
+import { getIconDataURL } from '@renderer/utils/ipc'
+import { HiSortAscending, HiSortDescending } from 'react-icons/hi'
+import { platform } from '@renderer/utils/init'
 
 let cachedConnections: IMihomoConnectionDetail[] = []
 
 const Connections: React.FC = () => {
   const [filter, setFilter] = useState('')
   const { appConfig, patchAppConfig } = useAppConfig()
-  const { connectionDirection = 'asc', connectionOrderBy = 'time' } = appConfig || {}
+  const {
+    connectionDirection = 'asc',
+    connectionOrderBy = 'time',
+    displayIcon = true
+  } = appConfig || {}
   const [connectionsInfo, setConnectionsInfo] = useState<IMihomoConnectionsInfo>()
   const [allConnections, setAllConnections] = useState<IMihomoConnectionDetail[]>(cachedConnections)
   const [activeConnections, setActiveConnections] = useState<IMihomoConnectionDetail[]>([])
   const [closedConnections, setClosedConnections] = useState<IMihomoConnectionDetail[]>([])
   const [isDetailModalOpen, setIsDetailModalOpen] = useState(false)
   const [selected, setSelected] = useState<IMihomoConnectionDetail>()
+
+  const [iconMap, setIconMap] = useState<Record<string, string>>({})
+
   const [tab, setTab] = useState('active')
 
   const filteredConnections = useMemo(() => {
@@ -65,7 +74,7 @@ const Connections: React.FC = () => {
       const raw = JSON.stringify(connection)
       return includesIgnoreCase(raw, filter)
     })
-  }, [activeConnections, closedConnections, filter, connectionDirection, connectionOrderBy])
+  }, [activeConnections, closedConnections, filter, connectionDirection, connectionOrderBy, tab])
 
   const closeAllConnections = (): void => {
     tab === 'active' ? mihomoCloseAllConnections() : trashAllClosedConnection()
@@ -79,14 +88,12 @@ const Connections: React.FC = () => {
     const trashIds = closedConnections.map((conn) => conn.id)
     setAllConnections((allConns) => allConns.filter((conn) => !trashIds.includes(conn.id)))
     setClosedConnections([])
-
     cachedConnections = allConnections
   }
 
   const trashClosedConnection = (id: string): void => {
-    setAllConnections((allConns) => allConns.filter((conn) => conn.id != id))
-    setClosedConnections((closedConns) => closedConns.filter((conn) => conn.id != id))
-
+    setAllConnections((allConns) => allConns.filter((conn) => conn.id !== id))
+    setClosedConnections((closedConns) => closedConns.filter((conn) => conn.id !== id))
     cachedConnections = allConnections
   }
 
@@ -95,24 +102,25 @@ const Connections: React.FC = () => {
       setConnectionsInfo(info)
 
       if (!info.connections) return
-      const allConns = unionWith(activeConnections, allConnections, (a, b) => a.id === b.id)
 
+      const allConns = unionWith(activeConnections, allConnections, (a, b) => a.id === b.id)
       const activeConns = info.connections.map((conn) => {
         const preConn = activeConnections.find((c) => c.id === conn.id)
         const downloadSpeed = preConn ? conn.download - preConn.download : 0
         const uploadSpeed = preConn ? conn.upload - preConn.upload : 0
         const metadata = {
           ...conn.metadata,
-          ...((!conn.metadata.sourceIP) && { process: 'mihomo' })
+          ...(!conn.metadata.sourceIP && { process: 'mihomo' })
         }
         return {
           ...conn,
           metadata,
           isActive: true,
-          downloadSpeed: downloadSpeed,
-          uploadSpeed: uploadSpeed
+          downloadSpeed,
+          uploadSpeed
         }
       })
+
       const closedConns = differenceWith(allConns, activeConns, (a, b) => a.id === b.id).map(
         (conn) => {
           return {
@@ -127,7 +135,6 @@ const Connections: React.FC = () => {
       setActiveConnections(activeConns)
       setClosedConnections(closedConns)
       setAllConnections(allConns.slice(-(activeConns.length + 200)))
-
       cachedConnections = allConnections
     })
 
@@ -135,6 +142,40 @@ const Connections: React.FC = () => {
       window.electron.ipcRenderer.removeAllListeners('mihomoConnections')
     }
   }, [allConnections, activeConnections, closedConnections])
+
+  useEffect(() => {
+    if (!displayIcon) return
+    if (platform === 'linux') return
+
+    const allPaths = new Set<string>()
+    activeConnections.forEach((c) => {
+      if (c.metadata.processPath) allPaths.add(c.metadata.processPath)
+    })
+    closedConnections.forEach((c) => {
+      if (c.metadata.processPath) allPaths.add(c.metadata.processPath)
+    })
+
+    allPaths.forEach((path) => {
+      if (iconMap[path]) return
+      const fromStorage = localStorage.getItem(path)
+      if (fromStorage) {
+        setIconMap((prev) => ({ ...prev, [path]: fromStorage }))
+        return
+      }
+      getIconDataURL(path)
+        .then((rawBase64) => {
+          if (!rawBase64) return
+          const fullDataURL = rawBase64.startsWith('data:')
+            ? rawBase64
+            : `data:image/png;base64,${rawBase64}`
+          try {
+            localStorage.setItem(path, fullDataURL)
+          } catch {}
+          setIconMap((prev) => ({ ...prev, [path]: fullDataURL }))
+        })
+        .catch(() => {})
+    })
+  }, [activeConnections, closedConnections, iconMap, displayIcon])
 
   return (
     <BasePage
@@ -154,7 +195,7 @@ const Connections: React.FC = () => {
             color="primary"
             variant="flat"
             showOutline={false}
-            content={`${filteredConnections.length}`}
+            content={filteredConnections.length}
           >
             <Button
               className="app-nodrag ml-1"
@@ -185,7 +226,7 @@ const Connections: React.FC = () => {
         <div className="flex p-2 gap-2">
           <Tabs
             size="sm"
-            color={`${tab === 'active' ? 'primary' : 'danger'}`}
+            color={tab === 'active' ? 'primary' : 'danger'}
             selectedKey={tab}
             variant="underlined"
             className="w-fit h-[32px]"
@@ -197,7 +238,7 @@ const Connections: React.FC = () => {
               key="active"
               title={
                 <Badge
-                  color={`${tab === 'active' ? 'primary' : 'default'}`}
+                  color={tab === 'active' ? 'primary' : 'default'}
                   size="sm"
                   shape="circle"
                   variant="flat"
@@ -212,7 +253,7 @@ const Connections: React.FC = () => {
               key="closed"
               title={
                 <Badge
-                  color={`${tab === 'closed' ? 'danger' : 'default'}`}
+                  color={tab === 'closed' ? 'danger' : 'default'}
                   size="sm"
                   shape="circle"
                   variant="flat"
@@ -278,17 +319,23 @@ const Connections: React.FC = () => {
       <div className="h-[calc(100vh-100px)] mt-[1px]">
         <Virtuoso
           data={filteredConnections}
-          itemContent={(i, connection) => (
-            <ConnectionItem
-              setSelected={setSelected}
-              setIsDetailModalOpen={setIsDetailModalOpen}
-              selected={selected}
-              close={closeConnection}
-              index={i}
-              key={connection.id}
-              info={connection}
-            />
-          )}
+          itemContent={(i, connection) => {
+            const pathKey = connection.metadata.processPath || ''
+            const iconUrl = displayIcon && pathKey ? iconMap[pathKey] || '' : ''
+            return (
+              <ConnectionItem
+                setSelected={setSelected}
+                setIsDetailModalOpen={setIsDetailModalOpen}
+                selected={selected}
+                iconUrl={iconUrl}
+                displayIcon={platform === 'linux' ? false : displayIcon}
+                close={closeConnection}
+                index={i}
+                key={connection.id}
+                info={connection}
+              />
+            )
+          }}
         />
       </div>
     </BasePage>

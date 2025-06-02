@@ -93,6 +93,21 @@ const Actions: React.FC = () => {
           </Button>
         </SettingItem>
         <SettingItem
+          title="清除缓存"
+          actions={
+            <Tooltip content="清除软件渲染进程缓存">
+              <Button isIconOnly size="sm" variant="light">
+                <IoIosHelpCircle className="text-lg" />
+              </Button>
+            </Tooltip>
+          }
+          divider
+        >
+          <Button size="sm" onPress={() => localStorage.clear()}>
+            清除缓存
+          </Button>
+        </SettingItem>
+        <SettingItem
           title="创建堆快照"
           actions={
             <Tooltip content="创建主进程堆快照，用于排查内存问题">

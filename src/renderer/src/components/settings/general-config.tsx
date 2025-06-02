@@ -29,7 +29,8 @@ const GeneralConfig: React.FC = () => {
     updateChannel = 'stable',
     networkDetection = false,
     networkDetectionBypass = ['VMware', 'vEthernet'],
-    networkDetectionInterval = 10
+    networkDetectionInterval = 10,
+    displayIcon = false
   } = appConfig || {}
 
   const [bypass, setBypass] = useState(networkDetectionBypass)
@@ -174,7 +175,7 @@ const GeneralConfig: React.FC = () => {
               </Button>
             </Tooltip>
           }
-          divider={networkDetection}
+          divider={platform === 'linux' ? networkDetection : true}
         >
           <Switch
             size="sm"
@@ -242,8 +243,23 @@ const GeneralConfig: React.FC = () => {
                 </Button>
               )}
             </SettingItem>
-            <EditableList items={bypass} onChange={(list) => setBypass(list)} divider={false} />
+            <EditableList
+              items={bypass}
+              onChange={(list) => setBypass(list)}
+              divider={platform != 'darwin'}
+            />
           </>
+        )}
+        {platform != 'linux' && (
+          <SettingItem title="连接显示应用图标">
+            <Switch
+              size="sm"
+              isSelected={displayIcon}
+              onValueChange={(v) => {
+                patchAppConfig({ displayIcon: v })
+              }}
+            />
+          </SettingItem>
         )}
       </SettingCard>
     </>

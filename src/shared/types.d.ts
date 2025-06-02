@@ -363,6 +363,7 @@ interface IAppConfig {
   networkDetection?: boolean
   networkDetectionBypass?: string[]
   networkDetectionInterval?: number
+  displayIcon?: boolean
 }
 
 interface IMihomoTunConfig {
@@ -549,3 +550,5 @@ interface ISubStoreSub {
   icon?: string
   tag?: string[]
 }
+
+declare module 'file-icon'
