@@ -16,8 +16,8 @@ interface Props {
 }
 
 const ConnectionItem: React.FC<Props> = memo((props) => {
-  const { index, info, iconUrl, close, selected, setSelected, setIsDetailModalOpen } = props
-  const displayIcon = iconUrl || ''
+  const { index, info, displayIcon, iconUrl, close, selected, setSelected, setIsDetailModalOpen } =
+    props
 
   useEffect(() => {
     if (selected?.id === info.id) {
@@ -38,7 +38,7 @@ const ConnectionItem: React.FC<Props> = memo((props) => {
         <div className="w-full flex justify-between items-center">
           {displayIcon && (
             <div>
-              <Avatar size="lg" radius="sm" src={displayIcon} className="bg-transparent ml-2" />
+              <Avatar size="lg" radius="sm" src={iconUrl} className="bg-transparent ml-2" />
             </div>
           )}
           <div

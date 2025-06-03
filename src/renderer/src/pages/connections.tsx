@@ -13,7 +13,6 @@ import { includesIgnoreCase } from '@renderer/utils/includes'
 import { differenceWith, unionWith } from 'lodash'
 import { getIconDataURL } from '@renderer/utils/ipc'
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi'
-import { platform } from '@renderer/utils/init'
 
 let cachedConnections: IMihomoConnectionDetail[] = []
 
@@ -149,7 +148,6 @@ const Connections: React.FC = () => {
 
   useEffect(() => {
     if (!displayIcon) return
-    if (platform === 'linux') return
 
     const allPaths = new Set<string>()
     activeConnections.forEach((c) => {
@@ -334,7 +332,7 @@ const Connections: React.FC = () => {
                 setIsDetailModalOpen={setIsDetailModalOpen}
                 selected={selected}
                 iconUrl={iconUrl}
-                displayIcon={platform === 'linux' ? false : displayIcon}
+                displayIcon={displayIcon}
                 close={closeConnection}
                 index={i}
                 key={connection.id}

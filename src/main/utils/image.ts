@@ -1,27 +1,10 @@
 import axios from 'axios'
 import { getControledMihomoConfig } from '../config'
-import fs from 'fs'
+import fs, { existsSync } from 'fs'
 import path from 'path'
 import fii from 'file-icon-info'
 import { windowsDefaultIcon, darwinDefaultIcon } from './defaultIcon'
 import { app } from 'electron'
-
-export async function getImageDataURL(url: string): Promise<string> {
-  const { 'mixed-port': port = 7890 } = await getControledMihomoConfig()
-  const res = await axios.get(url, {
-    responseType: 'arraybuffer',
-    ...(port != 0 && {
-      proxy: {
-        protocol: 'http',
-        host: '127.0.0.1',
-        port
-      }
-    })
-  })
-  const mimeType = res.headers['content-type']
-  const dataURL = `data:${mimeType};base64,${Buffer.from(res.data).toString('base64')}`
-  return dataURL
-}
 
 function isIOSApp(appPath: string): boolean {
   const appDir = appPath.endsWith('.app')
@@ -95,6 +78,95 @@ function findBestAppPath(appPath: string): string | null {
   return appPaths[0]
 }
 
+async function findDesktopFile(appPath: string) {
+  try {
+    const execName = path.isAbsolute(appPath) ? path.basename(appPath) : appPath
+    const desktopDirs = ['/usr/share/applications', `${process.env.HOME}/.local/share/applications`]
+
+    for (const dir of desktopDirs) {
+      if (!existsSync(dir)) continue
+
+      const files = fs.readdirSync(dir)
+      const desktopFiles = files.filter((file) => file.endsWith('.desktop'))
+
+      for (const file of desktopFiles) {
+        const fullPath = path.join(dir, file)
+        try {
+          const content = fs.readFileSync(fullPath, 'utf-8')
+
+          const execMatch = content.match(/^Exec\s*=\s*(.+?)$/m)
+          if (execMatch) {
+            const execLine = execMatch[1].trim()
+            const execCmd = execLine.split(/\s+/)[0]
+            const execBasename = path.basename(execCmd)
+
+            if (
+              execCmd === appPath ||
+              execBasename === execName ||
+              execCmd.endsWith(appPath) ||
+              appPath.endsWith(execBasename)
+            ) {
+              return fullPath
+            }
+          }
+
+          const nameRegex = new RegExp(`^Name\\s*=\\s*${appPath}\\s*$`, 'im')
+          const genericNameRegex = new RegExp(`^GenericName\\s*=\\s*${appPath}\\s*$`, 'im')
+
+          if (nameRegex.test(content) || genericNameRegex.test(content)) {
+            return fullPath
+          }
+        } catch (err) {
+          continue
+        }
+      }
+    }
+  } catch (err) {
+    // ignore
+  }
+
+  return null
+}
+
+function parseIconNameFromDesktopFile(content: string) {
+  const match = content.match(/^Icon\s*=\s*(.+?)$/m)
+  return match ? match[1].trim() : null
+}
+
+function resolveIconPath(iconName: string) {
+  if (path.isAbsolute(iconName) && existsSync(iconName)) {
+    return iconName
+  }
+
+  const searchPaths: string[] = []
+  const sizes = ['512x512', '256x256', '128x128', '64x64', '48x48', '32x32', '24x24', '16x16']
+  const extensions = ['png', 'svg', 'xpm']
+  const iconDirs = [
+    '/usr/share/icons/hicolor',
+    '/usr/share/pixmaps',
+    '/usr/share/icons/Adwaita',
+    `${process.env.HOME}/.local/share/icons`
+  ]
+
+  for (const dir of iconDirs) {
+    for (const size of sizes) {
+      for (const ext of extensions) {
+        searchPaths.push(path.join(dir, size, 'apps', `${iconName}.${ext}`))
+      }
+    }
+  }
+  for (const ext of extensions) {
+    searchPaths.push(`/usr/share/pixmaps/${iconName}.${ext}`)
+  }
+  for (const dir of iconDirs) {
+    for (const ext of extensions) {
+      searchPaths.push(path.join(dir, `${iconName}.${ext}`))
+    }
+  }
+
+  return searchPaths.find((iconPath) => existsSync(iconPath)) || null
+}
+
 export async function getIconDataURL(appPath: string): Promise<string> {
   if (!appPath) {
     return ''
@@ -133,5 +205,39 @@ export async function getIconDataURL(appPath: string): Promise<string> {
     return `data:image/png;base64,${base64Icon}`
   }
 
+  if (process.platform === 'linux') {
+    const desktopFile = await findDesktopFile(appPath)
+    if (desktopFile) {
+      const content = fs.readFileSync(desktopFile, 'utf-8')
+      const iconName = parseIconNameFromDesktopFile(content)
+      if (iconName) {
+        const iconPath = resolveIconPath(iconName)
+        if (iconPath) {
+          const base64 = fs.readFileSync(iconPath).toString('base64')
+          return `data:image/png;base64,${base64}`
+        }
+      }
+    }
+
+    return darwinDefaultIcon
+  }
+
   return ''
+}
+
+export async function getImageDataURL(url: string): Promise<string> {
+  const { 'mixed-port': port = 7890 } = await getControledMihomoConfig()
+  const res = await axios.get(url, {
+    responseType: 'arraybuffer',
+    ...(port != 0 && {
+      proxy: {
+        protocol: 'http',
+        host: '127.0.0.1',
+        port
+      }
+    })
+  })
+  const mimeType = res.headers['content-type']
+  const dataURL = `data:${mimeType};base64,${Buffer.from(res.data).toString('base64')}`
+  return dataURL
 }
