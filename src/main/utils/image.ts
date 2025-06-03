@@ -2,9 +2,10 @@ import axios from 'axios'
 import { getControledMihomoConfig } from '../config'
 import fs, { existsSync } from 'fs'
 import path from 'path'
-import fii from 'file-icon-info'
+import { getIcon } from 'file-icon-info'
 import { windowsDefaultIcon, darwinDefaultIcon } from './defaultIcon'
 import { app } from 'electron'
+import sharp from 'sharp'
 
 function isIOSApp(appPath: string): boolean {
   const appDir = appPath.endsWith('.app')
@@ -171,25 +172,13 @@ export async function getIconDataURL(appPath: string): Promise<string> {
   if (!appPath) {
     return ''
   }
-  if (appPath == 'mihomo') {
+  if (appPath === 'mihomo') {
     appPath = app.getPath('exe')
   }
 
-  if (process.platform === 'win32') {
-    if (fs.existsSync(appPath) && /\.(exe|dll)$/i.test(appPath)) {
-      try {
-        const base64: string = await new Promise((resolve) => {
-          fii.getIcon(appPath, (b64: string) => {
-            resolve(b64)
-          })
-        })
-        return `data:image/png;base64,${base64}`
-      } catch {
-        return windowsDefaultIcon
-      }
-    }
-    return windowsDefaultIcon
-  }
+  const borderSize = 24
+  const innerSize = 256 - 2 * borderSize
+  const supersampledSize = innerSize * 2
 
   if (process.platform === 'darwin') {
     if (!appPath.includes('.app') && !appPath.includes('.xpc')) {
@@ -205,7 +194,27 @@ export async function getIconDataURL(appPath: string): Promise<string> {
     return `data:image/png;base64,${base64Icon}`
   }
 
-  if (process.platform === 'linux') {
+  let iconBuffer: Buffer | null = null
+
+  if (process.platform === 'win32') {
+    if (fs.existsSync(appPath) && /\.(exe|dll)$/i.test(appPath)) {
+      try {
+        iconBuffer = await new Promise<Buffer>((resolve, reject) => {
+          getIcon(appPath, (b64d) => {
+            try {
+              resolve(Buffer.from(b64d, 'base64'))
+            } catch (err) {
+              reject(err)
+            }
+          })
+        })
+      } catch {
+        return windowsDefaultIcon
+      }
+    } else {
+      return windowsDefaultIcon
+    }
+  } else if (process.platform === 'linux') {
     const desktopFile = await findDesktopFile(appPath)
     if (desktopFile) {
       const content = fs.readFileSync(desktopFile, 'utf-8')
@@ -213,13 +222,97 @@ export async function getIconDataURL(appPath: string): Promise<string> {
       if (iconName) {
         const iconPath = resolveIconPath(iconName)
         if (iconPath) {
-          const base64 = fs.readFileSync(iconPath).toString('base64')
-          return `data:image/png;base64,${base64}`
+          try {
+            iconBuffer = fs.readFileSync(iconPath)
+          } catch {
+            return darwinDefaultIcon
+          }
         }
       }
     }
+    if (!iconBuffer) {
+      return darwinDefaultIcon
+    }
+  }
 
-    return darwinDefaultIcon
+  if (iconBuffer) {
+    try {
+      const img = sharp(iconBuffer).ensureAlpha()
+      const meta = await img.metadata()
+      const { width, height, hasAlpha } = meta
+
+      if (!hasAlpha) {
+        const buf = await sharp(iconBuffer)
+          .resize(innerSize, innerSize, {
+            fit: 'contain',
+            background: { r: 0, g: 0, b: 0, alpha: 0 }
+          })
+          .extend({
+            top: borderSize,
+            bottom: borderSize,
+            left: borderSize,
+            right: borderSize,
+            background: { r: 0, g: 0, b: 0, alpha: 0 }
+          })
+          .png({ compressionLevel: 6, adaptiveFiltering: true })
+          .toBuffer()
+        return `data:image/png;base64,${buf.toString('base64')}`
+      }
+
+      const raw = await img.raw().toBuffer()
+      const channels = 4
+      let left = width,
+        right = 0,
+        top = height,
+        bottom = 0
+
+      for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+          const idx = (y * width + x) * channels + 3
+          if (raw[idx] > 10) {
+            if (x < left) left = x
+            if (x > right) right = x
+            if (y < top) top = y
+            if (y > bottom) bottom = y
+          }
+        }
+      }
+
+      if (left > right || top > bottom) {
+        left = 0
+        top = 0
+        right = width - 1
+        bottom = height - 1
+      }
+
+      const cropWidth = right - left + 1
+      const cropHeight = bottom - top + 1
+
+      const croppedAndResized = await sharp(iconBuffer)
+        .extract({ left, top, width: cropWidth, height: cropHeight })
+        .resize(supersampledSize, supersampledSize, {
+          fit: 'contain',
+          background: { r: 0, g: 0, b: 0, alpha: 0 },
+          kernel: sharp.kernel.lanczos3
+        })
+        .toBuffer()
+
+      const finalBuf = await sharp(croppedAndResized)
+        .resize(innerSize, innerSize, { kernel: sharp.kernel.lanczos3 })
+        .extend({
+          top: borderSize,
+          bottom: borderSize,
+          left: borderSize,
+          right: borderSize,
+          background: { r: 0, g: 0, b: 0, alpha: 0 }
+        })
+        .png({ compressionLevel: 6, adaptiveFiltering: true })
+        .toBuffer()
+
+      return `data:image/png;base64,${finalBuf.toString('base64')}`
+    } catch {
+      return process.platform === 'win32' ? windowsDefaultIcon : darwinDefaultIcon
+    }
   }
 
   return ''
