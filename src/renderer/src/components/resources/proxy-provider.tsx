@@ -29,7 +29,7 @@ const ProxyProvider: React.FC = () => {
       const fetchProviderPath = async (name: string): Promise<void> => {
         try {
           const providers = await getRuntimeConfig()
-          const provider = providers['proxy-providers'][name]
+          const provider = providers?.['proxy-providers']?.[name]
           if (provider) {
             setShowDetails((prev) => ({
               ...prev,
@@ -66,7 +66,7 @@ const ProxyProvider: React.FC = () => {
       await mihomoUpdateProxyProviders(name)
       mutate()
     } catch (e) {
-      alert(e)
+      new Notification(`${name} 更新失败\n${e}`)
     } finally {
       setUpdating((prev) => {
         prev[index] = false
@@ -87,7 +87,9 @@ const ProxyProvider: React.FC = () => {
           type={showDetails.type}
           title={showDetails.title}
           privderType={showDetails.privderType}
-          onClose={() => setShowDetails({ show: false, path: '', type: '', title: '', privderType: '' })}
+          onClose={() =>
+            setShowDetails({ show: false, path: '', type: '', title: '', privderType: '' })
+          }
         />
       )}
       <SettingItem title="代理集合" divider>
