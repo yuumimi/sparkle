@@ -13,6 +13,7 @@ import {
   mihomoChangeProxy,
   mihomoCloseAllConnections,
   mihomoGroups,
+  mihomoGroupDelay,
   patchMihomoConfig
 } from '../core/mihomoApi'
 import { mainWindow, showMainWindow, triggerMainWindow } from '..'
@@ -47,32 +48,61 @@ export const buildContextMenu = async (): Promise<Menu> => {
     try {
       const groups = await mihomoGroups()
       groupsMenu = groups.map((group) => {
+        const currentProxy = group.all.find((proxy) => proxy.name === group.now)
+        const delay = currentProxy?.history.length
+          ? currentProxy.history[currentProxy.history.length - 1].delay
+          : -1
+        let displayDelay = ''
+        if (delay === 0) {
+          displayDelay = '(Timeout)'
+        } else if (delay > 0) {
+          displayDelay = `(${delay}ms)`
+        }
+
         return {
           id: group.name,
-          label: group.name,
+          label: `${group.name}   ${displayDelay}`,
           type: 'submenu',
-          submenu: group.all.map((proxy) => {
-            const delay = proxy.history.length ? proxy.history[proxy.history.length - 1].delay : -1
-            let displayDelay = `(${delay}ms)`
-            if (delay === -1) {
-              displayDelay = ''
-            }
-            if (delay === 0) {
-              displayDelay = '(Timeout)'
-            }
-            return {
-              id: proxy.name,
-              label: `${proxy.name}   ${displayDelay}`,
-              type: 'radio',
-              checked: proxy.name === group.now,
+          submenu: [
+            {
+              id: `${group.name}-test`,
+              label: '重新测试',
+              type: 'normal',
               click: async (): Promise<void> => {
-                await mihomoChangeProxy(group.name, proxy.name)
-                if (autoCloseConnection) {
-                  await mihomoCloseAllConnections()
+                try {
+                  await mihomoGroupDelay(group.name, group.testUrl)
+                  ipcMain.emit('updateTrayMenu')
+                } catch (e) {
+                  // ignore
                 }
               }
-            }
-          })
+            },
+            { type: 'separator' },
+            ...group.all.map((proxy) => {
+              const proxyDelay = proxy.history.length
+                ? proxy.history[proxy.history.length - 1].delay
+                : -1
+              let proxyDisplayDelay = `(${proxyDelay}ms)`
+              if (proxyDelay === -1) {
+                proxyDisplayDelay = ''
+              }
+              if (proxyDelay === 0) {
+                proxyDisplayDelay = '(Timeout)'
+              }
+              return {
+                id: proxy.name,
+                label: `${proxy.name}   ${proxyDisplayDelay}`,
+                type: 'radio' as const,
+                checked: proxy.name === group.now,
+                click: async (): Promise<void> => {
+                  await mihomoChangeProxy(group.name, proxy.name)
+                  if (autoCloseConnection) {
+                    await mihomoCloseAllConnections()
+                  }
+                }
+              }
+            })
+          ]
         }
       })
       groupsMenu.unshift({ type: 'separator' })
@@ -100,48 +130,6 @@ export const buildContextMenu = async (): Promise<Menu> => {
       type: 'normal',
       click: async (): Promise<void> => {
         await triggerFloatingWindow()
-      }
-    },
-    {
-      id: 'rule',
-      label: '规则模式',
-      accelerator: ruleModeShortcut,
-      type: 'radio',
-      checked: mode === 'rule',
-      click: async (): Promise<void> => {
-        await patchControledMihomoConfig({ mode: 'rule' })
-        await patchMihomoConfig({ mode: 'rule' })
-        mainWindow?.webContents.send('controledMihomoConfigUpdated')
-        mainWindow?.webContents.send('groupsUpdated')
-        ipcMain.emit('updateTrayMenu')
-      }
-    },
-    {
-      id: 'global',
-      label: '全局模式',
-      accelerator: globalModeShortcut,
-      type: 'radio',
-      checked: mode === 'global',
-      click: async (): Promise<void> => {
-        await patchControledMihomoConfig({ mode: 'global' })
-        await patchMihomoConfig({ mode: 'global' })
-        mainWindow?.webContents.send('controledMihomoConfigUpdated')
-        mainWindow?.webContents.send('groupsUpdated')
-        ipcMain.emit('updateTrayMenu')
-      }
-    },
-    {
-      id: 'direct',
-      label: '直连模式',
-      accelerator: directModeShortcut,
-      type: 'radio',
-      checked: mode === 'direct',
-      click: async (): Promise<void> => {
-        await patchControledMihomoConfig({ mode: 'direct' })
-        await patchMihomoConfig({ mode: 'direct' })
-        mainWindow?.webContents.send('controledMihomoConfigUpdated')
-        mainWindow?.webContents.send('groupsUpdated')
-        ipcMain.emit('updateTrayMenu')
       }
     },
     { type: 'separator' },
@@ -186,6 +174,55 @@ export const buildContextMenu = async (): Promise<Menu> => {
           ipcMain.emit('updateTrayMenu')
         }
       }
+    },
+    { type: 'separator' },
+    {
+      type: 'submenu',
+      label: `出站模式 (${mode === 'rule' ? '规则' : mode === 'global' ? '全局' : '直连'})`,
+      submenu: [
+        {
+          id: 'rule',
+          label: '规则模式',
+          accelerator: ruleModeShortcut,
+          type: 'radio',
+          checked: mode === 'rule',
+          click: async (): Promise<void> => {
+            await patchControledMihomoConfig({ mode: 'rule' })
+            await patchMihomoConfig({ mode: 'rule' })
+            mainWindow?.webContents.send('controledMihomoConfigUpdated')
+            mainWindow?.webContents.send('groupsUpdated')
+            ipcMain.emit('updateTrayMenu')
+          }
+        },
+        {
+          id: 'global',
+          label: '全局模式',
+          accelerator: globalModeShortcut,
+          type: 'radio',
+          checked: mode === 'global',
+          click: async (): Promise<void> => {
+            await patchControledMihomoConfig({ mode: 'global' })
+            await patchMihomoConfig({ mode: 'global' })
+            mainWindow?.webContents.send('controledMihomoConfigUpdated')
+            mainWindow?.webContents.send('groupsUpdated')
+            ipcMain.emit('updateTrayMenu')
+          }
+        },
+        {
+          id: 'direct',
+          label: '直连模式',
+          accelerator: directModeShortcut,
+          type: 'radio',
+          checked: mode === 'direct',
+          click: async (): Promise<void> => {
+            await patchControledMihomoConfig({ mode: 'direct' })
+            await patchMihomoConfig({ mode: 'direct' })
+            mainWindow?.webContents.send('controledMihomoConfigUpdated')
+            mainWindow?.webContents.send('groupsUpdated')
+            ipcMain.emit('updateTrayMenu')
+          }
+        }
+      ]
     },
     ...groupsMenu,
     { type: 'separator' },
