@@ -116,7 +116,7 @@ export async function getIconDataURL(appPath: string): Promise<string> {
   }
 
   if (process.platform === 'darwin') {
-    if (!appPath.endsWith('.app')) {
+    if (!appPath.includes('.app')) {
       return darwinDefaultIcon
     }
     const { fileIconToBuffer } = await import('file-icon')
