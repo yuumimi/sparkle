@@ -16,7 +16,7 @@ import {
   mihomoGroupDelay,
   patchMihomoConfig
 } from '../core/mihomoApi'
-import { mainWindow, showMainWindow, triggerMainWindow } from '..'
+import { mainWindow, setTrayQuit, showMainWindow, triggerMainWindow } from '..'
 import { app, clipboard, ipcMain, Menu, nativeImage, shell, Tray } from 'electron'
 import { dataDir, logDir, mihomoCoreDir, mihomoWorkDir } from '../utils/dirs'
 import { triggerSysProxy } from '../sys/sysproxy'
@@ -316,7 +316,10 @@ export const buildContextMenu = async (): Promise<Menu> => {
       label: '退出应用',
       type: 'normal',
       accelerator: 'CommandOrControl+Q',
-      click: (): void => app.quit()
+      click: (): void => {
+        setTrayQuit()
+        app.quit()
+      }
     }
   ] as Electron.MenuItemConstructorOptions[]
   return Menu.buildFromTemplate(contextMenu)

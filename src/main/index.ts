@@ -109,11 +109,34 @@ app.on('open-url', async (_event, url) => {
   await handleDeepLink(url)
 })
 
+let isQuitting = false,
+  isTrayQuit = false
+
+export function setTrayQuit(): void {
+  isTrayQuit = true
+}
+
 app.on('before-quit', async (e) => {
-  e.preventDefault()
-  triggerSysProxy(false, false)
-  await stopCore()
-  app.exit()
+  let result = { response: 0 }
+  if (!isQuitting && !isTrayQuit) {
+    e.preventDefault()
+
+    result = await dialog.showMessageBox({
+      type: 'question',
+      buttons: ['取消', '退出'],
+      defaultId: 1,
+      cancelId: 0,
+      title: '确认退出',
+      message: '确定要退出 Sparkle 吗？',
+      detail: '退出后代理功能将停止工作'
+    })
+  }
+  if (result.response === 1 || isTrayQuit) {
+    isQuitting = true
+    triggerSysProxy(false, false)
+    await stopCore()
+    app.exit()
+  }
 })
 
 powerMonitor.on('shutdown', async () => {
