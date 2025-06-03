@@ -4,6 +4,7 @@ import fs from 'fs'
 import path from 'path'
 import fii from 'file-icon-info'
 import { windowsDefaultIcon, darwinDefaultIcon } from './defaultIcon'
+import { app } from 'electron'
 
 export async function getImageDataURL(url: string): Promise<string> {
   const { 'mixed-port': port = 7890 } = await getControledMihomoConfig()
@@ -97,6 +98,9 @@ function findBestAppPath(appPath: string): string | null {
 export async function getIconDataURL(appPath: string): Promise<string> {
   if (!appPath) {
     return ''
+  }
+  if (appPath == 'mihomo') {
+    appPath = app.getPath('exe')
   }
 
   if (process.platform === 'win32') {

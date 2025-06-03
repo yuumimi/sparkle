@@ -190,7 +190,7 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
               prefix={['DOMAIN', 'DOMAIN-SUFFIX']}
             />
           )}
-          {connection.metadata.process && (
+          {connection.metadata.process && connection.metadata.type != 'Inner' && (
             <CopyableSettingItem
               title="进程名"
               value={[
@@ -203,7 +203,7 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
               prefix={['PROCESS-NAME', ...(connection.metadata.uid ? ['UID'] : [])]}
             />
           )}
-          {connection.metadata.processPath && (
+          {connection.metadata.processPath && connection.metadata.type != 'Inner' && (
             <CopyableSettingItem
               title="进程路径"
               value={connection.metadata.processPath}

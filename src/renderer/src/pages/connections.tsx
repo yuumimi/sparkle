@@ -114,7 +114,7 @@ const Connections: React.FC = () => {
         const uploadSpeed = preConn ? conn.upload - preConn.upload : 0
         const metadata = {
           ...conn.metadata,
-          ...(!conn.metadata.sourceIP && { process: 'mihomo' })
+          ...(conn.metadata.type == 'Inner' && { process: 'mihomo', processPath: 'mihomo' })
         }
         return {
           ...conn,
