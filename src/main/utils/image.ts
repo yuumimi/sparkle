@@ -61,7 +61,7 @@ function hasMacOSAppIcon(appPath: string): boolean {
 }
 
 function findBestAppPath(appPath: string): string | null {
-  if (!appPath.includes('.app')) {
+  if (!appPath.includes('.app') && !appPath.includes('.xpc')) {
     return null
   }
 
@@ -69,7 +69,7 @@ function findBestAppPath(appPath: string): string | null {
   const appPaths: string[] = []
 
   for (let i = 0; i < parts.length; i++) {
-    if (parts[i].endsWith('.app')) {
+    if (parts[i].endsWith('.app') || parts[i].endsWith('.xpc')) {
       const fullPath = parts.slice(0, i + 1).join(path.sep)
       appPaths.push(fullPath)
     }
@@ -120,7 +120,7 @@ export async function getIconDataURL(appPath: string): Promise<string> {
   }
 
   if (process.platform === 'darwin') {
-    if (!appPath.includes('.app')) {
+    if (!appPath.includes('.app') && !appPath.includes('.xpc')) {
       return darwinDefaultIcon
     }
     const { fileIconToBuffer } = await import('file-icon')
