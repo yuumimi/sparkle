@@ -5,8 +5,14 @@ import path from 'path'
 import { getIcon } from 'file-icon-info'
 import { windowsDefaultIcon, darwinDefaultIcon } from './defaultIcon'
 import { app } from 'electron'
-import sharp from 'sharp'
+let sharp: typeof import('sharp') | null = null
 
+async function ensureSharp() {
+  if (!sharp) {
+    const sharpModule = await import('sharp')
+    sharp = sharpModule.default
+  }
+}
 function isIOSApp(appPath: string): boolean {
   const appDir = appPath.endsWith('.app')
     ? appPath
@@ -236,6 +242,14 @@ export async function getIconDataURL(appPath: string): Promise<string> {
   }
 
   if (iconBuffer) {
+    if (process.arch != 'x64' && process.arch != 'arm64') {
+      return `data:image/png;base64,${iconBuffer.toString('base64')}`
+    }
+
+    await ensureSharp()
+    if (!sharp) {
+      return process.platform === 'win32' ? windowsDefaultIcon : darwinDefaultIcon
+    }
     try {
       const img = sharp(iconBuffer).ensureAlpha()
       const meta = await img.metadata()
