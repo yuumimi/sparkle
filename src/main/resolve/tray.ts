@@ -299,7 +299,10 @@ export const buildContextMenu = async (): Promise<Menu> => {
       label: '轻量模式',
       type: 'normal',
       accelerator: quitWithoutCoreShortcut,
-      click: quitWithoutCore
+      click: (): void => {
+        setTrayQuit()
+        quitWithoutCore()
+      }
     },
     {
       id: 'restart',
@@ -307,6 +310,7 @@ export const buildContextMenu = async (): Promise<Menu> => {
       type: 'normal',
       accelerator: restartAppShortcut,
       click: (): void => {
+        setTrayQuit()
         app.relaunch()
         app.quit()
       }
