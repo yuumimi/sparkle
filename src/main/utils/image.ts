@@ -5,14 +5,7 @@ import path from 'path'
 import { getIcon } from 'file-icon-info'
 import { windowsDefaultIcon, darwinDefaultIcon } from './defaultIcon'
 import { app } from 'electron'
-let sharp: typeof import('sharp') | null = null
 
-async function ensureSharp() {
-  if (!sharp) {
-    const sharpModule = await import('sharp')
-    sharp = sharpModule.default
-  }
-}
 function isIOSApp(appPath: string): boolean {
   const appDir = appPath.endsWith('.app')
     ? appPath
@@ -182,10 +175,6 @@ export async function getIconDataURL(appPath: string): Promise<string> {
     appPath = app.getPath('exe')
   }
 
-  const borderSize = 24
-  const innerSize = 256 - 2 * borderSize
-  const supersampledSize = innerSize * 2
-
   if (process.platform === 'darwin') {
     if (!appPath.includes('.app') && !appPath.includes('.xpc')) {
       return darwinDefaultIcon
@@ -200,12 +189,10 @@ export async function getIconDataURL(appPath: string): Promise<string> {
     return `data:image/png;base64,${base64Icon}`
   }
 
-  let iconBuffer: Buffer | null = null
-
   if (process.platform === 'win32') {
     if (fs.existsSync(appPath) && /\.(exe|dll)$/i.test(appPath)) {
       try {
-        iconBuffer = await new Promise<Buffer>((resolve, reject) => {
+        const iconBuffer = await new Promise<Buffer>((resolve, reject) => {
           getIcon(appPath, (b64d) => {
             try {
               resolve(Buffer.from(b64d, 'base64'))
@@ -214,6 +201,7 @@ export async function getIconDataURL(appPath: string): Promise<string> {
             }
           })
         })
+        return `data:image/png;base64,${iconBuffer.toString('base64')}`
       } catch {
         return windowsDefaultIcon
       }
@@ -229,103 +217,15 @@ export async function getIconDataURL(appPath: string): Promise<string> {
         const iconPath = resolveIconPath(iconName)
         if (iconPath) {
           try {
-            iconBuffer = fs.readFileSync(iconPath)
+            const iconBuffer = fs.readFileSync(iconPath)
+            return `data:image/png;base64,${iconBuffer.toString('base64')}`
           } catch {
             return darwinDefaultIcon
           }
         }
       }
-    }
-    if (!iconBuffer) {
+    } else {
       return darwinDefaultIcon
-    }
-  }
-
-  if (iconBuffer) {
-    if (process.arch != 'x64' && process.arch != 'arm64') {
-      return `data:image/png;base64,${iconBuffer.toString('base64')}`
-    }
-
-    await ensureSharp()
-    if (!sharp) {
-      return process.platform === 'win32' ? windowsDefaultIcon : darwinDefaultIcon
-    }
-    try {
-      const img = sharp(iconBuffer).ensureAlpha()
-      const meta = await img.metadata()
-      const { width, height, hasAlpha } = meta
-
-      if (!hasAlpha) {
-        const buf = await sharp(iconBuffer)
-          .resize(innerSize, innerSize, {
-            fit: 'contain',
-            background: { r: 0, g: 0, b: 0, alpha: 0 }
-          })
-          .extend({
-            top: borderSize,
-            bottom: borderSize,
-            left: borderSize,
-            right: borderSize,
-            background: { r: 0, g: 0, b: 0, alpha: 0 }
-          })
-          .png({ compressionLevel: 6, adaptiveFiltering: true })
-          .toBuffer()
-        return `data:image/png;base64,${buf.toString('base64')}`
-      }
-
-      const raw = await img.raw().toBuffer()
-      const channels = 4
-      let left = width,
-        right = 0,
-        top = height,
-        bottom = 0
-
-      for (let y = 0; y < height; y++) {
-        for (let x = 0; x < width; x++) {
-          const idx = (y * width + x) * channels + 3
-          if (raw[idx] > 10) {
-            if (x < left) left = x
-            if (x > right) right = x
-            if (y < top) top = y
-            if (y > bottom) bottom = y
-          }
-        }
-      }
-
-      if (left > right || top > bottom) {
-        left = 0
-        top = 0
-        right = width - 1
-        bottom = height - 1
-      }
-
-      const cropWidth = right - left + 1
-      const cropHeight = bottom - top + 1
-
-      const croppedAndResized = await sharp(iconBuffer)
-        .extract({ left, top, width: cropWidth, height: cropHeight })
-        .resize(supersampledSize, supersampledSize, {
-          fit: 'contain',
-          background: { r: 0, g: 0, b: 0, alpha: 0 },
-          kernel: sharp.kernel.lanczos3
-        })
-        .toBuffer()
-
-      const finalBuf = await sharp(croppedAndResized)
-        .resize(innerSize, innerSize, { kernel: sharp.kernel.lanczos3 })
-        .extend({
-          top: borderSize,
-          bottom: borderSize,
-          left: borderSize,
-          right: borderSize,
-          background: { r: 0, g: 0, b: 0, alpha: 0 }
-        })
-        .png({ compressionLevel: 6, adaptiveFiltering: true })
-        .toBuffer()
-
-      return `data:image/png;base64,${finalBuf.toString('base64')}`
-    } catch {
-      return process.platform === 'win32' ? windowsDefaultIcon : darwinDefaultIcon
     }
   }
 

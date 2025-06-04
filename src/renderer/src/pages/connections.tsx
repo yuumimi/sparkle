@@ -13,6 +13,8 @@ import { includesIgnoreCase } from '@renderer/utils/includes'
 import { differenceWith, unionWith } from 'lodash'
 import { getIconDataURL } from '@renderer/utils/ipc'
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi'
+import { cropAndPadTransparent } from '@renderer/utils/image'
+import { platform } from '@renderer/utils/init'
 
 let cachedConnections: IMihomoConnectionDetail[] = []
 
@@ -165,15 +167,20 @@ const Connections: React.FC = () => {
         return
       }
       getIconDataURL(path)
-        .then((rawBase64) => {
+        .then(async (rawBase64) => {
           if (!rawBase64) return
           const fullDataURL = rawBase64.startsWith('data:')
             ? rawBase64
             : `data:image/png;base64,${rawBase64}`
+
+          let processedDataURL = fullDataURL
+          if (platform != 'darwin') {
+            processedDataURL = await cropAndPadTransparent(fullDataURL)
+          }
           try {
-            localStorage.setItem(path, fullDataURL)
+            localStorage.setItem(path, processedDataURL)
           } catch {}
-          setIconMap((prev) => ({ ...prev, [path]: fullDataURL }))
+          setIconMap((prev) => ({ ...prev, [path]: processedDataURL }))
         })
         .catch(() => {})
     })
