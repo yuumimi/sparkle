@@ -1,7 +1,16 @@
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import { registerIpcMainHandlers } from './utils/ipc'
 import windowStateKeeper from 'electron-window-state'
-import { app, shell, BrowserWindow, Menu, dialog, Notification, powerMonitor } from 'electron'
+import {
+  app,
+  shell,
+  BrowserWindow,
+  Menu,
+  dialog,
+  Notification,
+  powerMonitor,
+  ipcMain
+} from 'electron'
 import { addProfileItem, getAppConfig } from './config'
 import { quitWithoutCore, startCore, stopCore } from './core/manager'
 import { triggerSysProxy } from './sys/sysproxy'
@@ -116,22 +125,36 @@ export function setTrayQuit(): void {
   isTrayQuit = true
 }
 
+function showQuitConfirmDialog(): Promise<boolean> {
+  return new Promise((resolve) => {
+    if (!mainWindow) {
+      resolve(true)
+      return
+    }
+
+    mainWindow.webContents.send('show-quit-confirm')
+    const handleQuitConfirm = (_event: Electron.IpcMainEvent, confirmed: boolean): void => {
+      ipcMain.off('quit-confirm-result', handleQuitConfirm)
+      resolve(confirmed)
+    }
+
+    ipcMain.once('quit-confirm-result', handleQuitConfirm)
+  })
+}
+
 app.on('before-quit', async (e) => {
-  let result = { response: 0 }
   if (!isQuitting && !isTrayQuit) {
     e.preventDefault()
 
-    result = await dialog.showMessageBox({
-      type: 'question',
-      buttons: ['取消', '退出'],
-      defaultId: 1,
-      cancelId: 0,
-      title: '确认退出',
-      message: '确定要退出 Sparkle 吗？',
-      detail: '退出后代理功能将停止工作'
-    })
-  }
-  if (result.response === 1 || isTrayQuit) {
+    const confirmed = await showQuitConfirmDialog()
+
+    if (confirmed) {
+      isQuitting = true
+      triggerSysProxy(false, false)
+      await stopCore()
+      app.exit()
+    }
+  } else if (isTrayQuit) {
     isQuitting = true
     triggerSysProxy(false, false)
     await stopCore()

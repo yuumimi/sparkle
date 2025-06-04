@@ -43,7 +43,7 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
   if (version.includes('beta')) {
     releaseTag = 'pre-release'
   }
-  let baseUrl = `https://github.com/xishang0128/sparkle/releases/download/${releaseTag}/`
+  const baseUrl = `https://github.com/xishang0128/sparkle/releases/download/${releaseTag}/`
   const fileMap = {
     'win32-x64': `sparkle-windows-${version}-x64-setup.exe`,
     'win32-arm64': `sparkle-windows-${version}-arm64-setup.exe`,
@@ -59,7 +59,7 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
   }
 
   const apiUrl = `https://api.github.com/repos/xishang0128/sparkle/releases/tags/${releaseTag}`
-  const apiRequestConfig: any = {
+  const apiRequestConfig = {
     headers: { Accept: 'application/vnd.github.v3+json' },
     ...(mixedPort != 0 && {
       proxy: {

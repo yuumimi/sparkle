@@ -36,6 +36,7 @@ import MihomoIcon from './components/base/mihomo-icon'
 import { driver } from 'driver.js'
 import 'driver.js/dist/driver.css'
 import useSWR from 'swr'
+import ConfirmModal from '@renderer/components/base/base-confirm'
 
 let navigate: NavigateFunction
 
@@ -188,6 +189,21 @@ const App: React.FC = () => {
     substore: SubStoreCard
   }
 
+  const [showQuitConfirm, setShowQuitConfirm] = useState(false)
+  useEffect(() => {
+    const handleShowQuitConfirm = (): void => {
+      setShowQuitConfirm(true)
+    }
+    window.electron.ipcRenderer.on('show-quit-confirm', handleShowQuitConfirm)
+    return (): void => {
+      window.electron.ipcRenderer.removeAllListeners('show-quit-confirm')
+    }
+  }, [])
+  const handleQuitConfirm = (confirmed: boolean): void => {
+    setShowQuitConfirm(false)
+    window.electron.ipcRenderer.send('quit-confirm-result', confirmed)
+  }
+
   return (
     <div
       onMouseMove={(e) => {
@@ -204,6 +220,25 @@ const App: React.FC = () => {
       }}
       className={`w-full h-[100vh] flex ${resizing ? 'cursor-ew-resize' : ''}`}
     >
+      {showQuitConfirm && (
+        <ConfirmModal
+          title="确定要退出 Sparkle 吗？"
+          description={
+            <div>
+              <p></p>
+              <p className="text-sm text-gray-500 mt-2">退出后代理功能将停止工作</p>
+            </div>
+          }
+          confirmText="退出"
+          cancelText="取消"
+          onChange={(open) => {
+            if (!open) {
+              handleQuitConfirm(false)
+            }
+          }}
+          onConfirm={() => handleQuitConfirm(true)}
+        />
+      )}
       {siderWidthValue === narrowWidth ? (
         <div style={{ width: `${narrowWidth}px` }} className="side h-full">
           <div className="app-drag flex justify-center items-center z-40 bg-transparent h-[45px]">
