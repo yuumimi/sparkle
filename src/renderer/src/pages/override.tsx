@@ -41,6 +41,7 @@ const Override: React.FC = () => {
   const [fileOver, setFileOver] = useState(false)
   const [url, setUrl] = useState('')
   const sensors = useSensors(useSensor(PointerSensor))
+  const isProcessingDrop = useRef(false)
   const handleImport = async (): Promise<void> => {
     setImporting(true)
     try {
@@ -87,24 +88,28 @@ const Override: React.FC = () => {
     pageRef.current?.addEventListener('drop', async (event) => {
       event.preventDefault()
       event.stopPropagation()
+      if (isProcessingDrop.current) return
+      isProcessingDrop.current = true
       if (event.dataTransfer?.files) {
         const file = event.dataTransfer.files[0]
         if (file.name.endsWith('.js') || file.name.endsWith('.yaml')) {
-          const content = await readTextFile(file.path)
           try {
+            const path = window.api.webUtils.getPathForFile(file)
+            const content = await readTextFile(path)
             await addOverrideItem({
               name: file.name,
               type: 'local',
               file: content,
               ext: file.name.endsWith('.js') ? 'js' : 'yaml'
             })
-          } finally {
-            setFileOver(false)
+          } catch (e) {
+            alert('文件导入失败' + e)
           }
         } else {
           alert('不支持的文件类型')
         }
       }
+      isProcessingDrop.current = false
       setFileOver(false)
     })
     return (): void => {

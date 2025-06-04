@@ -174,7 +174,7 @@ const Profiles: React.FC = () => {
             const content = await readTextFile(path)
             await addProfileItem({ name: file.name, type: 'local', file: content })
           } catch (e) {
-            alert(e)
+            alert('文件导入失败' + e)
           }
         } else {
           alert('不支持的文件类型')
