@@ -91,22 +91,43 @@ jobs:
           jq --arg version "$RELEASE_VERSION" '.version = $version' package.json > tmp.json && mv tmp.json package.json
 
       - name: Keep product name lowercase on Linux
-        if: matrix.os == 'ubuntu-latest'
+        if: matrix.os == 'ubuntu-latest' && matrix.format == 'pacman'
         run: |
           sed -i "s/productName: Sparkle/productName: sparkle/" electron-builder.yml
           sudo apt-get update && sudo apt-get install -y libarchive-tools
 
       - name: Install Dependencies and Prepare
         env:
+          npm_config_platform: ${{ matrix.platform }}
           npm_config_arch: ${{ matrix.arch }}
           npm_config_target_arch: ${{ matrix.arch }}
         shell: bash
         run: |
-          pnpm install
+          PLATFORM=$([[ "${{ matrix.os }}" == "windows-latest" ]] && echo "win32" \
+              || [[ "${{ matrix.os }}" == "macos-latest" ]] && echo "darwin" \
+              || echo "linux")
+          jq '.pnpm.supportedArchitectures = {"os":["'"$PLATFORM"'"],"cpu":["'"${{ matrix.arch }}"'"]}' \
+            package.json > tmp.json \
+            && mv tmp.json package.json
+          if [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
+            jq '.pnpm.supportedArchitectures.libc = ["musl"]' package.json > tmp.json \
+              && mv tmp.json package.json
+          fi
+          SKIP_PREPARE=1 pnpm install
+
+          jq 'del(.pnpm)' package.json > tmp.json && mv tmp.json package.json
+          SKIP_PREPARE=1 pnpm install
           pnpm prepare --${{ matrix.arch }}
+
+          if [[ "${{ matrix.arch }}" == "x64" ]]; then
+            rm -rf node_modules/@img/*arm64
+          elif [[ "${{ matrix.arch }}" == "arm64" ]]; then
+            rm -rf node_modules/@img/*x64
+          fi
 
       - name: Build
         env:
+          npm_config_platform: ${{ matrix.platform }}
           npm_config_arch: ${{ matrix.arch }}
           npm_config_target_arch: ${{ matrix.arch }}
         shell: bash

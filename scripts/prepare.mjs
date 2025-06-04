@@ -14,6 +14,11 @@ if (process.argv.slice(2).length !== 0) {
   arch = process.argv.slice(2)[0].replace('--', '')
 }
 
+if (process.env.SKIP_PREPARE === '1') {
+  console.log('Skipping prepare script...')
+  process.exit(0)
+}
+
 /* ======= mihomo alpha======= */
 const MIHOMO_ALPHA_VERSION_URL =
   'https://github.com/MetaCubeX/mihomo/releases/download/Prerelease-Alpha/version.txt'
@@ -432,7 +437,6 @@ async function runTask() {
   if (task.winOnly && platform !== 'win32') return runTask()
   if (task.linuxOnly && platform !== 'linux') return runTask()
   if (task.unixOnly && platform === 'win32') return runTask()
-  if (task.darwinOnly && platform !== 'darwin') return runTask()
 
   for (let i = 0; i < task.retry; i++) {
     try {
