@@ -47,7 +47,7 @@ const ConnectionItemComponent: React.FC<Props> = (props) => {
             <CardHeader className="pb-0 gap-1 flex items-center pr-12 relative">
               <div className="ml-2 flex-1 text-ellipsis whitespace-nowrap overflow-hidden text-left">
                 <span style={{ textAlign: 'left' }}>
-                  {info.metadata.process || info.metadata.sourceIP}
+                  {info.metadata.process?.replace(/\.exe$/, '') || info.metadata.sourceIP}
                 </span>
                 {' → '}
                 {info.metadata.host ||
