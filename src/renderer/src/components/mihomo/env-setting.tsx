@@ -17,7 +17,7 @@ const EnvSetting: React.FC = () => {
     skipSafePathCheck,
     safePaths = []
   } = appConfig || {}
-  const handleConfigChangeWithRestart = async (key: string, value: any) => {
+  const handleConfigChangeWithRestart = async (key: string, value: unknown): Promise<void> => {
     try {
       await patchAppConfig({ [key]: value })
       await restartCore()
@@ -94,7 +94,11 @@ const EnvSetting: React.FC = () => {
               </Button>
             )}
           </SettingItem>
-          <EditableList items={safePathsInput} onChange={setSafePathsInput} divider={false} />
+          <EditableList
+            items={safePathsInput}
+            onChange={(items) => setSafePathsInput(items as string[])}
+            divider={false}
+          />
         </>
       )}
     </SettingCard>

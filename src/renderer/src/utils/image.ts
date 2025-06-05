@@ -91,7 +91,7 @@ function isWindowsDefaultIcon(imgData: ImageData): boolean {
   for (let y = 0; y < height; y++) {
     const left = (y * width + 4) * 4
     const right = (y * width + width - 5) * 4
-    const lrAvg = (i: number) => (data[i] + data[i + 1] + data[i + 2]) / 3
+    const lrAvg = (i: number): number => (data[i] + data[i + 1] + data[i + 2]) / 3
 
     const leftGray = lrAvg(left)
     const rightGray = lrAvg(right)

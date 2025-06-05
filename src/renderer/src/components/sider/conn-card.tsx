@@ -68,7 +68,7 @@ const ConnCard: React.FC<Props> = (props) => {
     window.electron.ipcRenderer.on('mihomoTraffic', async (_e, info: IMihomoTrafficInfo) => {
       setUpload(info.up)
       setDownload(info.down)
-      mihomoConfig().then(config => setInterfaceName(config['interface-name']));
+      mihomoConfig().then((config) => setInterfaceName(config['interface-name']))
       const data = series
       data.shift()
       data.push(info.up + info.down)
@@ -226,9 +226,8 @@ const ConnCard: React.FC<Props> = (props) => {
             </h3>
           </CardFooter>
         </Card>
-      )
-      }
-    </div >
+      )}
+    </div>
   )
 }
 

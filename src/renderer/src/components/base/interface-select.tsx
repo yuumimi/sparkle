@@ -9,7 +9,7 @@ const InterfaceSelect: React.FC<{
 }> = ({ value, onChange, exclude = [] }) => {
   const [ifaces, setIfaces] = useState<string[]>([])
   useEffect(() => {
-    const fetchInterfaces = async () => {
+    const fetchInterfaces = async (): Promise<void> => {
       const names = Object.keys(await getInterfaces())
       setIfaces(names.filter((name) => !exclude.includes(name)))
     }

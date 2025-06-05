@@ -19,7 +19,7 @@ const Viewer: React.FC<Props> = (props) => {
   let language: Language = !format || format === 'YamlRule' ? 'yaml' : 'text'
 
   const getContent = async (): Promise<void> => {
-    let fileContent: React.SetStateAction<string>
+    let fileContent: string
     if (type === 'Inline') {
       fileContent = await getFileStr('config.yaml')
       language = 'yaml'
@@ -28,16 +28,36 @@ const Viewer: React.FC<Props> = (props) => {
     }
     try {
       const parsedYaml = yaml.load(fileContent)
-      if (privderType === 'proxy-providers') {
-        setCurrData(yaml.dump({
-          'proxies': parsedYaml[privderType][title].payload
-        }))
+      if (parsedYaml && typeof parsedYaml === 'object') {
+        const yamlObj = parsedYaml as Record<string, unknown>
+        const payload = yamlObj[privderType]?.[title]?.payload
+        if (payload) {
+          if (privderType === 'proxy-providers') {
+            setCurrData(
+              yaml.dump({
+                proxies: payload
+              })
+            )
+          } else {
+            setCurrData(
+              yaml.dump({
+                rules: payload
+              })
+            )
+          }
+        } else {
+          const targetObj = yamlObj[privderType]?.[title]
+          if (targetObj) {
+            setCurrData(yaml.dump(targetObj))
+          } else {
+            setCurrData(fileContent)
+          }
+        }
       } else {
-        setCurrData(yaml.dump({
-          'rules': parsedYaml[privderType][title].payload
-        }))
+        setCurrData(fileContent)
       }
     } catch (error) {
+      console.error('YAML parsing error:', error)
       setCurrData(fileContent)
     }
   }

@@ -32,7 +32,7 @@ const Mihomo: React.FC = () => {
     await restartCore()
   }
 
-  const handleConfigChangeWithRestart = async (key: string, value: any) => {
+  const handleConfigChangeWithRestart = async (key: string, value: unknown): Promise<void> => {
     try {
       await patchAppConfig({ [key]: value })
       await restartCore()

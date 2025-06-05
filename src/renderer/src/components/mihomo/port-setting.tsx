@@ -41,11 +41,11 @@ const PortSetting: React.FC = () => {
   const [skipAuthPrefixesInput, setSkipAuthPrefixesInput] = useState(skipAuthPrefixes)
   const [lanOpen, setLanOpen] = useState(false)
 
-  const parseAuth = (item: string) => {
+  const parseAuth = (item: string): { part1: string; part2: string } => {
     const [user = '', pass = ''] = item.split(':')
     return { part1: user, part2: pass }
   }
-  const formatAuth = (user: string, pass?: string) => `${user}:${pass || ''}`
+  const formatAuth = (user: string, pass?: string): string => `${user}:${pass || ''}`
   const hasPortConflict = (): boolean => {
     const ports = [
       mixedPortInput,
@@ -263,7 +263,7 @@ const PortSetting: React.FC = () => {
             </SettingItem>
             <EditableList
               items={lanAllowedIpsInput}
-              onChange={setLanAllowedIpsInput}
+              onChange={(items) => setLanAllowedIpsInput(items as string[])}
               placeholder="IP 段"
             />
             <SettingItem title="禁止连接的 IP 段">
@@ -281,7 +281,7 @@ const PortSetting: React.FC = () => {
             </SettingItem>
             <EditableList
               items={lanDisallowedIpsInput}
-              onChange={setLanDisallowedIpsInput}
+              onChange={(items) => setLanDisallowedIpsInput(items as string[])}
               placeholder="IP 段"
             />
           </>
@@ -299,7 +299,7 @@ const PortSetting: React.FC = () => {
         </SettingItem>
         <EditableList
           items={authenticationInput}
-          onChange={setAuthenticationInput}
+          onChange={(items) => setAuthenticationInput(items as string[])}
           placeholder="用户名"
           part2Placeholder="密码"
           parse={parseAuth}
@@ -320,7 +320,7 @@ const PortSetting: React.FC = () => {
         </SettingItem>
         <EditableList
           items={skipAuthPrefixesInput}
-          onChange={setSkipAuthPrefixesInput}
+          onChange={(items) => setSkipAuthPrefixesInput(items as string[])}
           placeholder="IP 段"
           disableFirst
           divider={false}

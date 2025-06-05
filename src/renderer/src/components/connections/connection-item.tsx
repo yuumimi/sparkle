@@ -15,7 +15,7 @@ interface Props {
   close: (id: string) => void
 }
 
-const ConnectionItem: React.FC<Props> = memo((props) => {
+const ConnectionItemComponent: React.FC<Props> = (props) => {
   const { index, info, displayIcon, iconUrl, close, selected, setSelected, setIsDetailModalOpen } =
     props
 
@@ -106,6 +106,8 @@ const ConnectionItem: React.FC<Props> = memo((props) => {
       </Card>
     </div>
   )
-})
+}
+
+const ConnectionItem = memo(ConnectionItemComponent)
 
 export default ConnectionItem

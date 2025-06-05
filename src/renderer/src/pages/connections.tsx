@@ -34,6 +34,7 @@ const Connections: React.FC = () => {
   const [selected, setSelected] = useState<IMihomoConnectionDetail>()
 
   const [iconMap, setIconMap] = useState<Record<string, string>>({})
+  const [firstItemRefreshTrigger, setFirstItemRefreshTrigger] = useState(0)
 
   const [tab, setTab] = useState('active')
 
@@ -164,6 +165,10 @@ const Connections: React.FC = () => {
       const fromStorage = localStorage.getItem(path)
       if (fromStorage) {
         setIconMap((prev) => ({ ...prev, [path]: fromStorage }))
+        const firstConnection = filteredConnections[0]
+        if (firstConnection?.metadata.processPath === path) {
+          setFirstItemRefreshTrigger((prev) => prev + 1)
+        }
         return
       }
       getIconDataURL(path)
@@ -179,12 +184,18 @@ const Connections: React.FC = () => {
           }
           try {
             localStorage.setItem(path, processedDataURL)
-          } catch {}
+          } catch {
+            // ignore
+          }
           setIconMap((prev) => ({ ...prev, [path]: processedDataURL }))
+          const firstConnection = filteredConnections[0]
+          if (firstConnection?.metadata.processPath === path) {
+            setFirstItemRefreshTrigger((prev) => prev + 1)
+          }
         })
         .catch(() => {})
     })
-  }, [activeConnections, closedConnections, iconMap, displayIcon])
+  }, [activeConnections, closedConnections, iconMap, displayIcon, filteredConnections])
 
   return (
     <BasePage
@@ -333,6 +344,8 @@ const Connections: React.FC = () => {
           itemContent={(i, connection) => {
             const pathKey = connection.metadata.processPath || ''
             const iconUrl = displayIcon && pathKey ? iconMap[pathKey] || '' : ''
+            const itemKey = i === 0 ? `${connection.id}-${firstItemRefreshTrigger}` : connection.id
+
             return (
               <ConnectionItem
                 setSelected={setSelected}
@@ -342,7 +355,7 @@ const Connections: React.FC = () => {
                 displayIcon={displayIcon}
                 close={closeConnection}
                 index={i}
-                key={connection.id}
+                key={itemKey}
                 info={connection}
               />
             )

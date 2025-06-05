@@ -8,7 +8,7 @@ interface EditableListProps {
     | string[]
     | Record<string, string | string[]>
     | Array<{ key: string; value: string | string[] }>
-  onChange: (items: any) => void
+  onChange: (items: unknown) => void
   placeholder?: string
   part2Placeholder?: string
   parse?: (item: string) => { part1: string; part2?: string }
@@ -55,7 +55,7 @@ const EditableList: React.FC<EditableListProps> = ({
   const extra = isDual || objectMode ? { part1: '', part2: '' } : { part1: '' }
   const displayed = [...processedItems, extra]
 
-  const handleUpdate = (idx: number, part1: string, part2?: string) => {
+  const handleUpdate = (idx: number, part1: string, part2?: string): void => {
     const isEmpty = !part1.trim() && (!part2 || !part2.trim())
 
     if (idx < processedItems.length && isEmpty) {

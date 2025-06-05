@@ -1,7 +1,8 @@
-import { useEffect, useState } from "react"
+/* eslint-disable react/prop-types */
+import { useEffect, useState } from 'react'
 import yaml from 'js-yaml'
-import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from "@heroui/react"
-import { BaseEditor } from "../base/base-editor"
+import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
+import { BaseEditor } from '../base/base-editor'
 
 interface Props {
   bypass: string[]
@@ -9,14 +10,19 @@ interface Props {
   onConfirm: (bypass: string[]) => void
 }
 
-const ByPassEditorModal: React.FC<Props> = ({ bypass, onCancel, onConfirm }) => {
+interface ParsedYaml {
+  bypass?: string[]
+}
+
+const ByPassEditorModal: React.FC<Props> = (props) => {
+  const { bypass, onCancel, onConfirm } = props
   const [currData, setCurrData] = useState<string>('')
   useEffect(() => {
     setCurrData(yaml.dump({ bypass }))
   }, [bypass])
-  const handleConfirm = () => {
+  const handleConfirm = (): void => {
     try {
-      const parsed = yaml.load(currData)
+      const parsed = yaml.load(currData) as ParsedYaml
       if (parsed && Array.isArray(parsed.bypass)) {
         onConfirm(parsed.bypass)
       } else {

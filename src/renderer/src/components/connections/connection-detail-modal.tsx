@@ -36,7 +36,7 @@ const CopyableSettingItem: React.FC<{
           .map((_, i, parts) => parts.slice(i).join('.'))
           .slice(0, -1)
 
-  const isIPv6 = (ip: string) => ip.includes(':')
+  const isIPv6 = (ip: string): boolean => ip.includes(':')
 
   const menuItems = [
     { key: 'raw', text: displayName || (Array.isArray(value) ? value.join(', ') : value) },

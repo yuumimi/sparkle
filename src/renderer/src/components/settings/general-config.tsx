@@ -245,7 +245,7 @@ const GeneralConfig: React.FC = () => {
             </SettingItem>
             <EditableList
               items={bypass}
-              onChange={(list) => setBypass(list)}
+              onChange={(list) => setBypass(list as string[])}
               divider={platform != 'darwin'}
             />
           </>

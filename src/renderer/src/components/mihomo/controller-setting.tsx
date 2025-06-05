@@ -36,7 +36,7 @@ const ControllerSetting: React.FC = () => {
     await patchControledMihomoConfig(patch)
     await restartCore()
   }
-  const generateRandomString = (length: number) => {
+  const generateRandomString = (length: number): string => {
     const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
     return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('')
   }
@@ -273,7 +273,11 @@ const ControllerSetting: React.FC = () => {
           </Button>
         )}
       </SettingItem>
-      <EditableList items={allowOriginsInput} onChange={setAllowOriginsInput} divider={false} />
+      <EditableList
+        items={allowOriginsInput}
+        onChange={(items) => setAllowOriginsInput(items as string[])}
+        divider={false}
+      />
     </SettingCard>
   )
 }

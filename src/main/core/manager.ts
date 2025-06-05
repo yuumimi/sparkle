@@ -167,7 +167,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
       ) {
         resolve([
           new Promise((resolve) => {
-            const handleProviderInitialization = async (logLine: string) => {
+            const handleProviderInitialization = async (logLine: string): Promise<void> => {
               for (const match of logLine.matchAll(/Start initial provider ([\w\-!@#$%^&*()]+)/g)) {
                 matchedProviders.add(match[1])
               }
