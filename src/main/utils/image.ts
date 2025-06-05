@@ -78,7 +78,7 @@ function findBestAppPath(appPath: string): string | null {
   return appPaths[0]
 }
 
-async function findDesktopFile(appPath: string) {
+async function findDesktopFile(appPath: string): Promise<string | null> {
   try {
     const execName = path.isAbsolute(appPath) ? path.basename(appPath) : appPath
     const desktopDirs = ['/usr/share/applications', `${process.env.HOME}/.local/share/applications`]
@@ -128,12 +128,12 @@ async function findDesktopFile(appPath: string) {
   return null
 }
 
-function parseIconNameFromDesktopFile(content: string) {
+function parseIconNameFromDesktopFile(content: string): string | null {
   const match = content.match(/^Icon\s*=\s*(.+?)$/m)
   return match ? match[1].trim() : null
 }
 
-function resolveIconPath(iconName: string) {
+function resolveIconPath(iconName: string): string | null {
   if (path.isAbsolute(iconName) && existsSync(iconName)) {
     return iconName
   }

@@ -119,10 +119,10 @@ app.on('open-url', async (_event, url) => {
 })
 
 let isQuitting = false,
-  isTrayQuit = false
+  notQuit = false
 
-export function setTrayQuit(): void {
-  isTrayQuit = true
+export function setNotQuit(): void {
+  notQuit = true
 }
 
 function showQuitConfirmDialog(): Promise<boolean> {
@@ -132,7 +132,21 @@ function showQuitConfirmDialog(): Promise<boolean> {
       return
     }
 
-    mainWindow.webContents.send('show-quit-confirm')
+    if (process.platform === 'darwin' && !mainWindow.isMinimized()) app.show()
+    if (mainWindow.isMinimized()) mainWindow.restore()
+    if (!mainWindow.isVisible()) mainWindow.show()
+
+    let timeout = 500
+    if (!mainWindow.isMinimized()) {
+      timeout = 0
+    }
+
+    setTimeout(() => {
+      mainWindow?.setAlwaysOnTop(true, 'pop-up-menu')
+      mainWindow?.focus()
+      mainWindow?.setAlwaysOnTop(false)
+      mainWindow?.webContents.send('show-quit-confirm')
+    }, timeout)
     const handleQuitConfirm = (_event: Electron.IpcMainEvent, confirmed: boolean): void => {
       ipcMain.off('quit-confirm-result', handleQuitConfirm)
       resolve(confirmed)
@@ -143,7 +157,7 @@ function showQuitConfirmDialog(): Promise<boolean> {
 }
 
 app.on('before-quit', async (e) => {
-  if (!isQuitting && !isTrayQuit) {
+  if (!isQuitting && !notQuit) {
     e.preventDefault()
 
     const confirmed = await showQuitConfirmDialog()
@@ -154,7 +168,7 @@ app.on('before-quit', async (e) => {
       await stopCore()
       app.exit()
     }
-  } else if (isTrayQuit) {
+  } else if (notQuit) {
     isQuitting = true
     triggerSysProxy(false, false)
     await stopCore()
