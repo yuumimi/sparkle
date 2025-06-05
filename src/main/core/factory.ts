@@ -25,8 +25,8 @@ import path from 'path'
 let runtimeConfigStr: string,
   rawProfileStr: string,
   currentProfileStr: string,
-  overrideProfileStr: string
-let runtimeConfig: IMihomoConfig
+  overrideProfileStr: string,
+  runtimeConfig: IMihomoConfig
 
 export async function generateProfile(): Promise<void> {
   const { current } = await getProfileConfig()

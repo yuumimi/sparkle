@@ -98,9 +98,12 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
       })
     }
   }
-  const { 'rule-providers': ruleProviders = {}, 'proxy-providers': proxyProviders = {} } =
+  const { 'rule-providers': ruleProviders, 'proxy-providers': proxyProviders } =
     await getRuntimeConfig()
-  const providerNames = new Set([...Object.keys(ruleProviders), ...Object.keys(proxyProviders)])
+  const providerNames = new Set([
+    ...Object.keys(ruleProviders || {}),
+    ...Object.keys(proxyProviders || {})
+  ])
   const matchedProviders = new Set<string>()
   const stdout = createWriteStream(logPath(), { flags: 'a' })
   const stderr = createWriteStream(logPath(), { flags: 'a' })
