@@ -498,8 +498,8 @@ interface IMihomoConfig {
   dns: IMihomoDNSConfig
   sniffer: IMihomoSnifferConfig
   profile: IMihomoProfileConfig
-  'rule-providers'?: Record<string, any>
-  'proxy-providers'?: Record<string, any>
+  'rule-providers'?: Record<string, unknown>
+  'proxy-providers'?: Record<string, unknown>
 }
 
 interface IProfileConfig {

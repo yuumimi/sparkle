@@ -132,13 +132,15 @@ function showQuitConfirmDialog(): Promise<boolean> {
       return
     }
 
-    if (process.platform === 'darwin' && !mainWindow.isMinimized()) app.show()
-    if (mainWindow.isMinimized()) mainWindow.restore()
-    if (!mainWindow.isVisible()) mainWindow.show()
+    if (mainWindow.isMinimized()) {
+      mainWindow.restore()
+    } else if (!mainWindow.isVisible()) {
+      mainWindow.show()
+    }
 
     let timeout = 500
     if (!mainWindow.isMinimized()) {
-      timeout = 0
+      timeout = 100
     }
 
     setTimeout(() => {
@@ -146,13 +148,12 @@ function showQuitConfirmDialog(): Promise<boolean> {
       mainWindow?.focus()
       mainWindow?.setAlwaysOnTop(false)
       mainWindow?.webContents.send('show-quit-confirm')
+      const handleQuitConfirm = (_event: Electron.IpcMainEvent, confirmed: boolean): void => {
+        ipcMain.off('quit-confirm-result', handleQuitConfirm)
+        resolve(confirmed)
+      }
+      ipcMain.once('quit-confirm-result', handleQuitConfirm)
     }, timeout)
-    const handleQuitConfirm = (_event: Electron.IpcMainEvent, confirmed: boolean): void => {
-      ipcMain.off('quit-confirm-result', handleQuitConfirm)
-      resolve(confirmed)
-    }
-
-    ipcMain.once('quit-confirm-result', handleQuitConfirm)
   })
 }
 
