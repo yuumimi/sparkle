@@ -19,18 +19,6 @@ export async function cropAndPadTransparent(
 
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
 
-  if (isWindowsDefaultIcon(imgData)) {
-    const outCanvas = document.createElement('canvas')
-    outCanvas.width = finalSize
-    outCanvas.height = finalSize
-    const outCtx = outCanvas.getContext('2d')!
-    outCtx.clearRect(0, 0, finalSize, finalSize)
-
-    const targetSize = finalSize - 2 * border
-    outCtx.drawImage(img, 0, 0, img.width, img.height, border, border, targetSize, targetSize)
-    return outCanvas.toDataURL('image/png')
-  }
-
   const { data, width, height } = imgData
   let top = height,
     bottom = 0,
@@ -54,6 +42,20 @@ export async function cropAndPadTransparent(
   const cropHeight = bottom - top + 1
   const contentSize = finalSize - 2 * border
 
+  const aspectRatio = cropWidth / cropHeight
+  let drawWidth = contentSize
+  let drawHeight = contentSize
+  let offsetX = border
+  let offsetY = border
+
+  if (aspectRatio > 1) {
+    drawHeight = contentSize / aspectRatio
+    offsetY = border + (contentSize - drawHeight) / 2
+  } else {
+    drawWidth = contentSize * aspectRatio
+    offsetX = border + (contentSize - drawWidth) / 2
+  }
+
   const outCanvas = document.createElement('canvas')
   outCanvas.width = finalSize
   outCanvas.height = finalSize
@@ -65,39 +67,11 @@ export async function cropAndPadTransparent(
     top,
     cropWidth,
     cropHeight,
-    border,
-    border,
-    contentSize,
-    contentSize
+    offsetX,
+    offsetY,
+    drawWidth,
+    drawHeight
   )
 
   return outCanvas.toDataURL('image/png')
-}
-
-function isWindowsDefaultIcon(imgData: ImageData): boolean {
-  const { data, width, height } = imgData
-
-  const centerX = Math.floor(width / 2)
-  const centerY = Math.floor(height / 2)
-  const centerIndex = (centerY * width + centerX) * 4
-
-  const r = data[centerIndex]
-  const g = data[centerIndex + 1]
-  const b = data[centerIndex + 2]
-
-  const isBlue = r < 100 && g < 150 && b > 180
-
-  let grayStripeCount = 0
-  for (let y = 0; y < height; y++) {
-    const left = (y * width + 4) * 4
-    const right = (y * width + width - 5) * 4
-    const lrAvg = (i: number): number => (data[i] + data[i + 1] + data[i + 2]) / 3
-
-    const leftGray = lrAvg(left)
-    const rightGray = lrAvg(right)
-
-    if (leftGray > 150 && rightGray > 150) grayStripeCount++
-  }
-
-  return isBlue && grayStripeCount > height * 0.5
 }
