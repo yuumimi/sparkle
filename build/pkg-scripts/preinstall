@@ -1,10 +1,17 @@
 #!/bin/sh
 
-if [ -e "/Library/LaunchDaemons/sparkle.helper.plist" ]; then
-  launchctl unload /Library/LaunchDaemons/sparkle.helper.plist
-  rm /Library/LaunchDaemons/sparkle.helper.plist
+if launchctl list | grep -q "sparkle.helper"; then
+    launchctl stop sparkle.helper 2>/dev/null || true
+    launchctl unload /Library/LaunchDaemons/sparkle.helper.plist 2>/dev/null || true
 fi
 
-if [ -e "/Library/PrivilegedHelperTools/sparkle.helper" ]; then
-  rm /Library/PrivilegedHelperTools/sparkle.helper
-fi
+for file in "/Library/LaunchDaemons/sparkle.helper.plist" \
+           "/Library/PrivilegedHelperTools/sparkle.helper" \
+           "/tmp/sparkle.helper" \
+           "/tmp/sparkle-helper.sock"; do
+    if [ -e "$file" ]; then
+        rm -f "$file"
+    fi
+done
+
+exit 0

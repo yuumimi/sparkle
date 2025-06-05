@@ -8,6 +8,7 @@ mkdir -p /Library/PrivilegedHelperTools
 cp $2/Sparkle.app/Contents/Resources/files/sysproxy /Library/PrivilegedHelperTools/sparkle.helper
 chown root:wheel /Library/PrivilegedHelperTools/sparkle.helper
 chmod 544 /Library/PrivilegedHelperTools/sparkle.helper
+
 cat << EOF > /Library/LaunchDaemons/sparkle.helper.plist
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -30,15 +31,16 @@ cat << EOF > /Library/LaunchDaemons/sparkle.helper.plist
                 <string>server</string>
         </array>
         <key>StandardErrorPath</key>
-        <string>/tmp/sparkle.helper.err</string>
+        <string>/tmp/sparkle.helper.log</string>
         <key>StandardOutPath</key>
         <string>/tmp/sparkle.helper.log</string>
     </dict>
 </plist>
 EOF
+
 chown root:wheel /Library/LaunchDaemons/sparkle.helper.plist
 chmod 644 /Library/LaunchDaemons/sparkle.helper.plist
-launchctl unload /Library/LaunchDaemons/sparkle.helper.plist
 launchctl load /Library/LaunchDaemons/sparkle.helper.plist
 launchctl start sparkle.helper
+
 exit 0
