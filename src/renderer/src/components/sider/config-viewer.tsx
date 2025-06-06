@@ -17,11 +17,13 @@ import {
   getOverrideProfileStr
 } from '@renderer/utils/ipc'
 import useSWR from 'swr'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 
 interface Props {
   onClose: () => void
 }
 const ConfigViewer: React.FC<Props> = ({ onClose }) => {
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [runtimeConfig, setRuntimeConfig] = useState('')
   const [rawProfile, setRawProfile] = useState('')
   const [profileConfig, setProfileConfig] = useState('')
@@ -31,14 +33,14 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
   const [isOverride, setIsOverride] = useState(false)
   const [sideBySide, setSideBySide] = useState(false)
 
-  const { data: appConfig } = useSWR('getProfileConfig', getProfileConfig)
+  const { data: config } = useSWR('getProfileConfig', getProfileConfig)
 
   const fetchConfigs = useCallback(async () => {
     setRuntimeConfig(await getRuntimeConfigStr())
     setRawProfile(await getRawProfileStr())
     setProfileConfig(await getCurrentProfileStr())
     setOverrideConfig(await getOverrideProfileStr())
-  }, [appConfig])
+  }, [config])
 
   useEffect(() => {
     fetchConfigs()
@@ -46,7 +48,8 @@ const ConfigViewer: React.FC<Props> = ({ onClose }) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
         backdrop: 'top-[48px]'

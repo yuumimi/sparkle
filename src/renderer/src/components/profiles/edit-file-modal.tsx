@@ -3,12 +3,16 @@ import React, { useEffect, useState } from 'react'
 import { BaseEditor } from '../base/base-editor'
 import { getProfileStr, setProfileStr } from '@renderer/utils/ipc'
 import { useNavigate } from 'react-router-dom'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+
 interface Props {
   id: string
   onClose: () => void
 }
+
 const EditFileModal: React.FC<Props> = (props) => {
   const { id, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState('')
   const navigate = useNavigate()
 
@@ -22,7 +26,8 @@ const EditFileModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
         backdrop: 'top-[48px]'

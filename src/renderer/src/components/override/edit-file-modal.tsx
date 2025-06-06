@@ -2,13 +2,17 @@ import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from
 import React, { useEffect, useState } from 'react'
 import { BaseEditor } from '../base/base-editor'
 import { getOverride, restartCore, setOverride } from '@renderer/utils/ipc'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+
 interface Props {
   id: string
   language: 'javascript' | 'yaml'
   onClose: () => void
 }
+
 const EditFileModal: React.FC<Props> = (props) => {
   const { id, language, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState('')
 
   const getContent = async (): Promise<void> => {
@@ -21,7 +25,8 @@ const EditFileModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
         backdrop: 'top-[48px]'

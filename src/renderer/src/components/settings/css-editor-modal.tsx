@@ -1,5 +1,6 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react'
 import { BaseEditor } from '@renderer/components/base/base-editor'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { readTheme } from '@renderer/utils/ipc'
 import React, { useEffect, useState } from 'react'
 interface Props {
@@ -9,6 +10,7 @@ interface Props {
 }
 const CSSEditorModal: React.FC<Props> = (props) => {
   const { theme, onCancel, onConfirm } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState('')
 
   useEffect(() => {
@@ -21,7 +23,8 @@ const CSSEditorModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
         backdrop: 'top-[48px]'

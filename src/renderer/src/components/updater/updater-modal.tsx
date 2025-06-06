@@ -10,6 +10,7 @@ import {
 import ReactMarkdown from 'react-markdown'
 import React, { useState } from 'react'
 import { downloadAndInstallUpdate } from '@renderer/utils/ipc'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 
 interface Props {
   version: string
@@ -18,6 +19,7 @@ interface Props {
 }
 const UpdaterModal: React.FC<Props> = (props) => {
   const { version, changelog, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [downloading, setDownloading] = useState(false)
   const onUpdate = async (): Promise<void> => {
     try {
@@ -29,7 +31,8 @@ const UpdaterModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{ backdrop: 'top-[48px]' }}
       hideCloseButton
       isOpen={true}

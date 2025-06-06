@@ -11,13 +11,17 @@ import {
 import React, { useState } from 'react'
 import SettingItem from '../base/base-setting-item'
 import { restartCore } from '@renderer/utils/ipc'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+
 interface Props {
   item: IOverrideItem
   updateOverrideItem: (item: IOverrideItem) => Promise<void>
   onClose: () => void
 }
+
 const EditInfoModal: React.FC<Props> = (props) => {
   const { item, updateOverrideItem, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [values, setValues] = useState(item)
 
   const onSave = async (): Promise<void> => {
@@ -28,7 +32,8 @@ const EditInfoModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{ backdrop: 'top-[48px]' }}
       hideCloseButton
       isOpen={true}

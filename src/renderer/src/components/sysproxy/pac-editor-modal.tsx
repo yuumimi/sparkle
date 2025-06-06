@@ -1,5 +1,6 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react'
 import { BaseEditor } from '@renderer/components/base/base-editor'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import React, { useState } from 'react'
 interface Props {
   script: string
@@ -8,11 +9,13 @@ interface Props {
 }
 const PacEditorModal: React.FC<Props> = (props) => {
   const { script, onCancel, onConfirm } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState(script)
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
         backdrop: 'top-[48px]'

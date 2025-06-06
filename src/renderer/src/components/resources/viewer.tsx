@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react'
 import { BaseEditor } from '../base/base-editor'
 import { getFileStr, setFileStr } from '@renderer/utils/ipc'
 import yaml from 'js-yaml'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 type Language = 'yaml' | 'javascript' | 'css' | 'json' | 'text'
 
 interface Props {
@@ -15,6 +16,7 @@ interface Props {
 }
 const Viewer: React.FC<Props> = (props) => {
   const { type, path, title, format, privderType, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState('')
   let language: Language = !format || format === 'YamlRule' ? 'yaml' : 'text'
 
@@ -68,7 +70,8 @@ const Viewer: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
         backdrop: 'top-[48px]'

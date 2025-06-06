@@ -9,11 +9,15 @@ import {
 } from '@heroui/react'
 import React, { useEffect, useState } from 'react'
 import { getInterfaces } from '@renderer/utils/ipc'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+
 interface Props {
   onClose: () => void
 }
+
 const InterfaceModal: React.FC<Props> = (props) => {
   const { onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [info, setInfo] = useState<Record<string, NetworkInterfaceInfo[]>>({})
   const getInfo = async (): Promise<void> => {
     setInfo(await getInterfaces())
@@ -25,7 +29,8 @@ const InterfaceModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{ backdrop: 'top-[48px]' }}
       hideCloseButton
       isOpen={true}

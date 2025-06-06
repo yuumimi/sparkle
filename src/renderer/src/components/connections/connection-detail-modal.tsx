@@ -16,18 +16,22 @@ import SettingItem from '../base/base-setting-item'
 import { calcTraffic } from '@renderer/utils/calc'
 import dayjs from 'dayjs'
 import { BiCopy } from 'react-icons/bi'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 
 interface Props {
   connection: IMihomoConnectionDetail
   onClose: () => void
 }
 
-const CopyableSettingItem: React.FC<{
+interface CopyProps {
   title: string
   value: string | string[]
   displayName?: string
   prefix?: string[]
-}> = ({ title, value, displayName, prefix = [] }) => {
+}
+
+const CopyableSettingItem: React.FC<CopyProps> = (props) => {
+  const { title, value, displayName, prefix = [] } = props
   const getSubDomains = (domain: string): string[] =>
     domain.split('.').length <= 2
       ? [domain]
@@ -133,9 +137,12 @@ const CopyableSettingItem: React.FC<{
 
 const ConnectionDetailModal: React.FC<Props> = (props) => {
   const { connection, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
+
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{ backdrop: 'top-[48px]' }}
       size="xl"
       hideCloseButton

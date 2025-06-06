@@ -1,3 +1,5 @@
+import os from 'os'
+
 export const defaultConfig: IAppConfig = {
   core: 'mihomo',
   updateChannel: 'stable',
@@ -39,7 +41,8 @@ export const defaultConfig: IAppConfig = {
   disableSystemCA: false,
   disableNftables: false,
   skipSafePathCheck: false,
-  safePaths: []
+  safePaths: [],
+  disableGPU: process.platform === 'win32' && parseInt(os.release().split('.')[2], 10) <= 20000
 }
 
 export const defaultControledMihomoConfig: Partial<IMihomoConfig> = {

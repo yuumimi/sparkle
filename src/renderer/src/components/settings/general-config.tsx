@@ -9,6 +9,7 @@ import {
   copyEnv,
   disableAutoRun,
   enableAutoRun,
+  relaunchApp,
   startNetworkDetection,
   stopNetworkDetection
 } from '@renderer/utils/ipc'
@@ -16,6 +17,7 @@ import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
 import { IoIosHelpCircle } from 'react-icons/io'
 import EditableList from '../base/base-list-editor'
+import ConfirmModal from '../base/base-confirm'
 
 const GeneralConfig: React.FC = () => {
   const { data: enable, mutate: mutateEnable } = useSWR('checkAutoRun', checkAutoRun)
@@ -30,14 +32,42 @@ const GeneralConfig: React.FC = () => {
     networkDetection = false,
     networkDetectionBypass = ['VMware', 'vEthernet'],
     networkDetectionInterval = 10,
-    displayIcon = true
+    disableGPU = false,
+    disableAnimation = false
   } = appConfig || {}
 
   const [bypass, setBypass] = useState(networkDetectionBypass)
   const [interval, setInterval] = useState(networkDetectionInterval)
+  const [showRestartConfirm, setShowRestartConfirm] = useState(false)
+  const [pendingDisableGPU, setPendingDisableGPU] = useState(disableGPU)
 
   return (
     <>
+      {showRestartConfirm && (
+        <ConfirmModal
+          title="确定要重启应用吗？"
+          description={
+            <div>
+              <p>修改 GPU 加速设置需要重启应用才能生效</p>
+            </div>
+          }
+          confirmText="重启"
+          cancelText="取消"
+          onChange={(open) => {
+            if (!open) {
+              setPendingDisableGPU(disableGPU)
+            }
+            setShowRestartConfirm(open)
+          }}
+          onConfirm={async () => {
+            await patchAppConfig({ disableGPU: pendingDisableGPU })
+            if (!pendingDisableGPU) {
+              await patchAppConfig({ disableAnimation: false })
+            }
+            await relaunchApp()
+          }}
+        />
+      )}
       <SettingCard>
         <SettingItem title="开机自启" divider>
           <Switch
@@ -167,6 +197,47 @@ const GeneralConfig: React.FC = () => {
           </Select>
         </SettingItem>
         <SettingItem
+          title="禁用 GPU 加速"
+          actions={
+            <Tooltip content="开启后，应用将禁用 GPU 加速，可能会提高稳定性，但会降低性能">
+              <Button isIconOnly size="sm" variant="light">
+                <IoIosHelpCircle className="text-lg" />
+              </Button>
+            </Tooltip>
+          }
+          divider
+        >
+          <Switch
+            size="sm"
+            isSelected={pendingDisableGPU}
+            onValueChange={(v) => {
+              setPendingDisableGPU(v)
+              setShowRestartConfirm(true)
+            }}
+          />
+        </SettingItem>
+        {pendingDisableGPU && (
+          <SettingItem
+            title="禁用动画"
+            actions={
+              <Tooltip content="开启后，应用将禁用所有动画效果，可能会提高性能">
+                <Button isIconOnly size="sm" variant="light">
+                  <IoIosHelpCircle className="text-lg" />
+                </Button>
+              </Tooltip>
+            }
+            divider
+          >
+            <Switch
+              size="sm"
+              isSelected={disableAnimation}
+              onValueChange={(v) => {
+                patchAppConfig({ disableAnimation: v })
+              }}
+            />
+          </SettingItem>
+        )}
+        <SettingItem
           title="断网时停止内核"
           actions={
             <Tooltip content="开启后，应用会在检测到网络断开时自动停止内核，并在网络恢复后自动重启内核">
@@ -175,7 +246,7 @@ const GeneralConfig: React.FC = () => {
               </Button>
             </Tooltip>
           }
-          divider
+          divider={networkDetection}
         >
           <Switch
             size="sm"
@@ -246,19 +317,10 @@ const GeneralConfig: React.FC = () => {
             <EditableList
               items={bypass}
               onChange={(list) => setBypass(list as string[])}
-              divider={platform != 'darwin'}
+              divider={false}
             />
           </>
         )}
-        <SettingItem title="连接显示应用图标">
-          <Switch
-            size="sm"
-            isSelected={displayIcon}
-            onValueChange={(v) => {
-              patchAppConfig({ displayIcon: v })
-            }}
-          />
-        </SettingItem>
       </SettingCard>
     </>
   )

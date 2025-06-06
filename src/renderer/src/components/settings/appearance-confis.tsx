@@ -39,7 +39,8 @@ const AppearanceConfig: React.FC = () => {
     spinFloatingIcon = true,
     useWindowFrame = false,
     customTheme = 'default.css',
-    appTheme = 'system'
+    appTheme = 'system',
+    displayIcon = true
   } = appConfig || {}
 
   useEffect(() => {
@@ -62,6 +63,15 @@ const AppearanceConfig: React.FC = () => {
         />
       )}
       <SettingCard title="外观设置">
+        <SettingItem title="连接显示应用图标" divider>
+          <Switch
+            size="sm"
+            isSelected={displayIcon}
+            onValueChange={(v) => {
+              patchAppConfig({ displayIcon: v })
+            }}
+          />
+        </SettingItem>
         <SettingItem title="显示悬浮窗" divider>
           <Switch
             size="sm"

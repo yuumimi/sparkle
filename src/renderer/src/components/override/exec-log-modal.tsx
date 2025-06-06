@@ -9,12 +9,16 @@ import {
 } from '@heroui/react'
 import React, { useEffect, useState } from 'react'
 import { getOverride } from '@renderer/utils/ipc'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
+
 interface Props {
   id: string
   onClose: () => void
 }
+
 const ExecLogModal: React.FC<Props> = (props) => {
   const { id, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [logs, setLogs] = useState<string[]>([])
 
   const getLog = async (): Promise<void> => {
@@ -27,7 +31,8 @@ const ExecLogModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{ backdrop: 'top-[48px]' }}
       hideCloseButton
       isOpen={true}

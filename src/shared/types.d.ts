@@ -364,6 +364,8 @@ interface IAppConfig {
   networkDetectionBypass?: string[]
   networkDetectionInterval?: number
   displayIcon?: boolean
+  disableGPU: boolean
+  disableAnimation?: boolean
 }
 
 interface IMihomoTunConfig {

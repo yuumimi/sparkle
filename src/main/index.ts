@@ -28,7 +28,7 @@ import path from 'path'
 import { startMonitor } from './resolve/trafficMonitor'
 import { showFloatingWindow } from './resolve/floatingWindow'
 import iconv from 'iconv-lite'
-import os from 'os'
+import { getAppConfigSync } from './config/app'
 
 let quitTimeout: NodeJS.Timeout | null = null
 export let mainWindow: BrowserWindow | null = null
@@ -99,10 +99,9 @@ if (process.platform === 'win32' && !exePath().startsWith('C')) {
 
 const initPromise = init()
 
-if (process.platform === 'win32') {
-  if (parseInt(os.release().split('.')[2], 10) <= 20000) {
-    app.disableHardwareAcceleration()
-  }
+const syncConfig = getAppConfigSync()
+if (syncConfig.disableGPU) {
+  app.disableHardwareAcceleration()
 }
 
 app.on('second-instance', async (_event, commandline) => {

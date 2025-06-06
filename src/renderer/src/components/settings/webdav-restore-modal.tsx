@@ -1,4 +1,5 @@
 import { Modal, ModalContent, ModalHeader, ModalBody, ModalFooter, Button } from '@heroui/react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { relaunchApp, webdavDelete, webdavRestore } from '@renderer/utils/ipc'
 import React, { useState } from 'react'
 import { MdDeleteForever } from 'react-icons/md'
@@ -8,12 +9,14 @@ interface Props {
 }
 const WebdavRestoreModal: React.FC<Props> = (props) => {
   const { filenames: names, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [filenames, setFilenames] = useState<string[]>(names)
   const [restoring, setRestoring] = useState(false)
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{ backdrop: 'top-[48px]' }}
       hideCloseButton
       isOpen={true}

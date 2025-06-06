@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import yaml from 'js-yaml'
 import { Button, Modal, ModalBody, ModalContent, ModalFooter, ModalHeader } from '@heroui/react'
 import { BaseEditor } from '../base/base-editor'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 
 interface Props {
   bypass: string[]
@@ -16,6 +17,7 @@ interface ParsedYaml {
 
 const ByPassEditorModal: React.FC<Props> = (props) => {
   const { bypass, onCancel, onConfirm } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const [currData, setCurrData] = useState<string>('')
   useEffect(() => {
     setCurrData(yaml.dump({ bypass }))
@@ -35,7 +37,8 @@ const ByPassEditorModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       classNames={{
         base: 'max-w-none w-full',
         backdrop: 'top-[48px]'

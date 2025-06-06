@@ -19,14 +19,17 @@ import { useOverrideConfig } from '@renderer/hooks/use-override-config'
 import { restartCore } from '@renderer/utils/ipc'
 import { MdDeleteForever } from 'react-icons/md'
 import { FaPlus } from 'react-icons/fa6'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 
 interface Props {
   item: IProfileItem
   updateProfileItem: (item: IProfileItem) => Promise<void>
   onClose: () => void
 }
+
 const EditInfoModal: React.FC<Props> = (props) => {
   const { item, updateProfileItem, onClose } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
   const { overrideConfig } = useOverrideConfig()
   const { items: overrideItems = [] } = overrideConfig || {}
   const [values, setValues] = useState(item)
@@ -50,7 +53,8 @@ const EditInfoModal: React.FC<Props> = (props) => {
 
   return (
     <Modal
-      backdrop="blur"
+      backdrop={disableAnimation ? 'transparent' : 'blur'}
+      disableAnimation={disableAnimation}
       size="5xl"
       classNames={{
         backdrop: 'top-[48px]',

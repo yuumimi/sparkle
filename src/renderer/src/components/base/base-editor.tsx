@@ -7,6 +7,7 @@ import pac from 'types-pac/pac.d.ts?raw'
 import { useTheme } from 'next-themes'
 import { nanoid } from 'nanoid'
 import React from 'react'
+import { useAppConfig } from '@renderer/hooks/use-app-config'
 type Language = 'yaml' | 'javascript' | 'css' | 'json' | 'text'
 
 interface Props {
@@ -97,6 +98,7 @@ export const BaseEditor: React.FC<Props> = (props) => {
     language,
     onChange
   } = props
+  const { appConfig: { disableAnimation = false } = {} } = useAppConfig()
 
   const editorRef = useRef<monaco.editor.IStandaloneCodeEditor>(undefined)
   const diffEditorRef = useRef<monaco.editor.IStandaloneDiffEditor>(undefined)
@@ -144,14 +146,30 @@ export const BaseEditor: React.FC<Props> = (props) => {
     },
     fontFamily: `Maple Mono NF CN,Fira Code, JetBrains Mono, Roboto Mono, "Source Code Pro", Consolas, Menlo, Monaco, monospace, "Courier New", "Apple Color Emoji", "Noto Color Emoji"`,
     fontLigatures: true, // 连字符
-    smoothScrolling: true, // 平滑滚动
+    smoothScrolling: !disableAnimation, // 禁用动画时关闭平滑滚动
     pixelRatio: window.devicePixelRatio, // 设置像素比
     renderSideBySide: diffRenderSideBySide, // 侧边显示
     glyphMargin: false, // 禁用字形边距
     folding: true, // 启用代码折叠
     scrollBeyondLastLine: false, // 禁止滚动超过最后一行
     automaticLayout: true, // 自动布局
-    wordWrap: 'on' as 'on' | 'off' // 自动换行
+    wordWrap: 'on' as 'on' | 'off', // 自动换行x
+    // 禁用动画时的性能优化选项
+    cursorBlinking: (disableAnimation ? 'solid' : 'blink') as 'solid' | 'blink', // 禁用光标闪烁动画
+    cursorSmoothCaretAnimation: (disableAnimation ? 'off' : 'on') as 'off' | 'on', // 禁用光标移动动画
+    scrollbar: {
+      useShadows: !disableAnimation, // 禁用滚动条阴影
+      verticalScrollbarSize: disableAnimation ? 10 : 14, // 减小滚动条尺寸
+      horizontalScrollbarSize: disableAnimation ? 10 : 14
+    },
+    suggest: {
+      insertMode: (disableAnimation ? 'replace' : 'insert') as 'replace' | 'insert', // 简化建议插入模式
+      showIcons: !disableAnimation // 禁用建议图标以减少渲染
+    },
+    hover: {
+      enabled: !disableAnimation, // 禁用悬停提示
+      delay: disableAnimation ? 0 : 300
+    }
   }
 
   if (originalValue !== undefined) {
