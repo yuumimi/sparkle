@@ -164,6 +164,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
         reject(`控制器监听错误:\n${str}`)
       }
 
+      let initialized = false
       if (
         (process.platform !== 'win32' && str.includes('RESTful API unix listening at')) ||
         (process.platform === 'win32' && str.includes('RESTful API pipe listening at'))
@@ -182,6 +183,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
                 providerNames.size > 0 && matchedProviders.size === providerNames.size
 
               if ((providerNames.size === 0 && isDefaultProvider) || isAllProvidersMatched) {
+                initialized = true
                 Promise.all([
                   new Promise((r) => setTimeout(r, 500)).then(() => {
                     mainWindow?.webContents.send('groupsUpdated')
@@ -193,7 +195,9 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
               }
             }
             child.stdout?.on('data', (data) => {
-              handleProviderInitialization(data.toString())
+              if (!initialized) {
+                handleProviderInitialization(data.toString())
+              }
             })
           })
         ])
