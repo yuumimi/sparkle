@@ -91,9 +91,13 @@ jobs:
           jq --arg version "$RELEASE_VERSION" '.version = $version' package.json > tmp.json && mv tmp.json package.json
 
       - name: Keep product name lowercase on Linux
-        if: matrix.os == 'ubuntu-latest' && matrix.format == 'pacman'
+        if: matrix.os == 'ubuntu-latest'
         run: |
           sed -i "s/productName: Sparkle/productName: sparkle/" electron-builder.yml
+
+      - name: Install Build Tools
+        if: matrix.os == 'ubuntu-latest' && matrix.format == 'pacman'
+        run: |
           sudo apt-get update && sudo apt-get install -y libarchive-tools
 
       - name: Install Dependencies and Prepare
