@@ -504,6 +504,11 @@ interface IMihomoConfig {
   'proxy-providers'?: Record<string, unknown>
 }
 
+interface ProxyProviderConfig {
+  path?: string
+  url?: string
+}
+
 interface IProfileConfig {
   current?: string
   items: IProfileItem[]

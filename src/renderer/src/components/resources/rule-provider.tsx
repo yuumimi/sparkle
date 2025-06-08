@@ -29,12 +29,12 @@ const RuleProvider: React.FC = () => {
       const fetchProviderPath = async (name: string): Promise<void> => {
         try {
           const providers = await getRuntimeConfig()
-          const provider = providers?.['rule-providers']?.[name]
+          const provider = providers?.['rule-providers']?.[name] as ProxyProviderConfig
           if (provider) {
             setShowDetails((prev) => ({
               ...prev,
               show: true,
-              path: provider?.path || `rules/${getHash(provider?.url)}`
+              path: provider?.path || `rules/${getHash(provider?.url || '')}`
             }))
           }
         } catch {

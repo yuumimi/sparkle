@@ -163,7 +163,7 @@ const DNS: React.FC = () => {
             <EditableList
               title="虚假 IP 过滤器"
               items={values.fakeIPFilter}
-              onChange={(list) => setValues({ ...values, fakeIPFilter: list })}
+              onChange={(list) => setValues({ ...values, fakeIPFilter: list as string[] })}
               placeholder="例：+.lan"
             />
           </>
@@ -171,19 +171,19 @@ const DNS: React.FC = () => {
         <EditableList
           title="基础服务器"
           items={values.defaultNameserver}
-          onChange={(list) => setValues({ ...values, defaultNameserver: list })}
+          onChange={(list) => setValues({ ...values, defaultNameserver: list as string[] })}
           placeholder="例：223.5.5.5，仅支持 IP"
         />
         <EditableList
           title="默认解析服务器"
           items={values.nameserver}
-          onChange={(list) => setValues({ ...values, nameserver: list })}
+          onChange={(list) => setValues({ ...values, nameserver: list as string[] })}
           placeholder="例：tls://dns.alidns.com"
         />
         <EditableList
           title="直连解析服务器"
           items={values.directNameserver}
-          onChange={(list) => setValues({ ...values, directNameserver: list })}
+          onChange={(list) => setValues({ ...values, directNameserver: list as string[] })}
           placeholder="例：tls://dns.alidns.com"
         />
         <EditableList
@@ -192,8 +192,8 @@ const DNS: React.FC = () => {
           onChange={(list) =>
             setValues({
               ...values,
-              proxyServerNameserver: list,
-              respectRules: list.length === 0 ? false : values.respectRules
+              proxyServerNameserver: list as string[],
+              respectRules: (list as string[]).length === 0 ? false : values.respectRules
             })
           }
           placeholder="例：tls://dns.alidns.com"
@@ -204,7 +204,7 @@ const DNS: React.FC = () => {
           onChange={(newValue) => {
             setValues({
               ...values,
-              nameserverPolicy: newValue
+              nameserverPolicy: newValue as { [key: string]: string | string[] }
             })
           }}
           placeholder="域名"
@@ -235,10 +235,12 @@ const DNS: React.FC = () => {
               values.hosts ? Object.fromEntries(values.hosts.map((h) => [h.domain, h.value])) : {}
             }
             onChange={(rec) => {
-              const hostArr: IHost[] = Object.entries(rec).map(([domain, value]) => ({
-                domain,
-                value: value as string | string[]
-              }))
+              const hostArr: IHost[] = Object.entries(rec as Record<string, string | string[]>).map(
+                ([domain, value]) => ({
+                  domain,
+                  value: value as string | string[]
+                })
+              )
               setValues({ ...values, hosts: hostArr })
             }}
             placeholder="域名"

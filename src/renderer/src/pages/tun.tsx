@@ -205,7 +205,7 @@ const Tun: React.FC = () => {
             title="排除自定义网段"
             items={values.routeExcludeAddress}
             placeholder="例: 172.20.0.0/16"
-            onChange={(newList) => setValues({ ...values, routeExcludeAddress: newList })}
+            onChange={(list) => setValues({ ...values, routeExcludeAddress: list as string[] })}
             divider={false}
           />
         </SettingCard>

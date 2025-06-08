@@ -29,12 +29,12 @@ const ProxyProvider: React.FC = () => {
       const fetchProviderPath = async (name: string): Promise<void> => {
         try {
           const providers = await getRuntimeConfig()
-          const provider = providers?.['proxy-providers']?.[name]
+          const provider = providers?.['proxy-providers']?.[name] as ProxyProviderConfig
           if (provider) {
             setShowDetails((prev) => ({
               ...prev,
               show: true,
-              path: provider?.path || `proxies/${getHash(provider?.url)}`
+              path: provider.path || `proxies/${getHash(provider.url || '')}`
             }))
           }
         } catch {

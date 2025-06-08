@@ -172,25 +172,25 @@ const Sniffer: React.FC = () => {
         <EditableList
           title="跳过域名嗅探"
           items={values.skipDomain}
-          onChange={(list) => setValues({ ...values, skipDomain: list })}
+          onChange={(list) => setValues({ ...values, skipDomain: list as string[] })}
           placeholder="例：+.push.apple.com"
         />
         <EditableList
           title="强制域名嗅探"
           items={values.forceDomain}
-          onChange={(list) => setValues({ ...values, forceDomain: list })}
+          onChange={(list) => setValues({ ...values, forceDomain: list as string[] })}
           placeholder="例：v2ex.com"
         />
         <EditableList
           title="跳过目标地址嗅探"
           items={values.skipDstAddress}
-          onChange={(list) => setValues({ ...values, skipDstAddress: list })}
+          onChange={(list) => setValues({ ...values, skipDstAddress: list as string[] })}
           placeholder="例：1.1.1.1/32"
         />
         <EditableList
           title="跳过来源地址嗅探"
           items={values.skipSrcAddress}
-          onChange={(list) => setValues({ ...values, skipSrcAddress: list })}
+          onChange={(list) => setValues({ ...values, skipSrcAddress: list as string[] })}
           placeholder="例：192.168.1.1/24"
           divider={false}
         />
