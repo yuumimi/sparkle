@@ -6,7 +6,7 @@ import EditableList from '@renderer/components/base/base-list-editor'
 import PacEditorModal from '@renderer/components/sysproxy/pac-editor-modal'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import { openUWPTool, triggerSysProxy } from '@renderer/utils/ipc'
+import { openUWPTool } from '@renderer/utils/ipc'
 import React, { Key, useState } from 'react'
 import ByPassEditorModal from '@renderer/components/sysproxy/bypass-editor-modal'
 import { IoIosHelpCircle } from 'react-icons/io'
@@ -87,14 +87,7 @@ const Sysproxy: React.FC = () => {
   const onSave = async (): Promise<void> => {
     // check valid TODO
     await patchAppConfig({ sysProxy: values })
-    try {
-      await triggerSysProxy(true, onlyActiveDevice)
-      await patchAppConfig({ sysProxy: { enable: true } })
-      setChanged(false)
-    } catch (e) {
-      alert(e)
-      await patchAppConfig({ sysProxy: { enable: false } })
-    }
+    setChanged(false)
   }
 
   return (
@@ -221,7 +214,7 @@ const Sysproxy: React.FC = () => {
             </SettingItem>
             <EditableList
               items={values.bypass}
-              onChange={(list) => setValues({ ...values, bypass: list })}
+              onChange={(list) => setValues({ ...values, bypass: list as string[] })}
               placeholder="例：*.baidu.com"
               divider={false}
             />

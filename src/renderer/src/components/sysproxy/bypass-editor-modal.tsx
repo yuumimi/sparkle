@@ -31,7 +31,7 @@ const ByPassEditorModal: React.FC<Props> = (props) => {
         alert('YAML 格式错误')
       }
     } catch (e) {
-      alert('YAML 解析失败: ' + e)
+      alert('YAML 解析失败：' + e)
     }
   }
 

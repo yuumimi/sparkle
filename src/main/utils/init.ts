@@ -30,7 +30,7 @@ import {
   startSubStoreBackendServer,
   startSubStoreFrontendServer
 } from '../resolve/server'
-import { triggerSysProxy } from '../sys/sysproxy'
+import { isHelperInstalled, triggerSysProxy } from '../sys/sysproxy'
 import {
   getAppConfig,
   getControledMihomoConfig,
@@ -255,10 +255,14 @@ export async function init(): Promise<void> {
     await startNetworkDetection()
   }
   try {
-    if (sysProxy.enable) {
-      await startPacServer()
+    if (!(await isHelperInstalled())) {
+      await patchAppConfig({ sysProxy: { enable: false } })
+    } else {
+      if (sysProxy.enable) {
+        await startPacServer()
+      }
+      await triggerSysProxy(sysProxy.enable, onlyActiveDevice)
     }
-    await triggerSysProxy(sysProxy.enable, onlyActiveDevice)
   } catch {
     // ignore
   }

@@ -1,7 +1,7 @@
 import { getAppConfig, getControledMihomoConfig } from '../config'
 import { pacPort, startPacServer, stopPacServer } from '../resolve/server'
 import { promisify } from 'util'
-import { execFile } from 'child_process'
+import { exec, execFile } from 'child_process'
 import { sysproxyPath } from '../utils/dirs'
 import { net } from 'electron'
 import axios from 'axios'
@@ -139,5 +139,32 @@ export async function disableSysProxy(onlyActiveDevice: boolean): Promise<void> 
     )
   } else {
     await execFilePromise(sysproxyPath(), ['disable'])
+  }
+}
+
+export async function isHelperInstalled(): Promise<boolean> {
+  if (process.platform !== 'darwin') {
+    return true
+  }
+  try {
+    await axios.get('http://localhost/ping', {
+      socketPath: helperSocketPath
+    })
+    return true
+  } catch (error) {
+    return false
+  }
+}
+
+export async function restartHelper(): Promise<void> {
+  if (process.platform === 'darwin') {
+    try {
+      const execPromise = promisify(exec)
+      await execPromise(
+        `osascript -e 'do shell script "launchctl unload /Library/LaunchDaemons/sparkle.helper.plist 2>/dev/null; launchctl load /Library/LaunchDaemons/sparkle.helper.plist 2>/dev/null; launchctl start sparkle.helper 2>/dev/null" with administrator privileges'`
+      )
+    } catch {
+      // ignore
+    }
   }
 }

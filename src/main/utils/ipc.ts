@@ -63,7 +63,7 @@ import {
   startNetworkDetection,
   stopNetworkDetection
 } from '../core/manager'
-import { triggerSysProxy } from '../sys/sysproxy'
+import { isHelperInstalled, restartHelper, triggerSysProxy } from '../sys/sysproxy'
 import { checkUpdate, downloadAndInstallUpdate } from '../resolve/autoUpdater'
 import {
   getFilePath,
@@ -191,6 +191,8 @@ export function registerIpcMainHandlers(): void {
   ipcMain.handle('triggerSysProxy', (_e, enable, onlyActiveDevice) =>
     ipcErrorWrapper(triggerSysProxy)(enable, onlyActiveDevice)
   )
+  ipcMain.handle('restartHelper', ipcErrorWrapper(restartHelper))
+  ipcMain.handle('isHelperInstalled', ipcErrorWrapper(isHelperInstalled))
   ipcMain.handle('manualGrantCorePermition', () => ipcErrorWrapper(manualGrantCorePermition)())
   ipcMain.handle('getFilePath', (_e, ext) => getFilePath(ext))
   ipcMain.handle('readTextFile', (_e, filePath) => ipcErrorWrapper(readTextFile)(filePath))
