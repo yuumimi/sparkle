@@ -6,9 +6,10 @@ import {
   createHeapSnapshot,
   quitApp,
   quitWithoutCore,
-  resetAppConfig
+  resetAppConfig,
+  cancelUpdate
 } from '@renderer/utils/ipc'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import UpdaterModal from '../updater/updater-modal'
 import { version } from '@renderer/utils/init'
 import { IoIosHelpCircle } from 'react-icons/io'
@@ -21,6 +22,38 @@ const Actions: React.FC = () => {
   const [openUpdate, setOpenUpdate] = useState(false)
   const [checkingUpdate, setCheckingUpdate] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
+  const [updateStatus, setUpdateStatus] = useState<{
+    downloading: boolean
+    progress: number
+    error?: string
+  }>({
+    downloading: false,
+    progress: 0
+  })
+
+  useEffect(() => {
+    const handleUpdateStatus = (
+      _: Electron.IpcRendererEvent,
+      status: typeof updateStatus
+    ): void => {
+      setUpdateStatus(status)
+    }
+
+    window.electron.ipcRenderer.on('update-status', handleUpdateStatus)
+
+    return (): void => {
+      window.electron.ipcRenderer.removeAllListeners('update-status')
+    }
+  }, [])
+
+  const handleCancelUpdate = async (): Promise<void> => {
+    try {
+      await cancelUpdate()
+      setUpdateStatus({ downloading: false, progress: 0 })
+    } catch (e) {
+      // ignore
+    }
+  }
 
   return (
     <>
@@ -29,6 +62,8 @@ const Actions: React.FC = () => {
           onClose={() => setOpenUpdate(false)}
           version={newVersion}
           changelog={changelog}
+          updateStatus={updateStatus}
+          onCancel={handleCancelUpdate}
         />
       )}
       {confirmOpen && (

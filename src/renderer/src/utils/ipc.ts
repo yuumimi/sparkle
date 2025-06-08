@@ -267,6 +267,10 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
   )
 }
 
+export async function cancelUpdate(): Promise<void> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('cancelUpdate'))
+}
+
 export async function getVersion(): Promise<string> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getVersion'))
 }

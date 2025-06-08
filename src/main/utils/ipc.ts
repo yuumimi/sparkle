@@ -64,7 +64,7 @@ import {
   stopNetworkDetection
 } from '../core/manager'
 import { isHelperInstalled, restartHelper, triggerSysProxy } from '../sys/sysproxy'
-import { checkUpdate, downloadAndInstallUpdate } from '../resolve/autoUpdater'
+import { checkUpdate, downloadAndInstallUpdate, cancelUpdate } from '../resolve/autoUpdater'
 import {
   getFilePath,
   openFile,
@@ -205,6 +205,7 @@ export function registerIpcMainHandlers(): void {
     ipcErrorWrapper(downloadAndInstallUpdate)(version)
   )
   ipcMain.handle('checkUpdate', ipcErrorWrapper(checkUpdate))
+  ipcMain.handle('cancelUpdate', ipcErrorWrapper(cancelUpdate))
   ipcMain.handle('getVersion', () => app.getVersion())
   ipcMain.handle('platform', () => process.platform)
   ipcMain.handle('openUWPTool', ipcErrorWrapper(openUWPTool))

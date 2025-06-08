@@ -1,7 +1,8 @@
 import { Button } from '@heroui/react'
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import UpdaterModal from './updater-modal'
 import { GrUpgrade } from 'react-icons/gr'
+import { cancelUpdate } from '@renderer/utils/ipc'
 
 interface Props {
   iconOnly?: boolean
@@ -14,6 +15,38 @@ interface Props {
 const UpdaterButton: React.FC<Props> = (props) => {
   const { iconOnly, latest } = props
   const [openModal, setOpenModal] = useState(false)
+  const [updateStatus, setUpdateStatus] = useState<{
+    downloading: boolean
+    progress: number
+    error?: string
+  }>({
+    downloading: false,
+    progress: 0
+  })
+
+  useEffect(() => {
+    const handleUpdateStatus = (
+      _: Electron.IpcRendererEvent,
+      status: typeof updateStatus
+    ): void => {
+      setUpdateStatus(status)
+    }
+
+    window.electron.ipcRenderer.on('update-status', handleUpdateStatus)
+
+    return (): void => {
+      window.electron.ipcRenderer.removeAllListeners('update-status')
+    }
+  }, [])
+
+  const handleCancelUpdate = async (): Promise<void> => {
+    try {
+      await cancelUpdate()
+      setUpdateStatus({ downloading: false, progress: 0 })
+    } catch (e) {
+      // ignore
+    }
+  }
 
   if (!latest) return null
 
@@ -23,6 +56,8 @@ const UpdaterButton: React.FC<Props> = (props) => {
         <UpdaterModal
           version={latest.version}
           changelog={latest.changelog}
+          updateStatus={updateStatus}
+          onCancel={handleCancelUpdate}
           onClose={() => {
             setOpenModal(false)
           }}

@@ -1,4 +1,4 @@
-import axios from 'axios'
+import axios, { AxiosRequestConfig, CancelTokenSource } from 'axios'
 import yaml from 'yaml'
 import { app, shell } from 'electron'
 import { getAppConfig, getControledMihomoConfig } from '../config'
@@ -9,7 +9,9 @@ import { existsSync } from 'fs'
 import { exec, spawn } from 'child_process'
 import { promisify } from 'util'
 import { createHash } from 'crypto'
-import { setNotQuit } from '..'
+import { setNotQuit, mainWindow } from '..'
+
+let downloadCancelToken: CancelTokenSource | null = null
 
 export async function checkUpdate(): Promise<IAppVersion | undefined> {
   const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
@@ -58,9 +60,10 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
   if (!file) {
     throw new Error('不支持自动更新，请手动下载更新')
   }
+  downloadCancelToken = axios.CancelToken.source()
 
   const apiUrl = `https://api.github.com/repos/xishang0128/sparkle/releases/tags/${releaseTag}`
-  const apiRequestConfig = {
+  const apiRequestConfig: AxiosRequestConfig = {
     headers: { Accept: 'application/vnd.github.v3+json' },
     ...(mixedPort != 0 && {
       proxy: {
@@ -68,17 +71,24 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
         host: '127.0.0.1',
         port: mixedPort
       }
-    })
+    }),
+    cancelToken: downloadCancelToken.token
   }
-  const releaseRes = await axios.get(apiUrl, apiRequestConfig)
-  const assets: Array<{ name: string; digest?: string }> = releaseRes.data.assets || []
-  const matchedAsset = assets.find((a) => a.name === file)
-  if (!matchedAsset || !matchedAsset.digest) {
-    throw new Error(`无法从 GitHub Release 中找到 "${file}" 对应的 SHA-256 信息`)
-  }
-  const expectedHash = matchedAsset.digest.split(':')[1].toLowerCase()
 
   try {
+    mainWindow?.webContents.send('update-status', {
+      downloading: true,
+      progress: 0
+    })
+
+    const releaseRes = await axios.get(apiUrl, apiRequestConfig)
+    const assets: Array<{ name: string; digest?: string }> = releaseRes.data.assets || []
+    const matchedAsset = assets.find((a) => a.name === file)
+    if (!matchedAsset || !matchedAsset.digest) {
+      throw new Error(`无法从 GitHub Release 中找到 "${file}" 对应的 SHA-256 信息`)
+    }
+    const expectedHash = matchedAsset.digest.split(':')[1].toLowerCase()
+
     if (!existsSync(path.join(dataDir(), file))) {
       const res = await axios.get(`${baseUrl}${file}`, {
         responseType: 'arraybuffer',
@@ -91,6 +101,16 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
         }),
         headers: {
           'Content-Type': 'application/octet-stream'
+        },
+        cancelToken: downloadCancelToken.token,
+        onDownloadProgress: (progressEvent) => {
+          const percentCompleted = Math.round(
+            (progressEvent.loaded * 100) / (progressEvent.total || 1)
+          )
+          mainWindow?.webContents.send('update-status', {
+            downloading: true,
+            progress: percentCompleted
+          })
         }
       })
       await writeFile(path.join(dataDir(), file), res.data)
@@ -104,6 +124,11 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
       await rm(path.join(dataDir(), file), { force: true })
       throw new Error(`SHA-256 校验失败：本地哈希 ${localHash} 与预期 ${expectedHash} 不符`)
     }
+
+    mainWindow?.webContents.send('update-status', {
+      downloading: false,
+      progress: 100
+    })
 
     if (file.endsWith('.exe')) {
       spawn(path.join(dataDir(), file), ['/S', '--force-run'], {
@@ -142,6 +167,29 @@ export async function downloadAndInstallUpdate(version: string): Promise<void> {
     }
   } catch (e) {
     await rm(path.join(dataDir(), file), { force: true })
+    if (axios.isCancel(e)) {
+      mainWindow?.webContents.send('update-status', {
+        downloading: false,
+        progress: 0,
+        error: '下载已取消'
+      })
+      return
+    } else {
+      mainWindow?.webContents.send('update-status', {
+        downloading: false,
+        progress: 0,
+        error: e instanceof Error ? e.message : '下载失败'
+      })
+    }
     throw e
+  } finally {
+    downloadCancelToken = null
+  }
+}
+
+export async function cancelUpdate(): Promise<void> {
+  if (downloadCancelToken) {
+    downloadCancelToken.cancel('用户取消下载')
+    downloadCancelToken = null
   }
 }
