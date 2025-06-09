@@ -115,6 +115,7 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     SKIP_SAFE_PATH_CHECK: String(skipSafePathCheck),
     SAFE_PATHS: safePaths.join(path.delimiter)
   }
+  let initialized = false
   child = spawn(
     corePath,
     ['-d', diffWorkDir ? mihomoProfileWorkDir(current) : mihomoWorkDir(), ctlParam, mihomoIpcPath],
@@ -164,7 +165,6 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
         reject(`控制器监听错误:\n${str}`)
       }
 
-      let initialized = false
       if (
         (process.platform !== 'win32' && str.includes('RESTful API unix listening at')) ||
         (process.platform === 'win32' && str.includes('RESTful API pipe listening at'))
