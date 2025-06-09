@@ -172,7 +172,9 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
         resolve([
           new Promise((resolve) => {
             const handleProviderInitialization = async (logLine: string): Promise<void> => {
-              for (const match of logLine.matchAll(/Start initial provider ([\w\-!@#$%^&*()]+)/g)) {
+              for (const match of logLine.matchAll(
+                /Start initial provider ([\w\-!@#$%^&*()\p{Script=Han}]+)/gu
+              )) {
                 matchedProviders.add(match[1])
               }
 
@@ -190,7 +192,9 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
                     mainWindow?.webContents.send('rulesUpdated')
                   }),
                   uploadRuntimeConfig(),
-                  patchMihomoConfig({ 'log-level': logLevel })
+                  new Promise((r) => setTimeout(r, 500)).then(() =>
+                    patchMihomoConfig({ 'log-level': logLevel })
+                  )
                 ]).then(() => resolve())
               }
             }
