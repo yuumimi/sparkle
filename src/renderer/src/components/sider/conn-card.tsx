@@ -132,7 +132,7 @@ const ConnCard: React.FC<Props> = (props) => {
             ref={setNodeRef}
             {...attributes}
             {...listeners}
-            className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
+            className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''} relative overflow-hidden`}
           >
             <CardBody className="pb-1 pt-0 px-0">
               <div className="flex justify-between">
@@ -161,7 +161,7 @@ const ConnCard: React.FC<Props> = (props) => {
                 </div>
               </div>
             </CardBody>
-            <CardFooter className="pt-1">
+            <CardFooter className="pt-1 relative z-10">
               <div
                 className={`flex justify-between items-center w-full text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
               >
@@ -169,31 +169,31 @@ const ConnCard: React.FC<Props> = (props) => {
                 <h3 className="truncate max-w-[65%]">{interfaceName}</h3>
               </div>
             </CardFooter>
-          </Card>
-          <ResponsiveContainer
-            height="100%"
-            width="100%"
-            className="w-full h-full absolute top-0 left-0 pointer-events-none overflow-hidden rounded-[14px]"
-          >
-            <AreaChart
-              data={series.map((v) => ({ traffic: v }))}
-              margin={{ top: 50, right: 0, left: 0, bottom: 0 }}
+            <ResponsiveContainer
+              height="100%"
+              width="100%"
+              className="absolute top-0 left-0 pointer-events-none rounded-[14px]"
             >
-              <defs>
-                <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="0%" stopColor={chartColor} stopOpacity={0.8} />
-                  <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
-                </linearGradient>
-              </defs>
-              <Area
-                isAnimationActive={false}
-                type="monotone"
-                dataKey="traffic"
-                stroke="none"
-                fill="url(#gradient)"
-              />
-            </AreaChart>
-          </ResponsiveContainer>
+              <AreaChart
+                data={series.map((v) => ({ traffic: v }))}
+                margin={{ top: 50, right: 0, left: 0, bottom: 0 }}
+              >
+                <defs>
+                  <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor={chartColor} stopOpacity={0.8} />
+                    <stop offset="100%" stopColor={chartColor} stopOpacity={0} />
+                  </linearGradient>
+                </defs>
+                <Area
+                  isAnimationActive={false}
+                  type="monotone"
+                  dataKey="traffic"
+                  stroke="none"
+                  fill="url(#gradient)"
+                />
+              </AreaChart>
+            </ResponsiveContainer>
+          </Card>
         </>
       ) : (
         <Card
