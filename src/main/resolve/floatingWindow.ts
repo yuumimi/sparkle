@@ -29,7 +29,7 @@ async function preallocateGpuResources(): Promise<void> {
 }
 
 async function createFloatingWindow(): Promise<void> {
-  // 预分配 GPU 资源,防止在创建悬浮窗时卡死
+  // 预分配 GPU 资源，防止在创建悬浮窗时卡死
   await preallocateGpuResources()
 
   const floatingWindowState = windowStateKeeper({

@@ -61,9 +61,28 @@ export const mihomoCloseConnection = async (id: string): Promise<void> => {
   return await instance.delete(`/connections/${encodeURIComponent(id)}`)
 }
 
-export const mihomoCloseAllConnections = async (): Promise<void> => {
+export const mihomoGetConnections = async (): Promise<IMihomoConnectionsInfo> => {
   const instance = await getAxios()
-  return await instance.delete('/connections')
+  return await instance.get('/connections')
+}
+
+export const mihomoCloseAllConnections = async (name?: string): Promise<void> => {
+  const instance = await getAxios()
+  if (name) {
+    const connectionsInfo = await mihomoGetConnections()
+    const targetConnections =
+      connectionsInfo?.connections?.filter((conn) => conn.chains && conn.chains.includes(name)) ||
+      []
+    for (const conn of targetConnections) {
+      try {
+        await mihomoCloseConnection(conn.id)
+      } catch (error) {
+        // ignore
+      }
+    }
+  } else {
+    return await instance.delete('/connections')
+  }
 }
 
 export const mihomoRules = async (): Promise<IMihomoRulesInfo> => {

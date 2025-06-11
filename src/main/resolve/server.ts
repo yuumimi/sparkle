@@ -201,7 +201,7 @@ export async function downloadSubStore(): Promise<void> {
     // 清理临时目录
     await rm(tempDir, { recursive: true })
   } catch (error) {
-    console.error('下载 Sub-Store 文件失败:', error)
+    console.error('下载 Sub-Store 文件失败：', error)
     throw error
   }
 }

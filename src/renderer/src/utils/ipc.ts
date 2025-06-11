@@ -21,8 +21,10 @@ export async function mihomoCloseConnection(id: string): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoCloseConnection', id))
 }
 
-export async function mihomoCloseAllConnections(): Promise<void> {
-  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('mihomoCloseAllConnections'))
+export async function mihomoCloseAllConnections(name?: string): Promise<void> {
+  return ipcErrorWrapper(
+    await window.electron.ipcRenderer.invoke('mihomoCloseAllConnections', name)
+  )
 }
 
 export async function mihomoRules(): Promise<IMihomoRulesInfo> {

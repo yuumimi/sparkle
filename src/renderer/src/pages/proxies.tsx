@@ -73,7 +73,7 @@ const Proxies: React.FC = () => {
   const onChangeProxy = async (group: string, proxy: string): Promise<void> => {
     await mihomoChangeProxy(group, proxy)
     if (autoCloseConnection) {
-      await mihomoCloseAllConnections()
+      await mihomoCloseAllConnections(group)
     }
     mutate()
   }
