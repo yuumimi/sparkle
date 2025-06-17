@@ -1,8 +1,10 @@
 name: Review Issues
 
 on:
-  issues:
-    types: [opened]
+  # issues:
+  #   types: [opened]
+  workflow_dispatch:
+  # disable issue event
 
 jobs:
   review:
