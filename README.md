@@ -253,3 +253,13 @@ pnpm install
 - 所有命令都使用 pnpm 执行
 - 修改类型定义后需要重启 TypeScript 服务
 - 预加载脚本修改后需要重启应用
+
+## Star History
+
+<a href="https://www.star-history.com/#xishang0128/sparkle&Date">
+ <picture>
+   <source media="(prefers-color-scheme: dark)" srcset="https://api.star-history.com/svg?repos=xishang0128/sparkle&type=Date&theme=dark" />
+   <source media="(prefers-color-scheme: light)" srcset="https://api.star-history.com/svg?repos=xishang0128/sparkle&type=Date" />
+   <img alt="Star History Chart" src="https://api.star-history.com/svg?repos=xishang0128/sparkle&type=Date" />
+ </picture>
+</a>
