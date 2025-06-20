@@ -262,7 +262,7 @@ export async function createWindow(): Promise<void> {
   const { useWindowFrame = false } = await getAppConfig()
   const mainWindowState = windowStateKeeper({
     defaultWidth: 800,
-    defaultHeight: 600,
+    defaultHeight: 700,
     file: 'window-state.json'
   })
   // https://github.com/electron/electron/issues/16521#issuecomment-582955104
