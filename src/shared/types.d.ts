@@ -284,7 +284,6 @@ interface IAppConfig {
   disableEmbedCA: boolean
   disableSystemCA: boolean
   disableNftables: boolean
-  skipSafePathCheck: boolean
   safePaths: string[]
   proxyDisplayMode: 'simple' | 'full'
   proxyDisplayOrder: 'default' | 'delay' | 'name'

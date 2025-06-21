@@ -40,7 +40,6 @@ export const defaultConfig: IAppConfig = {
   disableEmbedCA: false,
   disableSystemCA: false,
   disableNftables: false,
-  skipSafePathCheck: false,
   safePaths: [],
   disableGPU: process.platform === 'win32' && parseInt(os.release().split('.')[2], 10) <= 20000
 }
