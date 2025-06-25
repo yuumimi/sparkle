@@ -183,14 +183,15 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
                 providerNames.size > 0 && matchedProviders.size === providerNames.size
 
               if ((providerNames.size === 0 && isDefaultProvider) || isAllProvidersMatched) {
+                const delay = providerNames.size === 0 ? 100 : 500
                 initialized = true
                 Promise.all([
-                  new Promise((r) => setTimeout(r, 500)).then(() => {
+                  new Promise((r) => setTimeout(r, delay)).then(() => {
                     mainWindow?.webContents.send('groupsUpdated')
                     mainWindow?.webContents.send('rulesUpdated')
                   }),
                   uploadRuntimeConfig(),
-                  new Promise((r) => setTimeout(r, 500)).then(() =>
+                  new Promise((r) => setTimeout(r, delay)).then(() =>
                     patchMihomoConfig({ 'log-level': logLevel })
                   )
                 ]).then(() => resolve())

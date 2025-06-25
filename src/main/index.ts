@@ -150,7 +150,7 @@ function showQuitConfirmDialog(): Promise<boolean> {
       return
     }
 
-    const timeout = showWindow()
+    const delay = showWindow()
     setTimeout(() => {
       mainWindow?.webContents.send('show-quit-confirm')
       const handleQuitConfirm = (_event: Electron.IpcMainEvent, confirmed: boolean): void => {
@@ -158,7 +158,7 @@ function showQuitConfirmDialog(): Promise<boolean> {
         resolve(confirmed)
       }
       ipcMain.once('quit-confirm-result', handleQuitConfirm)
-    }, timeout)
+    }, delay)
   })
 }
 
@@ -323,7 +323,7 @@ async function showProfileInstallConfirm(url: string, name?: string | null): Pro
   }
 
   return new Promise((resolve) => {
-    const timeout = showWindow()
+    const delay = showWindow()
     setTimeout(() => {
       mainWindow?.webContents.send('show-profile-install-confirm', {
         url,
@@ -334,7 +334,7 @@ async function showProfileInstallConfirm(url: string, name?: string | null): Pro
         resolve(confirmed)
       }
       ipcMain.once('profile-install-confirm-result', handleConfirm)
-    }, timeout)
+    }, delay)
   })
 }
 
@@ -362,7 +362,7 @@ function showOverrideInstallConfirm(url: string, name?: string | null): Promise<
       finalName = pathName ? decodeURIComponent(pathName) : undefined
     }
 
-    const timeout = showWindow()
+    const delay = showWindow()
     setTimeout(() => {
       mainWindow?.webContents.send('show-override-install-confirm', {
         url,
@@ -373,7 +373,7 @@ function showOverrideInstallConfirm(url: string, name?: string | null): Promise<
         resolve(confirmed)
       }
       ipcMain.once('override-install-confirm-result', handleConfirm)
-    }, timeout)
+    }, delay)
   })
 }
 
