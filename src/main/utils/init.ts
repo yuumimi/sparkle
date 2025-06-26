@@ -252,7 +252,7 @@ export async function init(): Promise<void> {
   await cleanup()
   await startSubStoreFrontendServer()
   await startSubStoreBackendServer()
-  const { sysProxy, onlyActiveDevice = false, networkDetection = true } = await getAppConfig()
+  const { sysProxy, onlyActiveDevice = false, networkDetection = false } = await getAppConfig()
   if (networkDetection) {
     await startNetworkDetection()
   }
