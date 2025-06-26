@@ -232,9 +232,9 @@ const Proxies: React.FC = () => {
           className={`w-full pt-2 ${index === groupCounts.length - 1 && !isOpen[index] ? 'pb-2' : ''} px-2`}
         >
           <Card isPressable fullWidth onPress={() => toggleOpen(index)}>
-            <CardBody className="w-full">
-              <div className="flex justify-between">
-                <div className="flex text-ellipsis overflow-hidden whitespace-nowrap">
+            <CardBody className="w-full h-14">
+              <div className="flex justify-between h-full">
+                <div className="flex text-ellipsis overflow-hidden whitespace-nowrap h-full">
                   {groups[index].icon ? (
                     <Avatar
                       className="bg-transparent mr-2"
@@ -247,24 +247,18 @@ const Proxies: React.FC = () => {
                       }
                     />
                   ) : null}
-                  <div className="text-ellipsis overflow-hidden whitespace-nowrap">
+                  <div
+                    className={`flex flex-col h-full ${proxyDisplayMode === 'full' ? '' : 'justify-center'}`}
+                  >
                     <div
-                      title={groups[index].name}
-                      className="inline flag-emoji h-[32px] text-md leading-[32px]"
+                      className={`text-ellipsis overflow-hidden whitespace-nowrap leading-tight ${proxyDisplayMode === 'full' ? 'text-md flex-[5] flex items-center' : 'text-lg'}`}
                     >
-                      {groups[index].name}
+                      <span className="flag-emoji inline-block">{groups[index].name}</span>
                     </div>
                     {proxyDisplayMode === 'full' && (
-                      <div
-                        title={groups[index].type}
-                        className="inline ml-2 text-sm text-foreground-500"
-                      >
-                        {groups[index].type}
-                      </div>
-                    )}
-                    {proxyDisplayMode === 'full' && (
-                      <div className="inline flag-emoji ml-2 text-sm text-foreground-500">
-                        {groups[index].now}
+                      <div className="text-ellipsis overflow-hidden whitespace-nowrap text-xs text-foreground-500 leading-tight flex-[3] flex items-center">
+                        <span>{groups[index].type}</span>
+                        <span className="flag-emoji ml-1 inline-block">{groups[index].now}</span>
                       </div>
                     )}
                   </div>

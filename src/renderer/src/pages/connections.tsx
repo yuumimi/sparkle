@@ -15,10 +15,13 @@ import { getIconDataURL } from '@renderer/utils/ipc'
 import { HiSortAscending, HiSortDescending } from 'react-icons/hi'
 import { cropAndPadTransparent } from '@renderer/utils/image'
 import { platform } from '@renderer/utils/init'
+import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
 
 let cachedConnections: IMihomoConnectionDetail[] = []
 
 const Connections: React.FC = () => {
+  const { controledMihomoConfig } = useControledMihomoConfig()
+  const { 'find-process-mode': findProcessMode = 'always' } = controledMihomoConfig || {}
   const [filter, setFilter] = useState('')
   const { appConfig, patchAppConfig } = useAppConfig()
   const {
@@ -217,7 +220,7 @@ const Connections: React.FC = () => {
   }, [filteredConnections])
 
   useEffect(() => {
-    if (!displayIcon) return
+    if (!displayIcon || findProcessMode === 'off') return
 
     const visiblePaths = new Set<string>()
     const otherPaths = new Set<string>()
@@ -306,7 +309,8 @@ const Connections: React.FC = () => {
   const renderConnectionItem = useCallback(
     (i: number, connection: IMihomoConnectionDetail) => {
       const pathKey = connection.metadata.processPath || ''
-      const iconUrl = displayIcon && pathKey ? iconMap[pathKey] || '' : ''
+      const iconUrl =
+        displayIcon && findProcessMode !== 'off' && pathKey ? iconMap[pathKey] || '' : ''
       const itemKey = i === 0 ? `${connection.id}-${firstItemRefreshTrigger}` : connection.id
 
       return (
@@ -315,7 +319,7 @@ const Connections: React.FC = () => {
           setIsDetailModalOpen={setIsDetailModalOpen}
           selected={selected}
           iconUrl={iconUrl}
-          displayIcon={displayIcon}
+          displayIcon={displayIcon && findProcessMode !== 'off'}
           close={closeConnection}
           index={i}
           key={itemKey}
