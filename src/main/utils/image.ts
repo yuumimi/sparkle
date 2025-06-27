@@ -9,7 +9,7 @@ import os from 'os'
 import crypto from 'crypto'
 import { exec } from 'child_process'
 
-function isIOSApp(appPath: string): boolean {
+export function isIOSApp(appPath: string): boolean {
   const appDir = appPath.endsWith('.app')
     ? appPath
     : appPath.includes('.app')
@@ -46,7 +46,7 @@ function hasMacOSAppIcon(appPath: string): boolean {
   }
 }
 
-function findBestAppPath(appPath: string): string | null {
+export function findBestAppPath(appPath: string): string | null {
   if (!appPath.includes('.app') && !appPath.includes('.xpc')) {
     return null
   }

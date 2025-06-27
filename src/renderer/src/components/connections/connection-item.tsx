@@ -9,6 +9,7 @@ interface Props {
   info: IMihomoConnectionDetail
   displayIcon?: boolean
   iconUrl: string
+  displayName?: string
   selected: IMihomoConnectionDetail | undefined
   setSelected: React.Dispatch<React.SetStateAction<IMihomoConnectionDetail | undefined>>
   setIsDetailModalOpen: React.Dispatch<React.SetStateAction<boolean>>
@@ -20,14 +21,16 @@ const ConnectionItemComponent: React.FC<Props> = ({
   info,
   displayIcon,
   iconUrl,
+  displayName,
   close,
   setSelected,
   setIsDetailModalOpen
 }) => {
-  const processName = useMemo(
+  const fallbackProcessName = useMemo(
     () => info.metadata.process?.replace(/\.exe$/, '') || info.metadata.sourceIP,
     [info.metadata.process, info.metadata.sourceIP]
   )
+  const processName = displayName || fallbackProcessName
 
   const destination = useMemo(
     () =>
@@ -148,6 +151,7 @@ const ConnectionItem = memo(ConnectionItemComponent, (prevProps, nextProps) => {
     prevProps.info.isActive === nextProps.info.isActive &&
     prevProps.iconUrl === nextProps.iconUrl &&
     prevProps.displayIcon === nextProps.displayIcon &&
+    prevProps.displayName === nextProps.displayName &&
     prevProps.selected?.id === nextProps.selected?.id
   )
 })
