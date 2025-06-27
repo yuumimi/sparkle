@@ -27,7 +27,8 @@ const Connections: React.FC = () => {
   const {
     connectionDirection = 'asc',
     connectionOrderBy = 'time',
-    displayIcon = true
+    displayIcon = true,
+    displayAppName = true
   } = appConfig || {}
   const [connectionsInfo, setConnectionsInfo] = useState<IMihomoConnectionsInfo>()
   const [allConnections, setAllConnections] = useState<IMihomoConnectionDetail[]>(cachedConnections)
@@ -300,11 +301,15 @@ const Connections: React.FC = () => {
 
     visiblePaths.forEach((path) => {
       loadIcon(path, true)
-      loadAppName(path)
+      if (displayAppName) {
+        loadAppName(path)
+      }
     })
     otherPaths.forEach((path) => {
       loadIcon(path, false)
-      loadAppName(path)
+      if (displayAppName) {
+        loadAppName(path)
+      }
     })
 
     if (processIconTimer.current) {
@@ -312,10 +317,12 @@ const Connections: React.FC = () => {
     }
     processIconTimer.current = setTimeout(processIconQueue, 10)
 
-    if (processAppNameTimer.current) {
-      clearTimeout(processAppNameTimer.current)
+    if (displayAppName) {
+      if (processAppNameTimer.current) {
+        clearTimeout(processAppNameTimer.current)
+      }
+      processAppNameTimer.current = setTimeout(processAppNameQueue, 10)
     }
-    processAppNameTimer.current = setTimeout(processAppNameQueue, 10)
 
     return (): void => {
       if (processIconTimer.current) {
@@ -367,7 +374,7 @@ const Connections: React.FC = () => {
       const iconUrl =
         displayIcon && findProcessMode !== 'off' && pathKey ? iconMap[pathKey] || '' : ''
       const itemKey = i === 0 ? `${connection.id}-${firstItemRefreshTrigger}` : connection.id
-      const displayName = pathKey ? appNameCache[pathKey] : undefined
+      const displayName = displayAppName && pathKey ? appNameCache[pathKey] : undefined
 
       return (
         <ConnectionItem

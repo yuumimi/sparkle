@@ -40,7 +40,8 @@ const AppearanceConfig: React.FC = () => {
     useWindowFrame = false,
     customTheme = 'default.css',
     appTheme = 'system',
-    displayIcon = true
+    displayIcon = true,
+    displayAppName = true
   } = appConfig || {}
 
   useEffect(() => {
@@ -69,9 +70,23 @@ const AppearanceConfig: React.FC = () => {
             isSelected={displayIcon}
             onValueChange={(v) => {
               patchAppConfig({ displayIcon: v })
+              if (!v) {
+                patchAppConfig({ displayAppName: false })
+              }
             }}
           />
         </SettingItem>
+        {displayIcon && (
+          <SettingItem title="连接显示应用名称" divider>
+            <Switch
+              size="sm"
+              isSelected={displayAppName}
+              onValueChange={(v) => {
+                patchAppConfig({ displayAppName: v })
+              }}
+            />
+          </SettingItem>
+        )}
         <SettingItem title="显示悬浮窗" divider>
           <Switch
             size="sm"
