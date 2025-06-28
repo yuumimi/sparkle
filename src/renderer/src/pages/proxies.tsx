@@ -256,7 +256,7 @@ const Proxies: React.FC = () => {
                       <span className="flag-emoji inline-block">{groups[index].name}</span>
                     </div>
                     {proxyDisplayMode === 'full' && (
-                      <div className="text-ellipsis whitespace-nowrap text-[11px] text-foreground-500 leading-tight flex-[3] flex items-center">
+                      <div className="text-ellipsis whitespace-nowrap text-[10px] text-foreground-500 leading-tight flex-[3] flex items-center">
                         <span>{groups[index].type}</span>
                         <span className="flag-emoji ml-1 inline-block">{groups[index].now}</span>
                       </div>
