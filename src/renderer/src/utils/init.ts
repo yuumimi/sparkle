@@ -1,4 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
+ 
 
 import { getPlatform, getVersion } from './ipc'
 // const originError = console.error
