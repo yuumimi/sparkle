@@ -40,7 +40,13 @@ const Override: React.FC = () => {
   const [importing, setImporting] = useState(false)
   const [fileOver, setFileOver] = useState(false)
   const [url, setUrl] = useState('')
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 2
+      }
+    })
+  )
   const isProcessingDrop = useRef(false)
   const handleImport = async (): Promise<void> => {
     setImporting(true)
