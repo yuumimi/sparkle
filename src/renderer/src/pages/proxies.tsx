@@ -266,38 +266,40 @@ const Proxies: React.FC = () => {
                     )}
                   </div>
                 </div>
-                <div className="flex" onClick={(e) => e.stopPropagation()}>
-                  {proxyDisplayMode === 'full' && (
-                    <Chip size="sm" className="my-1 mr-2">
-                      {groups[index].all.length}
-                    </Chip>
-                  )}
-                  <CollapseInput
-                    title="搜索节点"
-                    value={searchValue[index]}
-                    onValueChange={(v) => updateSearchValue(index, v)}
-                  />
-                  <Button
-                    title="定位到当前节点"
-                    variant="light"
-                    size="sm"
-                    isIconOnly
-                    onPress={() => scrollToCurrentProxy(index)}
-                  >
-                    <FaLocationCrosshairs className="text-lg text-foreground-500" />
-                  </Button>
-                  <Button
-                    title="延迟测试"
-                    variant="light"
-                    isLoading={delaying[index]}
-                    size="sm"
-                    isIconOnly
-                    onPress={() => onGroupDelay(index)}
-                  >
-                    <MdOutlineSpeed className="text-lg text-foreground-500" />
-                  </Button>
+                <div className="flex items-center">
+                  <div className="flex items-center" onClick={(e) => e.stopPropagation()}>
+                    {proxyDisplayMode === 'full' && (
+                      <Chip size="sm" className="my-1 mr-2">
+                        {groups[index].all.length}
+                      </Chip>
+                    )}
+                    <CollapseInput
+                      title="搜索节点"
+                      value={searchValue[index]}
+                      onValueChange={(v) => updateSearchValue(index, v)}
+                    />
+                    <Button
+                      title="定位到当前节点"
+                      variant="light"
+                      size="sm"
+                      isIconOnly
+                      onPress={() => scrollToCurrentProxy(index)}
+                    >
+                      <FaLocationCrosshairs className="text-lg text-foreground-500" />
+                    </Button>
+                    <Button
+                      title="延迟测试"
+                      variant="light"
+                      isLoading={delaying[index]}
+                      size="sm"
+                      isIconOnly
+                      onPress={() => onGroupDelay(index)}
+                    >
+                      <MdOutlineSpeed className="text-lg text-foreground-500" />
+                    </Button>
+                  </div>
                   <IoIosArrowBack
-                    className={`transition duration-200 ml-2 h-[32px] text-lg text-foreground-500 ${isOpen[index] ? '-rotate-90' : ''}`}
+                    className={`transition duration-200 ml-2 h-[32px] text-lg text-foreground-500 flex items-center ${isOpen[index] ? '-rotate-90' : ''}`}
                   />
                 </div>
               </div>
