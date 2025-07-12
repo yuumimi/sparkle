@@ -9,6 +9,7 @@ interface CollapseInputProps extends InputProps {
 const CollapseInput: React.FC<CollapseInputProps> = (props) => {
   const { title, ...inputProps } = props
   const inputRef = useRef<HTMLInputElement>(null)
+
   return (
     <div className="flex">
       <Input
@@ -25,7 +26,11 @@ const CollapseInput: React.FC<CollapseInputProps> = (props) => {
             className="cursor-pointer p-2 text-lg text-foreground-500"
             onClick={(e) => {
               e.stopPropagation()
-              inputRef.current?.focus()
+              if (inputRef.current?.offsetWidth != 0) {
+                inputRef.current?.blur()
+              } else {
+                inputRef.current?.focus()
+              }
             }}
           >
             <FaSearch title={title} />
