@@ -63,10 +63,15 @@ export async function generateProfile(): Promise<void> {
     }
   }
   // macOS 只允许 utun 设备
-  if (process.platform === 'darwin' && controledMihomoConfig.tun) {
-    if (!controledMihomoConfig.tun.device?.startsWith('utun')) {
-      controledMihomoConfig.tun.device = undefined
+  if (process.platform === 'darwin' && profile.tun) {
+    if (!profile.tun.device?.startsWith('utun')) {
+      profile.tun.device = undefined
     }
+  }
+  // 禁用 dns.fallback 相关配置
+  if (profile.dns) {
+    profile.dns.fallback = undefined
+    profile.dns['fallback-filter'] = undefined
   }
 
   runtimeConfig = profile

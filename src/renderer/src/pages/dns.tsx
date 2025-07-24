@@ -98,9 +98,7 @@ const DNS: React.FC = () => {
                 nameserver: values.nameserver,
                 'proxy-server-nameserver': values.proxyServerNameserver,
                 'direct-nameserver': values.directNameserver,
-                'nameserver-policy': values.nameserverPolicy,
-                fallback: undefined,
-                'fallback-filter': undefined
+                'nameserver-policy': values.nameserverPolicy
               }
               onSave({
                 dns: dnsConfig,
