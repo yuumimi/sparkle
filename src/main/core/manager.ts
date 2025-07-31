@@ -56,6 +56,8 @@ const ctlParam = process.platform === 'win32' ? '-ext-ctl-pipe' : '-ext-ctl-unix
 let setPublicDNSTimer: NodeJS.Timeout | null = null
 let recoverDNSTimer: NodeJS.Timeout | null = null
 let networkDetectionTimer: NodeJS.Timeout | null = null
+let networkDownHandled = false
+
 let child: ChildProcess
 let retry = 10
 
@@ -398,13 +400,17 @@ export async function startNetworkDetection(): Promise<void> {
 
   networkDetectionTimer = setInterval(() => {
     if (isAnyNetworkInterfaceUp(extendedBypass) && net.isOnline()) {
-      if (child && child.killed) {
+      if (networkDownHandled && child && child.killed) {
         startCore()
         triggerSysProxy(true, onlyActiveDevice)
+        networkDownHandled = false
       }
     } else {
-      disableSysProxy(false)
-      stopCore()
+      if (!networkDownHandled) {
+        disableSysProxy(false)
+        stopCore()
+        networkDownHandled = true
+      }
     }
   }, networkDetectionInterval * 1000)
 }
