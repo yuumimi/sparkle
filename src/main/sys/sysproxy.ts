@@ -117,7 +117,7 @@ async function setSysProxy(onlyActiveDevice: boolean): Promise<void> {
             '--server',
             `${host || '127.0.0.1'}:${port}`,
             '--bypass',
-            bypass.join(';')
+            process.platform === 'win32' ? bypass.join(';') : bypass.join(',')
           ])
         }
       }
