@@ -180,16 +180,16 @@ pnpm build:mac pkg/dmg
 **指定架构和产物类型：**
 
 ```bash
-pnpm build:win --x64 7z
-pnpm build:mac --arm64 pkg
-pnpm build:linux --x64 deb
+pnpm build:win 7z --x64
+pnpm build:mac pkg --arm64
+pnpm build:linux deb --x64
 ```
 
 #### 构建产物
 
 - **Windows**: `.exe` 安装包和 `.7z` 便携版
 - **macOS**: `.pkg` 安装包
-- **Linux**: `.deb`、`.rpm`、`.pacman` 等格式
+- **Linux**: `.deb`、`.rpm`、`.pkg.tar.xz(pacman)` 等格式
 
 ### 常见问题
 

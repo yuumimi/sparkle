@@ -72,7 +72,14 @@ const App: React.FC = () => {
   const siderWidthValueRef = useRef(siderWidthValue)
   const [resizing, setResizing] = useState(false)
   const resizingRef = useRef(resizing)
-  const sensors = useSensors(useSensor(PointerSensor))
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+        delay: 10
+      }
+    })
+  )
   const { setTheme, systemTheme } = useTheme()
   navigate = useNavigate()
   const location = useLocation()
