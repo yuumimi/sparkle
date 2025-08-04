@@ -82,7 +82,12 @@ const ConnectionItemComponent: React.FC<Props> = ({
         <div className="w-full flex justify-between items-center">
           {displayIcon && (
             <div>
-              <Avatar size="lg" radius="sm" src={iconUrl} className="bg-transparent ml-2" />
+              <Avatar
+                size="lg"
+                radius="sm"
+                src={iconUrl}
+                className="bg-transparent ml-2 w-14 h-14"
+              />
             </div>
           )}
           <div

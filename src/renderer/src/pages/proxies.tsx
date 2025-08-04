@@ -240,7 +240,7 @@ const Proxies: React.FC = () => {
                 <div className="flex text-ellipsis overflow-hidden whitespace-nowrap h-full">
                   {groups[index].icon ? (
                     <Avatar
-                      className="bg-transparent mr-2"
+                      className="bg-transparent mr-2 w-8 h-8"
                       size="sm"
                       radius="sm"
                       src={
