@@ -73,6 +73,154 @@ export async function generateProfile(): Promise<void> {
     profile.dns.fallback = undefined
     profile.dns['fallback-filter'] = undefined
   }
+  // 清理值为默认的配置项，使显示更简洁
+  // bool 类型的配置项
+  if (!profile.ipv6) {
+    profile.ipv6 = undefined
+  }
+  if (!profile['allow-lan']) {
+    profile['allow-lan'] = undefined
+    profile['lan-allowed-ips'] = undefined
+    profile['lan-disallowed-ips'] = undefined
+  }
+  if (!profile['unified-delay']) {
+    profile['unified-delay'] = undefined
+  }
+  if (!profile['tcp-concurrent']) {
+    profile['tcp-concurrent'] = undefined
+  }
+  if (!profile['geodata-mode']) {
+    profile['geodata-mode'] = undefined
+  }
+  if (!profile['geo-auto-update']) {
+    profile['geo-auto-update'] = undefined
+  }
+  if (profile.profile && !profile.profile['store-selected']) {
+    if (!profile.profile['store-selected'] && !profile.profile['store-fake-ip']) {
+      profile.profile = undefined
+    } else {
+      if (!profile.profile['store-selected']) {
+        profile.profile['store-selected'] = undefined
+      }
+      if (!profile.profile['store-fake-ip']) {
+        profile.profile['store-fake-ip'] = undefined
+      }
+    }
+  }
+
+  // int 类型的配置项
+  if (profile.port == 0) {
+    profile.port = undefined
+  }
+  if (profile['socks-port'] == 0) {
+    profile['socks-port'] = undefined
+  }
+  if (profile['redir-port'] == 0) {
+    profile['redir-port'] = undefined
+  }
+  if (profile['tproxy-port'] == 0) {
+    profile['tproxy-port'] = undefined
+  }
+  if (profile['mixed-port'] == 0) {
+    profile['mixed-port'] = undefined
+  }
+
+  // string 类型的配置项
+  if (profile.mode === 'rule') {
+    profile.mode = undefined
+  }
+  if (profile['interface-name'] === '') {
+    profile['interface-name'] = undefined
+  }
+  if (profile.secret === '') {
+    profile.secret = undefined
+  }
+  if (profile['global-client-fingerprint'] === '') {
+    profile['global-client-fingerprint'] = undefined
+  }
+  if (profile['external-controller'] === '') {
+    profile['external-controller'] = undefined
+    profile['external-ui'] = undefined
+    profile['external-ui-url'] = undefined
+    profile['external-controller-cors'] = undefined
+  } else if (profile['external-ui'] === '') {
+    profile['external-ui'] = undefined
+    profile['external-ui-url'] = undefined
+  }
+
+  // 复杂类型的配置项
+  if (profile.authentication.length === 0) {
+    profile.authentication = undefined
+    profile['skip-auth-prefixes'] = undefined
+  }
+  if (profile.tun && !profile.tun.enable) {
+    profile.tun = undefined
+  } else {
+    if (!profile.tun['auto-route']) {
+      profile.tun['auto-route'] = undefined
+    }
+    if (!profile.tun['auto-redirect']) {
+      profile.tun['auto-redirect'] = undefined
+    }
+    if (!profile.tun['strict-route']) {
+      profile.tun['strict-route'] = undefined
+    }
+    if (!profile.tun['auto-detect-interface']) {
+      profile.tun['auto-detect-interface'] = undefined
+    }
+    if (profile.tun.device === '') {
+      profile.tun.device = undefined
+    }
+    if (profile.tun['dns-hijack']?.length === 0) {
+      profile.tun['dns-hijack'] = undefined
+    }
+    if (profile.tun['route-exclude-address'].length === 0) {
+      profile.tun['route-exclude-address'] = undefined
+    }
+  }
+  if (profile.dns && !profile.dns.enable) {
+    profile.dns = undefined
+  } else {
+    if (profile.dns['fake-ip-range']?.length === 0) {
+      profile.dns['fake-ip-range'] = undefined
+    }
+    if (profile.dns['fake-ip-filter']?.length === 0) {
+      profile.dns['fake-ip-filter'] = undefined
+    }
+    if (profile.dns['proxy-server-nameserver']?.length === 0) {
+      profile.dns['proxy-server-nameserver'] = undefined
+    }
+    if (profile.dns['direct-nameserver']?.length === 0) {
+      profile.dns['direct-nameserver'] = undefined
+    }
+    if (profile.dns.nameserver?.length === 0) {
+      profile.dns.nameserver = undefined
+    }
+    if (
+      profile.dns['nameserver-policy'] &&
+      Object.keys(profile.dns['nameserver-policy']).length === 0
+    ) {
+      profile.dns['nameserver-policy'] = undefined
+    }
+  }
+  if (profile.sniffer && !profile.sniffer.enable) {
+    profile.sniffer = undefined
+  }
+  if (profile.proxies && profile.proxies.length === 0) {
+    profile.proxies = undefined
+  }
+  if (profile['proxy-groups'] && profile['proxy-groups'].length === 0) {
+    profile['proxy-groups'] = undefined
+  }
+  if (profile.rules && profile.rules.length === 0) {
+    profile.rules = undefined
+  }
+  if (profile['proxy-providers'] && Object.keys(profile['proxy-providers']).length === 0) {
+    profile['proxy-providers'] = undefined
+  }
+  if (profile['rule-providers'] && Object.keys(profile['rule-providers']).length === 0) {
+    profile['rule-providers'] = undefined
+  }
 
   runtimeConfig = profile
   runtimeConfigStr = yaml.stringify(profile)
