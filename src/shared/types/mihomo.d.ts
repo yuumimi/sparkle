@@ -44,15 +44,15 @@ interface MihomoConfig {
     mmdb?: string
     asn?: string
   }
-  tun: IMihomoTunConfig
-  dns: IMihomoDNSConfig
-  sniffer: IMihomoSnifferConfig
-  profile: IMihomoProfileConfig
+  tun: MihomoTunConfig
+  dns: MihomoDNSConfig
+  sniffer: MihomoSnifferConfig
+  profile: MihomoProfileConfig
   'rule-providers'?: Record<string, unknown>
   'proxy-providers'?: Record<string, unknown>
 }
 
-interface IMihomoTunConfig {
+interface MihomoTunConfig {
   enable?: boolean
   stack?: TunStack
   'auto-route'?: boolean
@@ -83,7 +83,7 @@ interface IMihomoTunConfig {
   'exclude-package'?: string[]
 }
 
-interface IMihomoDNSConfig {
+interface MihomoDNSConfig {
   enable?: boolean
   listen?: string
   ipv6?: boolean
@@ -107,7 +107,7 @@ interface IMihomoDNSConfig {
   'cache-algorithm'?: string
 }
 
-interface IMihomoSnifferConfig {
+interface MihomoSnifferConfig {
   enable?: boolean
   'parse-pure-ip'?: boolean
   'override-destination'?: boolean
@@ -130,7 +130,7 @@ interface IMihomoSnifferConfig {
   }
 }
 
-interface IMihomoProfileConfig {
+interface MihomoProfileConfig {
   'store-selected'?: boolean
   'store-fake-ip'?: boolean
 }

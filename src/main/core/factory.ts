@@ -41,186 +41,8 @@ export async function generateProfile(): Promise<void> {
     JSON.parse(JSON.stringify(currentProfile)),
     JSON.parse(JSON.stringify(controledMihomoConfig))
   )
-  // 确保可以拿到基础日志信息
-  // 使用 debug 可以调试内核相关问题 `debug/pprof`
-  if (['info', 'debug'].includes(profile['log-level']) === false) {
-    profile['log-level'] = 'info'
-  }
-  // 处理端口局域连接网相关配置项
-  if (profile['allow-lan'] === false) {
-    profile['lan-allowed-ips'] = undefined
-    profile['lan-disallowed-ips'] = undefined
-  } else {
-    if (profile['lan-allowed-ips']?.length === 0) {
-      profile['lan-allowed-ips'] = undefined
-    } else if (profile['lan-allowed-ips']) {
-      if (!profile['lan-allowed-ips'].some((ip: string) => ip.startsWith('127.0.0.1/'))) {
-        profile['lan-allowed-ips']?.push('127.0.0.1/8')
-      }
-    }
-    if (profile['lan-disallowed-ips']?.length === 0) {
-      profile['lan-disallowed-ips'] = undefined
-    }
-  }
-  // macOS 只允许 utun 设备
-  if (process.platform === 'darwin' && profile.tun) {
-    if (!profile.tun.device?.startsWith('utun')) {
-      profile.tun.device = undefined
-    }
-  }
-  // 禁用 dns.fallback 相关配置
-  if (profile.dns) {
-    profile.dns.fallback = undefined
-    profile.dns['fallback-filter'] = undefined
-  }
-  // 清理值为默认的配置项，使显示更简洁
-  // bool 类型的配置项
-  if (!profile.ipv6) {
-    profile.ipv6 = undefined
-  }
-  if (!profile['allow-lan']) {
-    profile['allow-lan'] = undefined
-    profile['lan-allowed-ips'] = undefined
-    profile['lan-disallowed-ips'] = undefined
-  }
-  if (!profile['unified-delay']) {
-    profile['unified-delay'] = undefined
-  }
-  if (!profile['tcp-concurrent']) {
-    profile['tcp-concurrent'] = undefined
-  }
-  if (!profile['geodata-mode']) {
-    profile['geodata-mode'] = undefined
-  }
-  if (!profile['geo-auto-update']) {
-    profile['geo-auto-update'] = undefined
-  }
-  if (profile.profile && !profile.profile['store-selected']) {
-    if (!profile.profile['store-selected'] && !profile.profile['store-fake-ip']) {
-      profile.profile = undefined
-    } else {
-      if (!profile.profile['store-selected']) {
-        profile.profile['store-selected'] = undefined
-      }
-      if (!profile.profile['store-fake-ip']) {
-        profile.profile['store-fake-ip'] = undefined
-      }
-    }
-  }
 
-  // int 类型的配置项
-  if (profile.port == 0) {
-    profile.port = undefined
-  }
-  if (profile['socks-port'] == 0) {
-    profile['socks-port'] = undefined
-  }
-  if (profile['redir-port'] == 0) {
-    profile['redir-port'] = undefined
-  }
-  if (profile['tproxy-port'] == 0) {
-    profile['tproxy-port'] = undefined
-  }
-  if (profile['mixed-port'] == 0) {
-    profile['mixed-port'] = undefined
-  }
-
-  // string 类型的配置项
-  if (profile.mode === 'rule') {
-    profile.mode = undefined
-  }
-  if (profile['interface-name'] === '') {
-    profile['interface-name'] = undefined
-  }
-  if (profile.secret === '') {
-    profile.secret = undefined
-  }
-  if (profile['global-client-fingerprint'] === '') {
-    profile['global-client-fingerprint'] = undefined
-  }
-  if (profile['external-controller'] === '') {
-    profile['external-controller'] = undefined
-    profile['external-ui'] = undefined
-    profile['external-ui-url'] = undefined
-    profile['external-controller-cors'] = undefined
-  } else if (profile['external-ui'] === '') {
-    profile['external-ui'] = undefined
-    profile['external-ui-url'] = undefined
-  }
-
-  // 复杂类型的配置项
-  if (profile.authentication.length === 0) {
-    profile.authentication = undefined
-    profile['skip-auth-prefixes'] = undefined
-  }
-  if (profile.tun && !profile.tun.enable) {
-    profile.tun = undefined
-  } else {
-    if (!profile.tun['auto-route']) {
-      profile.tun['auto-route'] = undefined
-    }
-    if (!profile.tun['auto-redirect']) {
-      profile.tun['auto-redirect'] = undefined
-    }
-    if (!profile.tun['strict-route']) {
-      profile.tun['strict-route'] = undefined
-    }
-    if (!profile.tun['auto-detect-interface']) {
-      profile.tun['auto-detect-interface'] = undefined
-    }
-    if (profile.tun.device === '') {
-      profile.tun.device = undefined
-    }
-    if (profile.tun['dns-hijack']?.length === 0) {
-      profile.tun['dns-hijack'] = undefined
-    }
-    if (profile.tun['route-exclude-address'].length === 0) {
-      profile.tun['route-exclude-address'] = undefined
-    }
-  }
-  if (profile.dns && !profile.dns.enable) {
-    profile.dns = undefined
-  } else {
-    if (profile.dns['fake-ip-range']?.length === 0) {
-      profile.dns['fake-ip-range'] = undefined
-    }
-    if (profile.dns['fake-ip-filter']?.length === 0) {
-      profile.dns['fake-ip-filter'] = undefined
-    }
-    if (profile.dns['proxy-server-nameserver']?.length === 0) {
-      profile.dns['proxy-server-nameserver'] = undefined
-    }
-    if (profile.dns['direct-nameserver']?.length === 0) {
-      profile.dns['direct-nameserver'] = undefined
-    }
-    if (profile.dns.nameserver?.length === 0) {
-      profile.dns.nameserver = undefined
-    }
-    if (
-      profile.dns['nameserver-policy'] &&
-      Object.keys(profile.dns['nameserver-policy']).length === 0
-    ) {
-      profile.dns['nameserver-policy'] = undefined
-    }
-  }
-  if (profile.sniffer && !profile.sniffer.enable) {
-    profile.sniffer = undefined
-  }
-  if (profile.proxies && profile.proxies.length === 0) {
-    profile.proxies = undefined
-  }
-  if (profile['proxy-groups'] && profile['proxy-groups'].length === 0) {
-    profile['proxy-groups'] = undefined
-  }
-  if (profile.rules && profile.rules.length === 0) {
-    profile.rules = undefined
-  }
-  if (profile['proxy-providers'] && Object.keys(profile['proxy-providers']).length === 0) {
-    profile['proxy-providers'] = undefined
-  }
-  if (profile['rule-providers'] && Object.keys(profile['rule-providers']).length === 0) {
-    profile['rule-providers'] = undefined
-  }
+  await cleanProfile(profile)
 
   runtimeConfig = profile
   runtimeConfigStr = stringifyYaml(profile)
@@ -231,6 +53,197 @@ export async function generateProfile(): Promise<void> {
     diffWorkDir ? mihomoWorkConfigPath(current) : mihomoWorkConfigPath('work'),
     runtimeConfigStr
   )
+}
+
+async function cleanProfile(profile: MihomoConfig): Promise<void> {
+  const { controlDns = true } = await getAppConfig()
+
+  if (!['info', 'debug'].includes(profile['log-level'])) {
+    profile['log-level'] = 'info'
+  }
+
+  configureLanSettings(profile)
+  cleanBooleanConfigs(profile)
+  cleanPortConfigs(profile)
+  cleanStringConfigs(profile)
+  cleanAuthenticationConfig(profile)
+  cleanTunConfig(profile)
+  cleanDnsConfig(profile, controlDns)
+  cleanSnifferConfig(profile)
+  cleanProxyConfigs(profile)
+}
+
+function cleanBooleanConfigs(profile: MihomoConfig): void {
+  const booleanConfigs = [
+    'ipv6',
+    'unified-delay',
+    'tcp-concurrent',
+    'geodata-mode',
+    'geo-auto-update'
+  ]
+
+  booleanConfigs.forEach((key) => {
+    if (!profile[key]) delete (profile as Partial<MihomoConfig>)[key]
+  })
+
+  if (!profile.profile) return
+
+  const { 'store-selected': hasStoreSelected, 'store-fake-ip': hasStoreFakeIp } = profile.profile
+
+  if (!hasStoreSelected && !hasStoreFakeIp) {
+    delete (profile as Partial<MihomoConfig>).profile
+  } else {
+    const profileConfig = profile.profile as MihomoProfileConfig
+    if (!hasStoreSelected) delete profileConfig['store-selected']
+    if (!hasStoreFakeIp) delete profileConfig['store-fake-ip']
+  }
+}
+
+function cleanPortConfigs(profile: MihomoConfig): void {
+  ;['port', 'socks-port', 'redir-port', 'tproxy-port', 'mixed-port'].forEach((key) => {
+    if (profile[key] === 0) delete (profile as Partial<MihomoConfig>)[key]
+  })
+}
+
+function cleanStringConfigs(profile: MihomoConfig): void {
+  const partialProfile = profile as Partial<MihomoConfig>
+
+  if (profile.mode === 'rule') delete partialProfile.mode
+
+  const emptyStringConfigs = ['interface-name', 'secret', 'global-client-fingerprint']
+  emptyStringConfigs.forEach((key) => {
+    if (profile[key] === '') delete partialProfile[key]
+  })
+
+  if (profile['external-controller'] === '') {
+    delete partialProfile['external-controller']
+    delete partialProfile['external-ui']
+    delete partialProfile['external-ui-url']
+    delete partialProfile['external-controller-cors']
+  } else if (profile['external-ui'] === '') {
+    delete partialProfile['external-ui']
+    delete partialProfile['external-ui-url']
+  }
+}
+
+function configureLanSettings(profile: MihomoConfig): void {
+  const partialProfile = profile as Partial<MihomoConfig>
+
+  if (profile['allow-lan'] === false) {
+    delete partialProfile['lan-allowed-ips']
+    delete partialProfile['lan-disallowed-ips']
+    return
+  }
+
+  if (!profile['allow-lan']) {
+    delete partialProfile['allow-lan']
+    delete partialProfile['lan-allowed-ips']
+    delete partialProfile['lan-disallowed-ips']
+    return
+  }
+
+  const allowedIps = profile['lan-allowed-ips']
+  if (allowedIps?.length === 0) {
+    delete partialProfile['lan-allowed-ips']
+  } else if (allowedIps && !allowedIps.some((ip: string) => ip.startsWith('127.0.0.1/'))) {
+    allowedIps.push('127.0.0.1/8')
+  }
+
+  if (profile['lan-disallowed-ips']?.length === 0) {
+    delete partialProfile['lan-disallowed-ips']
+  }
+}
+
+function cleanAuthenticationConfig(profile: MihomoConfig): void {
+  if (profile.authentication?.length === 0) {
+    const partialProfile = profile as Partial<MihomoConfig>
+    delete partialProfile.authentication
+    delete partialProfile['skip-auth-prefixes']
+  }
+}
+
+function cleanTunConfig(profile: MihomoConfig): void {
+  if (!profile.tun?.enable) {
+    delete (profile as Partial<MihomoConfig>).tun
+    return
+  }
+
+  const tunConfig = profile.tun as MihomoTunConfig
+  const tunBooleanConfigs = ['auto-route', 'auto-redirect', 'strict-route', 'auto-detect-interface']
+
+  tunBooleanConfigs.forEach((key) => {
+    if (!tunConfig[key]) delete tunConfig[key]
+  })
+
+  if (tunConfig.device === '') {
+    delete tunConfig.device
+  } else if (
+    process.platform === 'darwin' &&
+    tunConfig.device &&
+    !tunConfig.device.startsWith('utun')
+  ) {
+    delete tunConfig.device
+  }
+
+  if (tunConfig['dns-hijack']?.length === 0) delete tunConfig['dns-hijack']
+  if (tunConfig['route-exclude-address']?.length === 0) delete tunConfig['route-exclude-address']
+}
+
+function cleanDnsConfig(profile: MihomoConfig, controlDns: boolean): void {
+  if (!controlDns) return
+  if (!profile.dns?.enable) {
+    delete (profile as Partial<MihomoConfig>).dns
+    return
+  }
+
+  const dnsConfig = profile.dns as MihomoDNSConfig
+  const dnsArrayConfigs = [
+    'fake-ip-range',
+    'fake-ip-filter',
+    'proxy-server-nameserver',
+    'direct-nameserver',
+    'nameserver'
+  ]
+
+  dnsArrayConfigs.forEach((key) => {
+    if (dnsConfig[key]?.length === 0) delete dnsConfig[key]
+  })
+
+  if (dnsConfig['nameserver-policy'] && Object.keys(dnsConfig['nameserver-policy']).length === 0) {
+    delete dnsConfig['nameserver-policy']
+  }
+
+  delete dnsConfig.fallback
+  delete dnsConfig['fallback-filter']
+}
+
+function cleanSnifferConfig(profile: MihomoConfig): void {
+  if (!profile.sniffer?.enable) {
+    delete (profile as Partial<MihomoConfig>).sniffer
+  }
+}
+
+function cleanProxyConfigs(profile: MihomoConfig): void {
+  const partialProfile = profile as Partial<MihomoConfig>
+  const arrayConfigs = ['proxies', 'proxy-groups', 'rules']
+  const objectConfigs = ['proxy-providers', 'rule-providers']
+
+  arrayConfigs.forEach((key) => {
+    if (Array.isArray(profile[key]) && profile[key]?.length === 0) {
+      delete partialProfile[key]
+    }
+  })
+
+  objectConfigs.forEach((key) => {
+    const value = profile[key]
+    if (
+      value === null ||
+      value === undefined ||
+      (value && typeof value === 'object' && Object.keys(value).length === 0)
+    ) {
+      delete partialProfile[key]
+    }
+  })
 }
 
 async function prepareProfileWorkDir(current: string | undefined): Promise<void> {
