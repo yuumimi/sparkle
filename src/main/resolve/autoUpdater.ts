@@ -1,5 +1,5 @@
 import axios, { AxiosRequestConfig, CancelTokenSource } from 'axios'
-import yaml from 'yaml'
+import { parseYaml } from '../utils/yaml'
 import { app, shell } from 'electron'
 import { getAppConfig, getControledMihomoConfig } from '../config'
 import { dataDir, exeDir, exePath, isPortable, resourcesFilesDir } from '../utils/dirs'
@@ -32,7 +32,7 @@ export async function checkUpdate(): Promise<AppVersion | undefined> {
     }),
     responseType: 'text'
   })
-  const latest = yaml.parse(res.data, { merge: true }) as AppVersion
+  const latest = parseYaml<AppVersion>(res.data)
   const currentVersion = app.getVersion()
   if (latest.version !== currentVersion) {
     return latest

@@ -6,7 +6,7 @@ import { restartCore } from '../core/manager'
 import { getAppConfig } from './app'
 import { existsSync } from 'fs'
 import axios, { AxiosResponse } from 'axios'
-import yaml from 'yaml'
+import { parseYaml, stringifyYaml } from '../utils/yaml'
 import { defaultProfile } from '../utils/template'
 import { subStorePort } from '../resolve/server'
 import { dirname, join } from 'path'
@@ -17,7 +17,7 @@ let profileConfig: ProfileConfig // profile.yaml
 export async function getProfileConfig(force = false): Promise<ProfileConfig> {
   if (force || !profileConfig) {
     const data = await readFile(profileConfigPath(), 'utf-8')
-    profileConfig = yaml.parse(data, { merge: true }) || { items: [] }
+    profileConfig = parseYaml(data) || { items: [] }
   }
   if (typeof profileConfig !== 'object') profileConfig = { items: [] }
   return profileConfig
@@ -25,7 +25,7 @@ export async function getProfileConfig(force = false): Promise<ProfileConfig> {
 
 export async function setProfileConfig(config: ProfileConfig): Promise<void> {
   profileConfig = config
-  await writeFile(profileConfigPath(), yaml.stringify(config), 'utf-8')
+  await writeFile(profileConfigPath(), stringifyYaml(config), 'utf-8')
 }
 
 export async function getProfileItem(id: string | undefined): Promise<ProfileItem | undefined> {
@@ -186,7 +186,7 @@ export async function getProfileStr(id: string | undefined): Promise<string> {
   if (existsSync(profilePath(id || 'default'))) {
     return await readFile(profilePath(id || 'default'), 'utf-8')
   } else {
-    return yaml.stringify(defaultProfile)
+    return stringifyYaml(defaultProfile)
   }
 }
 
@@ -195,10 +195,10 @@ export async function getProfileParseStr(id: string | undefined): Promise<string
   if (existsSync(profilePath(id || 'default'))) {
     data = await readFile(profilePath(id || 'default'), 'utf-8')
   } else {
-    data = yaml.stringify(defaultProfile)
+    data = stringifyYaml(defaultProfile)
   }
-  const profile = deepMerge(yaml.parse(data), {})
-  return yaml.stringify(profile)
+  const profile = deepMerge(parseYaml<object>(data), {})
+  return stringifyYaml(profile)
 }
 
 export async function setProfileStr(id: string, content: string): Promise<void> {
@@ -209,8 +209,8 @@ export async function setProfileStr(id: string, content: string): Promise<void> 
 
 export async function getProfile(id: string | undefined): Promise<MihomoConfig> {
   const profile = await getProfileStr(id)
-  let result = yaml.parse(profile, { merge: true }) || {}
-  if (typeof result !== 'object') result = {}
+  let result = parseYaml<MihomoConfig>(profile)
+  if (typeof result !== 'object') result = {} as MihomoConfig
   return result
 }
 

@@ -1,6 +1,6 @@
 import { controledMihomoConfigPath } from '../utils/dirs'
 import { readFile, writeFile } from 'fs/promises'
-import yaml from 'yaml'
+import { parseYaml, stringifyYaml } from '../utils/yaml'
 import { generateProfile } from '../core/factory'
 import { getAppConfig } from './app'
 import { defaultControledMihomoConfig } from '../utils/template'
@@ -11,7 +11,7 @@ let controledMihomoConfig: Partial<MihomoConfig> // mihomo.yaml
 export async function getControledMihomoConfig(force = false): Promise<Partial<MihomoConfig>> {
   if (force || !controledMihomoConfig) {
     const data = await readFile(controledMihomoConfigPath(), 'utf-8')
-    controledMihomoConfig = yaml.parse(data, { merge: true }) || defaultControledMihomoConfig
+    controledMihomoConfig = parseYaml<Partial<MihomoConfig>>(data) || defaultControledMihomoConfig
   }
   if (typeof controledMihomoConfig !== 'object')
     controledMihomoConfig = defaultControledMihomoConfig
@@ -46,5 +46,5 @@ export async function patchControledMihomoConfig(patch: Partial<MihomoConfig>): 
   }
   controledMihomoConfig = deepMerge(controledMihomoConfig, patch)
   await generateProfile()
-  await writeFile(controledMihomoConfigPath(), yaml.stringify(controledMihomoConfig), 'utf-8')
+  await writeFile(controledMihomoConfigPath(), stringifyYaml(controledMihomoConfig), 'utf-8')
 }

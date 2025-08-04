@@ -21,7 +21,7 @@ import {
   defaultProfile,
   defaultProfileConfig
 } from './template'
-import yaml from 'yaml'
+import { stringifyYaml } from './yaml'
 import { mkdir, writeFile, cp, rm, readdir } from 'fs/promises'
 import { existsSync } from 'fs'
 import path from 'path'
@@ -70,19 +70,19 @@ async function initDirs(): Promise<void> {
 
 async function initConfig(): Promise<void> {
   if (!existsSync(appConfigPath())) {
-    await writeFile(appConfigPath(), yaml.stringify(defaultConfig))
+    await writeFile(appConfigPath(), stringifyYaml(defaultConfig))
   }
   if (!existsSync(profileConfigPath())) {
-    await writeFile(profileConfigPath(), yaml.stringify(defaultProfileConfig))
+    await writeFile(profileConfigPath(), stringifyYaml(defaultProfileConfig))
   }
   if (!existsSync(overrideConfigPath())) {
-    await writeFile(overrideConfigPath(), yaml.stringify(defaultOverrideConfig))
+    await writeFile(overrideConfigPath(), stringifyYaml(defaultOverrideConfig))
   }
   if (!existsSync(profilePath('default'))) {
-    await writeFile(profilePath('default'), yaml.stringify(defaultProfile))
+    await writeFile(profilePath('default'), stringifyYaml(defaultProfile))
   }
   if (!existsSync(controledMihomoConfigPath())) {
-    await writeFile(controledMihomoConfigPath(), yaml.stringify(defaultControledMihomoConfig))
+    await writeFile(controledMihomoConfigPath(), stringifyYaml(defaultControledMihomoConfig))
   }
 }
 

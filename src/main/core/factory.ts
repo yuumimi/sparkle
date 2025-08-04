@@ -15,7 +15,7 @@ import {
   mihomoWorkDir,
   overridePath
 } from '../utils/dirs'
-import yaml from 'yaml'
+import { parseYaml, stringifyYaml } from '../utils/yaml'
 import { copyFile, mkdir, writeFile } from 'fs/promises'
 import { deepMerge } from '../utils/merge'
 import vm from 'vm'
@@ -33,9 +33,9 @@ export async function generateProfile(): Promise<void> {
   const { diffWorkDir = false } = await getAppConfig()
   const currentProfileConfig = await getProfile(current)
   rawProfileStr = await getProfileStr(current)
-  currentProfileStr = yaml.stringify(currentProfileConfig)
+  currentProfileStr = stringifyYaml(currentProfileConfig)
   const currentProfile = await overrideProfile(current, currentProfileConfig)
-  overrideProfileStr = yaml.stringify(currentProfile)
+  overrideProfileStr = stringifyYaml(currentProfile)
   const controledMihomoConfig = await getControledMihomoConfig()
   const profile = deepMerge(
     JSON.parse(JSON.stringify(currentProfile)),
@@ -223,7 +223,7 @@ export async function generateProfile(): Promise<void> {
   }
 
   runtimeConfig = profile
-  runtimeConfigStr = yaml.stringify(profile)
+  runtimeConfigStr = stringifyYaml(profile)
   if (diffWorkDir) {
     await prepareProfileWorkDir(current)
   }
@@ -268,7 +268,7 @@ async function overrideProfile(
         profile = await runOverrideScript(profile, content, item)
         break
       case 'yaml': {
-        let patch = yaml.parse(content, { merge: true }) || {}
+        let patch = parseYaml<Partial<MihomoConfig>>(content)
         if (typeof patch !== 'object') patch = {}
         profile = deepMerge(profile, patch, true)
         break
@@ -301,7 +301,7 @@ async function runOverrideScript(
         debug: (...args: unknown[]) => log('debug', args.map(format).join(' '))
       }),
       fetch,
-      yaml,
+      yaml: { parse: parseYaml, stringify: stringifyYaml },
       b64d,
       b64e,
       Buffer

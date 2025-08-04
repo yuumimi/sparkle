@@ -3,14 +3,14 @@ import { getControledMihomoConfig } from './controledMihomo'
 import { readFile, writeFile, rm } from 'fs/promises'
 import { existsSync } from 'fs'
 import axios from 'axios'
-import yaml from 'yaml'
+import { parseYaml, stringifyYaml } from '../utils/yaml'
 
 let overrideConfig: OverrideConfig // override.yaml
 
 export async function getOverrideConfig(force = false): Promise<OverrideConfig> {
   if (force || !overrideConfig) {
     const data = await readFile(overrideConfigPath(), 'utf-8')
-    overrideConfig = yaml.parse(data, { merge: true }) || { items: [] }
+    overrideConfig = parseYaml<OverrideConfig>(data) || { items: [] }
   }
   if (typeof overrideConfig !== 'object') overrideConfig = { items: [] }
   return overrideConfig
@@ -18,7 +18,7 @@ export async function getOverrideConfig(force = false): Promise<OverrideConfig> 
 
 export async function setOverrideConfig(config: OverrideConfig): Promise<void> {
   overrideConfig = config
-  await writeFile(overrideConfigPath(), yaml.stringify(overrideConfig), 'utf-8')
+  await writeFile(overrideConfigPath(), stringifyYaml(overrideConfig), 'utf-8')
 }
 
 export async function getOverrideItem(id: string | undefined): Promise<OverrideItem | undefined> {
