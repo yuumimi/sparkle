@@ -434,6 +434,10 @@ export async function createHeapSnapshot(): Promise<void> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('createHeapSnapshot'))
 }
 
+export async function getUserAgent(): Promise<string> {
+  return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getUserAgent'))
+}
+
 export async function getAppName(appPath: string): Promise<string> {
   return ipcErrorWrapper(await window.electron.ipcRenderer.invoke('getAppName', appPath))
 }

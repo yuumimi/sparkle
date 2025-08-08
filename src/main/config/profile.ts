@@ -11,6 +11,7 @@ import { defaultProfile } from '../utils/template'
 import { subStorePort } from '../resolve/server'
 import { dirname, join } from 'path'
 import { deepMerge } from '../utils/merge'
+import { getUserAgent } from '../utils/userAgent'
 
 let profileConfig: ProfileConfig // profile.yaml
 
@@ -120,7 +121,6 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
   } as ProfileItem
   switch (newItem.type) {
     case 'remote': {
-      const { userAgent } = await getAppConfig()
       const { 'mixed-port': mixedPort = 7890 } = await getControledMihomoConfig()
       if (!item.url) throw new Error('Empty URL')
       let res: AxiosResponse
@@ -135,7 +135,7 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
         }
         res = await axios.get(urlObj.toString(), {
           headers: {
-            'User-Agent': userAgent || 'clash.meta/alpha-de19f92'
+            'User-Agent': await getUserAgent()
           },
           responseType: 'text'
         })
@@ -150,7 +150,7 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
                 }
               : false,
           headers: {
-            'User-Agent': userAgent || 'clash.meta/alpha-de19f92'
+            'User-Agent': await getUserAgent()
           },
           responseType: 'text'
         })

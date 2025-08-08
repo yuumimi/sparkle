@@ -4,7 +4,12 @@ import SettingItem from '../base/base-setting-item'
 import { Button, Input, Select, SelectItem, Switch, Tooltip } from '@heroui/react'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import debounce from '@renderer/utils/debounce'
-import { getGistUrl, patchControledMihomoConfig, restartCore } from '@renderer/utils/ipc'
+import {
+  getGistUrl,
+  getUserAgent,
+  patchControledMihomoConfig,
+  restartCore
+} from '@renderer/utils/ipc'
 import { MdDeleteForever } from 'react-icons/md'
 import { BiCopy } from 'react-icons/bi'
 import { IoIosHelpCircle } from 'react-icons/io'
@@ -35,6 +40,14 @@ const MihomoConfig: React.FC = () => {
   const setUaDebounce = debounce((v: string) => {
     patchAppConfig({ userAgent: v })
   }, 500)
+
+  const [defaultUserAgent, setDefaultUserAgent] = useState<string>('')
+  if (!defaultUserAgent) {
+    getUserAgent().then((ua) => {
+      setDefaultUserAgent(ua)
+    })
+  }
+
   return (
     <SettingCard title="订阅与代理组设置">
       <SettingItem title="订阅拉取 UA" divider>
@@ -42,7 +55,7 @@ const MihomoConfig: React.FC = () => {
           size="sm"
           className="w-[60%]"
           value={ua}
-          placeholder="默认 clash.meta/alpha-de19f92"
+          placeholder={`默认 ${defaultUserAgent}`}
           onValueChange={(v) => {
             setUa(v)
             setUaDebounce(v)

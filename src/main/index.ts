@@ -30,6 +30,7 @@ import { startMonitor } from './resolve/trafficMonitor'
 import { showFloatingWindow } from './resolve/floatingWindow'
 import iconv from 'iconv-lite'
 import { getAppConfigSync } from './config/app'
+import { getUserAgent } from './utils/userAgent'
 
 let quitTimeout: NodeJS.Timeout | null = null
 export let mainWindow: BrowserWindow | null = null
@@ -306,11 +307,10 @@ async function showProfileInstallConfirm(url: string, name?: string | null): Pro
 
   if (!extractedName) {
     try {
-      const { userAgent } = await getAppConfig()
       const axios = (await import('axios')).default
       const response = await axios.head(url, {
         headers: {
-          'User-Agent': userAgent || 'clash.meta/alpha-de19f92'
+          'User-Agent': await getUserAgent()
         },
         timeout: 5000
       })
