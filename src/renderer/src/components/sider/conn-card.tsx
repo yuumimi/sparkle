@@ -2,37 +2,33 @@ import { Button, Card, CardBody, CardFooter, Tooltip } from '@heroui/react'
 import { FaCircleArrowDown, FaCircleArrowUp } from 'react-icons/fa6'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { calcTraffic } from '@renderer/utils/calc'
-import { mihomoConfig } from '@renderer/utils/ipc'
-import React, { useEffect, useState, useMemo, useCallback } from 'react'
+import React, { useEffect, useState, useCallback, useRef } from 'react'
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { IoLink } from 'react-icons/io5'
-import { useTheme } from 'next-themes'
 import { useAppConfig } from '@renderer/hooks/use-app-config'
 import { platform } from '@renderer/utils/init'
-import { Area, AreaChart, ResponsiveContainer } from 'recharts'
+import TrafficChart from './traffic-chart'
 
 let currentUpload: number | undefined = undefined
 let currentDownload: number | undefined = undefined
 let hasShowTraffic = false
 let drawing = false
-let updateTimeoutId: NodeJS.Timeout | null = null
 
 interface Props {
   iconOnly?: boolean
 }
+
 const ConnCard: React.FC<Props> = (props) => {
-  const { theme = 'system', systemTheme = 'dark' } = useTheme()
   const { iconOnly } = props
   const { appConfig } = useAppConfig()
-  const { showTraffic = false, connectionCardStatus = 'col-span-2', customTheme } = appConfig || {}
+  const { showTraffic = false, connectionCardStatus = 'col-span-2' } = appConfig || {}
   const location = useLocation()
   const navigate = useNavigate()
   const match = location.pathname.includes('/connections')
 
   const [upload, setUpload] = useState(0)
   const [download, setDownload] = useState(0)
-  const [interfaceName, setInterfaceName] = useState('')
   const {
     attributes,
     listeners,
@@ -43,63 +39,32 @@ const ConnCard: React.FC<Props> = (props) => {
   } = useSortable({
     id: 'connection'
   })
-  const [series, setSeries] = useState(Array(10).fill(0))
-  const [chartColor, setChartColor] = useState('rgba(255,255,255,0.5)')
-
-  useEffect(() => {
-    const updateChartColor = () => {
-      try {
-        const color = match
-          ? `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--heroui-primary-foreground')})`
-          : `hsla(${getComputedStyle(document.documentElement).getPropertyValue('--heroui-foreground')})`
-        setChartColor(color)
-      } catch (error) {
-        setChartColor('rgba(255,255,255,0.5)')
-      }
-    }
-
-    const timeoutId = setTimeout(updateChartColor, 100)
-    return () => clearTimeout(timeoutId)
-  }, [theme, systemTheme, match, customTheme])
-
-  const chartData = useMemo(() => {
-    if (!Array.isArray(series) || series.length === 0) {
-      return Array(10)
-        .fill(0)
-        .map((v, index) => ({ traffic: v, index }))
-    }
-    return series.map((v, index) => ({ traffic: v || 0, index }))
-  }, [series])
-
-  const gradientId = useMemo(() => `gradient-conn-${Math.random().toString(36).substr(2, 9)}`, [])
-
-  const safeChartColor = useMemo(() => {
-    if (typeof chartColor === 'string' && chartColor.trim()) {
-      return chartColor
-    }
-    return 'rgba(255,255,255,0.5)'
-  }, [chartColor])
+  const [trafficData, setTrafficData] = useState(() =>
+    Array(10)
+      .fill(0)
+      .map((v, i) => ({ traffic: v, index: i }))
+  )
+  const updateTimeoutRef = useRef<NodeJS.Timeout | null>(null)
 
   const transform = tf ? { x: tf.x, y: tf.y, scaleX: 1, scaleY: 1 } : null
 
   const handleTraffic = useCallback(
     async (_e: unknown, info: ControllerTraffic) => {
-      setUpload(info.up)
-      setDownload(info.down)
-      mihomoConfig().then((config) => setInterfaceName(config['interface-name']))
+      setUpload((prev) => (prev !== info.up ? info.up : prev))
+      setDownload((prev) => (prev !== info.down ? info.down : prev))
 
-      if (updateTimeoutId) {
-        clearTimeout(updateTimeoutId)
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current)
       }
 
-      updateTimeoutId = setTimeout(() => {
-        setSeries((prevSeries) => {
-          const newData = [...prevSeries]
+      updateTimeoutRef.current = setTimeout(() => {
+        setTrafficData((prev) => {
+          const newData = [...prev]
           newData.shift()
-          newData.push(info.up + info.down)
+          newData.push({ traffic: info.up + info.down, index: Date.now() })
           return newData
         })
-        updateTimeoutId = null
+        updateTimeoutRef.current = null
       }, 100)
 
       if (platform === 'darwin' && showTraffic) {
@@ -127,6 +92,9 @@ const ConnCard: React.FC<Props> = (props) => {
 
     return (): void => {
       window.electron.ipcRenderer.removeAllListeners('mihomoTraffic')
+      if (updateTimeoutRef.current) {
+        clearTimeout(updateTimeoutRef.current)
+      }
     }
   }, [handleTraffic])
 
@@ -201,34 +169,9 @@ const ConnCard: React.FC<Props> = (props) => {
                 className={`flex justify-between items-center w-full text-md font-bold ${match ? 'text-primary-foreground' : 'text-foreground'}`}
               >
                 <h3>连接</h3>
-                <h3 className="truncate max-w-[65%]">{interfaceName}</h3>
               </div>
             </CardFooter>
-            <ResponsiveContainer
-              height="100%"
-              width="100%"
-              className="absolute top-0 left-0 pointer-events-none rounded-[14px]"
-            >
-              <AreaChart
-                data={chartData}
-                margin={{ top: 50, right: 0, left: 0, bottom: 0 }}
-                syncId="traffic"
-              >
-                <defs>
-                  <linearGradient id={gradientId} x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="0%" stopColor={safeChartColor} stopOpacity={0.8} />
-                    <stop offset="100%" stopColor={safeChartColor} stopOpacity={0} />
-                  </linearGradient>
-                </defs>
-                <Area
-                  isAnimationActive={false}
-                  type="monotone"
-                  dataKey="traffic"
-                  stroke="none"
-                  fill={`url(#${gradientId})`}
-                />
-              </AreaChart>
-            </ResponsiveContainer>
+            <TrafficChart data={trafficData} isActive={match} />
           </Card>
         </>
       ) : (
@@ -267,7 +210,9 @@ const ConnCard: React.FC<Props> = (props) => {
   )
 }
 
-export default React.memo(ConnCard)
+export default React.memo(ConnCard, (prevProps, nextProps) => {
+  return prevProps.iconOnly === nextProps.iconOnly
+})
 
 const drawSvg = async (upload: number, download: number): Promise<void> => {
   if (upload === currentUpload && download === currentDownload) return
