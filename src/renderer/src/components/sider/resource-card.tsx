@@ -13,7 +13,7 @@ interface Props {
 const ResourceCard: React.FC<Props> = (props) => {
   const { appConfig } = useAppConfig()
   const { iconOnly } = props
-  const { resourceCardStatus = 'col-span-1' } = appConfig || {}
+  const { resourceCardStatus = 'col-span-1', disableAnimation = false } = appConfig || {}
   const location = useLocation()
   const navigate = useNavigate()
   const match = location.pathname.includes('/resources')
@@ -63,7 +63,7 @@ const ResourceCard: React.FC<Props> = (props) => {
         ref={setNodeRef}
         {...attributes}
         {...listeners}
-        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
+        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
       >
         <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
           <div className="flex justify-between">

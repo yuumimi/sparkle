@@ -15,7 +15,11 @@ interface Props {
 const SniffCard: React.FC<Props> = (props) => {
   const { appConfig } = useAppConfig()
   const { iconOnly } = props
-  const { sniffCardStatus = 'col-span-1', controlSniff = true } = appConfig || {}
+  const {
+    sniffCardStatus = 'col-span-1',
+    controlSniff = true,
+    disableAnimation = false
+  } = appConfig || {}
   const location = useLocation()
   const navigate = useNavigate()
   const match = location.pathname.includes('/sniffer')
@@ -73,7 +77,7 @@ const SniffCard: React.FC<Props> = (props) => {
         ref={setNodeRef}
         {...attributes}
         {...listeners}
-        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
+        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
       >
         <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
           <div className="flex justify-between">

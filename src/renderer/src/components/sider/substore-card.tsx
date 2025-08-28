@@ -13,7 +13,11 @@ interface Props {
 const SubStoreCard: React.FC<Props> = (props) => {
   const { appConfig } = useAppConfig()
   const { iconOnly } = props
-  const { substoreCardStatus = 'col-span-1', useSubStore = true } = appConfig || {}
+  const {
+    substoreCardStatus = 'col-span-1',
+    useSubStore = true,
+    disableAnimation = false
+  } = appConfig || {}
   const location = useLocation()
   const navigate = useNavigate()
   const match = location.pathname.includes('/substore')
@@ -64,7 +68,7 @@ const SubStoreCard: React.FC<Props> = (props) => {
         {...attributes}
         {...listeners}
         fullWidth
-        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
+        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
       >
         <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
           <div className="flex justify-between">

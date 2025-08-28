@@ -19,7 +19,7 @@ const TunSwitcher: React.FC<Props> = (props) => {
   const navigate = useNavigate()
   const match = location.pathname.includes('/tun') || false
   const { appConfig } = useAppConfig()
-  const { tunCardStatus = 'col-span-1' } = appConfig || {}
+  const { tunCardStatus = 'col-span-1', disableAnimation = false } = appConfig || {}
   const { controledMihomoConfig, patchControledMihomoConfig } = useControledMihomoConfig()
   const { tun } = controledMihomoConfig || {}
   const { enable } = tun || {}
@@ -80,7 +80,7 @@ const TunSwitcher: React.FC<Props> = (props) => {
         ref={setNodeRef}
         {...attributes}
         {...listeners}
-        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? 'scale-[0.97] tap-highlight-transparent' : ''}`}
+        className={`${match ? 'bg-primary' : 'hover:bg-primary/30'} ${isDragging ? `${disableAnimation ? '' : 'scale-[0.95]'} tap-highlight-transparent` : ''}`}
       >
         <CardBody className="pb-1 pt-0 px-0 overflow-y-visible">
           <div className="flex justify-between">

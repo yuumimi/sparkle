@@ -216,27 +216,25 @@ const GeneralConfig: React.FC = () => {
             }}
           />
         </SettingItem>
-        {pendingDisableGPU && (
-          <SettingItem
-            title="禁用动画"
-            actions={
-              <Tooltip content="开启后，应用将禁用所有动画效果，可能会提高性能">
-                <Button isIconOnly size="sm" variant="light">
-                  <IoIosHelpCircle className="text-lg" />
-                </Button>
-              </Tooltip>
-            }
-            divider
-          >
-            <Switch
-              size="sm"
-              isSelected={disableAnimation}
-              onValueChange={(v) => {
-                patchAppConfig({ disableAnimation: v })
-              }}
-            />
-          </SettingItem>
-        )}
+        <SettingItem
+          title="禁用动画"
+          actions={
+            <Tooltip content="开启后，应用将禁用绝大部分动画效果，可能会提高性能">
+              <Button isIconOnly size="sm" variant="light">
+                <IoIosHelpCircle className="text-lg" />
+              </Button>
+            </Tooltip>
+          }
+          divider
+        >
+          <Switch
+            size="sm"
+            isSelected={disableAnimation}
+            onValueChange={(v) => {
+              patchAppConfig({ disableAnimation: v })
+            }}
+          />
+        </SettingItem>
         <SettingItem
           title="断网时停止内核"
           actions={
