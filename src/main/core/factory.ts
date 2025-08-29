@@ -74,13 +74,11 @@ async function cleanProfile(profile: MihomoConfig): Promise<void> {
 }
 
 function cleanBooleanConfigs(profile: MihomoConfig): void {
-  const booleanConfigs = [
-    'ipv6',
-    'unified-delay',
-    'tcp-concurrent',
-    'geodata-mode',
-    'geo-auto-update'
-  ]
+  if (profile.ipv6 !== false) {
+    delete (profile as Partial<MihomoConfig>).ipv6
+  }
+
+  const booleanConfigs = ['unified-delay', 'tcp-concurrent', 'geodata-mode', 'geo-auto-update']
 
   booleanConfigs.forEach((key) => {
     if (!profile[key]) delete (profile as Partial<MihomoConfig>)[key]
@@ -169,8 +167,15 @@ function cleanTunConfig(profile: MihomoConfig): void {
   }
 
   const tunConfig = profile.tun as MihomoTunConfig
-  const tunBooleanConfigs = ['auto-route', 'auto-redirect', 'strict-route', 'auto-detect-interface']
 
+  if (tunConfig['auto-route'] !== false) {
+    delete tunConfig['auto-route']
+  }
+  if (tunConfig['auto-detect-interface'] !== false) {
+    delete tunConfig['auto-detect-interface']
+  }
+
+  const tunBooleanConfigs = ['auto-redirect', 'strict-route']
   tunBooleanConfigs.forEach((key) => {
     if (!tunConfig[key]) delete tunConfig[key]
   })
