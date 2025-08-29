@@ -2,11 +2,8 @@ import yaml from 'yaml'
 
 export function parseYaml<T = unknown>(content: string): T {
   const processedContent = content.replace(
-    /^(\s*short-id:\s*)([^"\s\n}{]+)/gm,
-    (match, prefix, value) => {
-      const nullValues = ['null', 'Null', 'NULL', '~']
-      return nullValues.includes(value) ? match : `${prefix}"${value}"`
-    }
+    /(^|\{|,)(\s*short-id:\s*)(?!['"]|null\b|Null\b|NULL\b|~\b)([^"'\s,}\n]+)/gm,
+    '$1$2"$3"'
   )
 
   const result =
