@@ -113,7 +113,8 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     DISABLE_EMBED_CA: String(disableEmbedCA),
     DISABLE_SYSTEM_CA: String(disableSystemCA),
     DISABLE_NFTABLES: String(disableNftables),
-    SAFE_PATHS: safePaths.join(path.delimiter)
+    SAFE_PATHS: safePaths.join(path.delimiter),
+    PATH: process.env.PATH
   }
   let initialized = false
   child = spawn(
