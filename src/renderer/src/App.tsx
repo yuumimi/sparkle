@@ -372,7 +372,7 @@ const App: React.FC = () => {
           className="side h-full overflow-y-auto no-scrollbar"
         >
           <div
-            className={`app-drag sticky top-0 z-40 ${disableAnimation ? 'bg-background/95' : 'backdrop-blur bg-transparent'} h-[49px]`}
+            className={`app-drag sticky top-0 z-40 ${disableAnimation ? 'bg-background/95 backdrop-blur-sm' : 'bg-transparent backdrop-blur'} h-[49px]`}
           >
             <div
               className={`flex justify-between p-2 ${!useWindowFrame && platform === 'darwin' ? 'ml-[60px]' : ''}`}
