@@ -175,7 +175,7 @@ function cleanTunConfig(profile: MihomoConfig): void {
     delete tunConfig['auto-detect-interface']
   }
 
-  const tunBooleanConfigs = ['auto-redirect', 'strict-route']
+  const tunBooleanConfigs = ['auto-redirect', 'strict-route', 'disable-icmp-forwarding']
   tunBooleanConfigs.forEach((key) => {
     if (!tunConfig[key]) delete tunConfig[key]
   })

@@ -62,6 +62,7 @@ interface MihomoTunConfig {
   device?: string
   mtu?: number
   'strict-route'?: boolean
+  'disable-icmp-forwarding'?: boolean
   gso?: boolean
   'gso-max-size'?: number
   'udp-timeout'?: number

@@ -24,6 +24,7 @@ const Tun: React.FC = () => {
     'dns-hijack': dnsHijack = ['any:53'],
     'route-exclude-address': routeExcludeAddress = [],
     'strict-route': strictRoute = false,
+    'disable-icmp-forwarding': disableIcmpForwarding = false,
     mtu = 1500
   } = tun || {}
   const [changed, setChanged] = useState(false)
@@ -36,6 +37,7 @@ const Tun: React.FC = () => {
     dnsHijack,
     strictRoute,
     routeExcludeAddress,
+    disableIcmpForwarding,
     mtu
   })
   const setValues = (v: typeof values): void => {
@@ -70,6 +72,7 @@ const Tun: React.FC = () => {
                     'dns-hijack': values.dnsHijack,
                     'strict-route': values.strictRoute,
                     'route-exclude-address': values.routeExcludeAddress,
+                    'disable-icmp-forwarding': values.disableIcmpForwarding,
                     mtu: values.mtu
                   }
                 })
@@ -176,6 +179,15 @@ const Tun: React.FC = () => {
               isSelected={values.autoDetectInterface}
               onValueChange={(v) => {
                 setValues({ ...values, autoDetectInterface: v })
+              }}
+            />
+          </SettingItem>
+          <SettingItem title="ICMP 转发" divider>
+            <Switch
+              size="sm"
+              isSelected={!values.disableIcmpForwarding}
+              onValueChange={(v) => {
+                setValues({ ...values, disableIcmpForwarding: !v })
               }}
             />
           </SettingItem>
