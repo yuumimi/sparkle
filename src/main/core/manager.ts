@@ -74,16 +74,6 @@ export async function startCore(detached = false): Promise<Promise<void>[]> {
     safePaths = []
   } = await getAppConfig()
   const { 'log-level': logLevel } = await getControledMihomoConfig()
-  if (existsSync(path.join(dataDir(), 'core.pid'))) {
-    const pid = parseInt(await readFile(path.join(dataDir(), 'core.pid'), 'utf-8'))
-    try {
-      process.kill(pid, 'SIGINT')
-    } catch {
-      // ignore
-    } finally {
-      await rm(path.join(dataDir(), 'core.pid'))
-    }
-  }
   const { current } = await getProfileConfig()
   const { tun } = await getControledMihomoConfig()
   const corePath = mihomoCorePath(core)
@@ -228,18 +218,112 @@ export async function stopCore(force = false): Promise<void> {
     })
   }
 
-  if (child) {
-    child.removeAllListeners()
-    child.kill('SIGINT')
-  }
   stopMihomoTraffic()
   stopMihomoConnections()
   stopMihomoLogs()
   stopMihomoMemory()
+
+  if (child && !child.killed) {
+    await stopChildProcess(child)
+    child = undefined as unknown as ChildProcess
+  }
+
+  if (existsSync(path.join(dataDir(), 'core.pid'))) {
+    const pidString = await readFile(path.join(dataDir(), 'core.pid'), 'utf-8')
+    const pid = parseInt(pidString.trim())
+    if (!isNaN(pid)) {
+      try {
+        process.kill(pid, 0)
+        process.kill(pid, 'SIGINT')
+        await new Promise((resolve) => setTimeout(resolve, 1000))
+        try {
+          process.kill(pid, 0)
+          process.kill(pid, 'SIGKILL')
+        } catch {
+          // ignore
+        }
+      } catch {
+        // ignore
+      }
+    }
+    await rm(path.join(dataDir(), 'core.pid')).catch(() => {})
+  }
+}
+
+async function stopChildProcess(process: ChildProcess): Promise<void> {
+  return new Promise<void>((resolve) => {
+    if (!process || process.killed) {
+      resolve()
+      return
+    }
+
+    const pid = process.pid
+    if (!pid) {
+      resolve()
+      return
+    }
+
+    process.removeAllListeners()
+
+    let isResolved = false
+    const timers: NodeJS.Timeout[] = []
+
+    const resolveOnce = async (): Promise<void> => {
+      if (!isResolved) {
+        isResolved = true
+
+        timers.forEach((timer) => clearTimeout(timer))
+        resolve()
+      }
+    }
+
+    process.once('close', resolveOnce)
+    process.once('exit', resolveOnce)
+
+    try {
+      process.kill('SIGINT')
+
+      const timer1 = setTimeout(async () => {
+        if (!process.killed && !isResolved) {
+          try {
+            if (pid) {
+              globalThis.process.kill(pid, 0)
+              process.kill('SIGTERM')
+            }
+          } catch {
+            await resolveOnce()
+          }
+        }
+      }, 3000)
+      timers.push(timer1)
+
+      const timer2 = setTimeout(async () => {
+        if (!process.killed && !isResolved) {
+          try {
+            if (pid) {
+              globalThis.process.kill(pid, 0)
+              process.kill('SIGKILL')
+              await writeFile(logPath(), `[Manager]: Force killed process ${pid} with SIGKILL\n`, {
+                flag: 'a'
+              })
+            }
+          } catch {
+            // ignore
+          }
+          await resolveOnce()
+        }
+      }, 6000)
+      timers.push(timer2)
+    } catch (error) {
+      resolveOnce()
+      return
+    }
+  })
 }
 
 export async function restartCore(): Promise<void> {
   try {
+    await stopCore()
     await startCore()
   } catch (e) {
     dialog.showErrorBox('内核启动出错', `${e}`)
@@ -399,7 +483,7 @@ export async function startNetworkDetection(): Promise<void> {
     [device, 'lo', 'docker0', 'utun'].filter((item): item is string => item !== undefined)
   )
 
-  networkDetectionTimer = setInterval(() => {
+  networkDetectionTimer = setInterval(async () => {
     if (isAnyNetworkInterfaceUp(extendedBypass) && net.isOnline()) {
       if (networkDownHandled && child && child.killed) {
         startCore()
@@ -409,7 +493,7 @@ export async function startNetworkDetection(): Promise<void> {
     } else {
       if (!networkDownHandled) {
         disableSysProxy(false)
-        stopCore()
+        await stopCore()
         networkDownHandled = true
       }
     }
