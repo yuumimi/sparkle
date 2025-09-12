@@ -309,9 +309,11 @@ const ConnectionDetailModal: React.FC<Props> = (props) => {
             />
           )}
           {connection.metadata.remoteDestination && (
-            <SettingItem title="远程目标">
-              <div className="truncate">{connection.metadata.remoteDestination}</div>
-            </SettingItem>
+            <CopyableSettingItem
+              title="远程目标"
+              value={connection.metadata.remoteDestination}
+              prefix={['IP-CIDR']}
+            />
           )}
           {connection.metadata.dnsMode && (
             <SettingItem title="DNS模式">
