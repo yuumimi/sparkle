@@ -140,7 +140,13 @@ jobs:
           if [[ "${{ matrix.os }}" == "windows-latest" ]]; then
             pnpm build:win ${{ matrix.format }} --${{ matrix.arch }}
           elif [[ "${{ matrix.os }}" == "ubuntu-latest" ]]; then
-            pnpm build:linux ${{ matrix.format }} --${{ matrix.arch }}
+            if [[ "${{ matrix.arch }}" == "loong64" ]]; then
+              export ELECTRON_MIRROR="https://github.com/darkyzhou/electron-loong64/releases/download/"
+              export electron_use_remote_checksums=1
+              pnpm build:linux ${{ matrix.format }} --${{ matrix.arch }}
+            else
+              pnpm build:linux ${{ matrix.format }} --${{ matrix.arch }}
+            fi
           else
             pnpm build:mac --${{ matrix.arch }}
           fi
