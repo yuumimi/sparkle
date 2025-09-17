@@ -120,7 +120,7 @@ jobs:
           export electron_use_remote_checksums=1
           SKIP_PREPARE=1 pnpm install electron@37.2.5 -D
           pnpm remove electron-builder
-          SKIP_PREPARE=1 pnpm install @sparkle-loong64/electron-builder@26.0.12 -D
+          SKIP_PREPARE=1 pnpm install @alanlin-powered/electron-builder@26.0.12 -D
 
       - name: Install Dependencies and Prepare
         env:
