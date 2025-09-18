@@ -485,7 +485,7 @@ export async function startNetworkDetection(): Promise<void> {
 
   networkDetectionTimer = setInterval(async () => {
     if (isAnyNetworkInterfaceUp(extendedBypass) && net.isOnline()) {
-      if (networkDownHandled && child && child.killed) {
+      if ((networkDownHandled && !child) || (child && child.killed)) {
         startCore()
         triggerSysProxy(true, onlyActiveDevice)
         networkDownHandled = false
