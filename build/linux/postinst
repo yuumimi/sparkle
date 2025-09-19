@@ -17,6 +17,10 @@ chmod +x /opt/sparkle/resources/files/sysproxy
 chmod +sx /opt/sparkle/resources/sidecar/mihomo
 chmod +sx /opt/sparkle/resources/sidecar/mihomo-alpha
 
+if [ -d '/opt/sparkle/resources/files/sub-store-frontend' ]; then
+    chmod -R go-w '/opt/sparkle/resources/files/sub-store-frontend' 2>/dev/null || true
+fi
+
 if hash update-mime-database 2>/dev/null; then
     update-mime-database /usr/share/mime || true
 fi

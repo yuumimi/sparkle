@@ -352,6 +352,28 @@ const resolveSubstoreFrontend = async () => {
   zip.extractAllTo(resDir, true)
   fs.renameSync(path.join(resDir, 'dist'), targetPath)
 
+  if (platform !== 'win32') {
+    try {
+      const fixPermissions = (dir) => {
+        const items = fs.readdirSync(dir, { withFileTypes: true })
+        for (const item of items) {
+          const fullPath = path.join(dir, item.name)
+          if (item.isDirectory()) {
+            fs.chmodSync(fullPath, 0o755)
+            fixPermissions(fullPath)
+          } else {
+            fs.chmodSync(fullPath, 0o644)
+          }
+        }
+      }
+      fs.chmodSync(targetPath, 0o755)
+      fixPermissions(targetPath)
+      console.log(`[INFO]: sub-store-frontend permissions fixed`)
+    } catch (error) {
+      console.warn(`[WARN]: Failed to fix permissions: ${error.message}`)
+    }
+  }
+
   console.log(`[INFO]: sub-store-frontend finished`)
 }
 const resolveFont = async () => {
