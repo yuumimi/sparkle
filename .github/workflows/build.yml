@@ -171,6 +171,15 @@ jobs:
           sed -i 's/^Architecture: .*/Architecture: loongarch64/' workdir/DEBIAN/control
           dpkg-deb -b workdir dist/sparkle-linux-${VERSION}-loongarch64.deb
           rm -rf workdir
+
+      ## Waiting for loogdotjs@electron-builder fix it
+      - name: Make sure rpm show correct loongarch64 architecture name 
+        if: matrix.os == 'ubuntu-latest' && matrix.format == 'rpm' && matrix.arch == 'loong64'
+        shell: bash
+        run: |
+          set -e
+          VERSION=$(jq -r '.version' package.json)
+          mv dist/sparkle-linux-${VERSION}-loong64.rpm dist/sparkle-linux-${VERSION}-loongarch64.rpm
           
       - name: Create Changelog
         env:
