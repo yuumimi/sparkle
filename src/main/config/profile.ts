@@ -166,7 +166,7 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
       }
       if (headers['profile-update-interval']) {
         newItem.interval = parseInt(headers['profile-update-interval']) * 60
-        if (newItem.interval !== 0) {
+        if (newItem.interval) {
           newItem.locked = true
         }
       }
