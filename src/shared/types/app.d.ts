@@ -125,6 +125,7 @@ interface ProfileItem {
   useProxy?: boolean
   extra?: SubscriptionUserInfo
   substore?: boolean
+  locked?: boolean
 }
 
 interface SubscriptionUserInfo {

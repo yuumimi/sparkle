@@ -108,6 +108,7 @@ const EditInfoModal: React.FC<Props> = (props) => {
                   onValueChange={(v) => {
                     setValues({ ...values, interval: parseInt(v) })
                   }}
+                  disabled={values.locked}
                 />
               </SettingItem>
             </>

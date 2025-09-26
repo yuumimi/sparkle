@@ -166,6 +166,9 @@ export async function createProfile(item: Partial<ProfileItem>): Promise<Profile
       }
       if (headers['profile-update-interval']) {
         newItem.interval = parseInt(headers['profile-update-interval']) * 60
+        if (newItem.interval !== 0) {
+          newItem.locked = true
+        }
       }
       if (headers['subscription-userinfo']) {
         newItem.extra = parseSubinfo(headers['subscription-userinfo'])
