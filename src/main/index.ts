@@ -460,6 +460,10 @@ export async function createWindow(): Promise<void> {
     if (mainWindow) mainWindowState.saveState(mainWindow)
   })
 
+  mainWindow.on('unmaximize', () => {
+    if (mainWindow) mainWindowState.saveState(mainWindow)
+  })
+
   mainWindow.on('move', () => {
     if (mainWindow) mainWindowState.saveState(mainWindow)
   })
