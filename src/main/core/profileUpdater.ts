@@ -105,7 +105,6 @@ export async function addProfileUpdater(item: ProfileItem): Promise<void> {
       },
       delay === 0 ? item.interval * 60 * 1000 : delay
     )
-    console.log(`Profile ${item.name} updater set with interval ${item.interval} minutes.`)
   }
 }
 

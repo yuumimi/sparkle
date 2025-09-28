@@ -41,7 +41,7 @@ const TrafficChart: React.FC<TrafficChartProps> = (props) => {
         }
       }
     } catch (error) {
-      console.warn('Chart color calculation failed:', error)
+      // ignore
     }
 
     return isActive ? 'rgba(255,255,255,0.6)' : 'rgba(156,163,175,0.6)'

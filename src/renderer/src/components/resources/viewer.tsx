@@ -59,7 +59,6 @@ const Viewer: React.FC<Props> = (props) => {
         setCurrData(fileContent)
       }
     } catch (error) {
-      console.error('YAML parsing error:', error)
       setCurrData(fileContent)
     }
   }

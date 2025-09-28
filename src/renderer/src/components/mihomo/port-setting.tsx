@@ -249,7 +249,6 @@ const PortSetting: React.FC = () => {
                   color="primary"
                   onPress={() => {
                     onChangeNeedRestart({ 'lan-allowed-ips': lanAllowedIpsInput })
-                    console.log(lanAllowedIps, lanAllowedIpsInput)
                   }}
                 >
                   确认
