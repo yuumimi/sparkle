@@ -16,7 +16,7 @@ import { GroupedVirtuoso, GroupedVirtuosoHandle } from 'react-virtuoso'
 import ProxyItem from '@renderer/components/proxies/proxy-item'
 import { IoIosArrowBack } from 'react-icons/io'
 import { MdDoubleArrow, MdOutlineSpeed } from 'react-icons/md'
-import { useGroups } from '@renderer/hooks/use-groups'
+import { useVisibleGroups } from '@renderer/hooks/use-groups'
 import CollapseInput from '@renderer/components/base/collapse-input'
 import { includesIgnoreCase } from '@renderer/utils/includes'
 import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-config'
@@ -24,7 +24,7 @@ import { useControledMihomoConfig } from '@renderer/hooks/use-controled-mihomo-c
 const Proxies: React.FC = () => {
   const { controledMihomoConfig } = useControledMihomoConfig()
   const { mode = 'rule' } = controledMihomoConfig || {}
-  const { groups = [], mutate } = useGroups()
+  const { groups: groupsData, mutate } = useVisibleGroups(mode)
   const { appConfig, patchAppConfig } = useAppConfig()
   const {
     proxyDisplayMode = 'simple',
@@ -33,6 +33,7 @@ const Proxies: React.FC = () => {
     proxyCols = 'auto',
     delayTestConcurrency = 50
   } = appConfig || {}
+  const groups = groupsData ?? []
   const [cols, setCols] = useState(1)
   const [isOpen, setIsOpen] = useState(Array(groups.length).fill(false))
   const [delaying, setDelaying] = useState(Array(groups.length).fill(false))
