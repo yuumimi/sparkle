@@ -111,10 +111,7 @@ const App: React.FC = () => {
 
   useEffect(() => {
     const tourShown = window.localStorage.getItem('tourShown')
-    if (!tourShown) {
       window.localStorage.setItem('tourShown', 'true')
-      firstDriver.drive()
-    }
   }, [])
 
   useEffect(() => {
