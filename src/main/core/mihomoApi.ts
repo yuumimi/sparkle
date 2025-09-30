@@ -166,7 +166,7 @@ export const mihomoProxyDelay = async (
   const instance = await getAxios()
   return await instance.get(`/proxies/${encodeURIComponent(proxy)}/delay`, {
     params: {
-      url: url || delayTestUrl || 'https://www.gstatic.com/generate_204',
+      url: url || delayTestUrl || 'http://www.gstatic.com/generate_204',
       timeout: delayTestTimeout || 5000
     }
   })
@@ -181,7 +181,7 @@ export const mihomoGroupDelay = async (
   const instance = await getAxios()
   return await instance.get(`/group/${encodeURIComponent(group)}/delay`, {
     params: {
-      url: url || delayTestUrl || 'https://www.gstatic.com/generate_204',
+      url: url || delayTestUrl || 'http://www.gstatic.com/generate_204',
       timeout: delayTestTimeout || 5000
     }
   })
