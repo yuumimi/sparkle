@@ -1,4 +1,4 @@
-import React, { createContext, useContext, ReactNode } from 'react'
+import React, { createContext, useContext, ReactNode, useMemo } from 'react'
 import useSWR from 'swr'
 import { mihomoGroups } from '@renderer/utils/ipc'
 
@@ -33,4 +33,18 @@ export const useGroups = (): GroupsContextType => {
     throw new Error('useGroups must be used within an GroupsProvider')
   }
   return context
+}
+export const useVisibleGroups = (mode: OutboundMode = 'rule'): GroupsContextType => {
+  const { groups, mutate } = useGroups()
+  const visibleGroups = useMemo(() => {
+    if (!groups) return undefined
+    if (mode === 'global') {
+      return groups.filter((group) => group.name === 'GLOBAL')
+    }
+    if (mode === 'rule') {
+      return groups.filter((group) => group.name !== 'GLOBAL')
+    }
+    return groups
+  }, [groups, mode])
+  return { groups: visibleGroups, mutate }
 }
