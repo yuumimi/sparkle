@@ -67,7 +67,7 @@ const MihomoConfig: React.FC = () => {
           size="sm"
           className="w-[60%]"
           value={url}
-          placeholder="默认 https://www.gstatic.com/generate_204"
+          placeholder="http://www.gstatic.com/generate_204"
           onValueChange={(v) => {
             setUrl(v)
             setUrlDebounce(v)
