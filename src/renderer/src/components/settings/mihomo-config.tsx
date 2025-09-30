@@ -55,7 +55,7 @@ const MihomoConfig: React.FC = () => {
           size="sm"
           className="w-[60%]"
           value={ua}
-          placeholder={`默认 ${defaultUserAgent}`}
+          placeholder={`${defaultUserAgent}`}
           onValueChange={(v) => {
             setUa(v)
             setUaDebounce(v)
@@ -80,7 +80,7 @@ const MihomoConfig: React.FC = () => {
           size="sm"
           className="w-[60%]"
           value={delayTestConcurrency?.toString()}
-          placeholder="默认 50"
+          placeholder="50"
           onValueChange={(v) => {
             patchAppConfig({ delayTestConcurrency: parseInt(v) })
           }}
@@ -92,7 +92,7 @@ const MihomoConfig: React.FC = () => {
           size="sm"
           className="w-[60%]"
           value={delayTestTimeout?.toString()}
-          placeholder="默认 5000"
+          placeholder="5000"
           onValueChange={(v) => {
             patchAppConfig({ delayTestTimeout: parseInt(v) })
           }}
