@@ -66,7 +66,7 @@ const Sysproxy: React.FC = () => {
 
   const { appConfig, patchAppConfig } = useAppConfig()
   const { sysProxy, onlyActiveDevice = false, autoEnableSysProxy = true } =
-    appConfig || ({ sysProxy: { enable: false }, autoEnableSysProxy = true } as AppConfig)
+    appConfig || ({ sysProxy: { enable: false }, autoEnableSysProxy: true } as AppConfig)
   const [changed, setChanged] = useState(false)
   const [values, originSetValues] = useState({
     enable: sysProxy.enable,
