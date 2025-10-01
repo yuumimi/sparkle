@@ -16,6 +16,7 @@ export const defaultConfig: AppConfig = {
   proxyDisplayOrder: 'default',
   autoCheckUpdate: false,
   autoCloseConnection: true,
+  autoEnableSysProxy: true,
   controlDns: true,
   controlSniff: true,
   showTraffic: true,
